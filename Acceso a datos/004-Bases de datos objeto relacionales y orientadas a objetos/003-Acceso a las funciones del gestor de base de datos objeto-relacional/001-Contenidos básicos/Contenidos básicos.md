@@ -1,0 +1,11 @@
+En esta subunidad del curso, nos adentramos en la exploración de cómo acceder a las funciones del gestor de base de datos objeto-relacional (ODB). El acceso a estas funciones es fundamental para interactuar con los objetos persistidos en una base de datos orientada a objetos. Comenzamos por entender el concepto básico de mapeo objeto-relacional, que permite representar los objetos de la aplicación como entidades y relaciones en una base de datos relacional.
+
+A medida que avanzamos, nos familiarizamos con las características específicas de las herramientas ORM disponibles, aprendiendo cómo instalarlas y configurarlas para nuestro proyecto. La estructura de un fichero de mapeo es crucial, ya que define cómo se relacionan los objetos de la aplicación con las tablas y columnas de la base de datos.
+
+Además, exploramos el uso de anotaciones para simplificar el proceso de mapeo, lo que facilita la gestión del código. Las clases persistentes son el núcleo de nuestra aplicación en este contexto, representando los objetos que deseamos almacenar y recuperar desde la base de datos. La gestión de sesiones es otro aspecto importante, ya que permite controlar el ciclo de vida de los objetos persistidos.
+
+La carga, almacenamiento y modificación de objetos son operaciones fundamentales en cualquier sistema ORM. Aprenderemos cómo realizar estas acciones eficientemente, utilizando métodos específicos proporcionados por la herramienta ORM. Consultas SQL también desempeñan un papel crucial, permitiendo realizar búsquedas complejas sobre los datos almacenados.
+
+Finalmente, el manejo de transacciones es una cuestión crítica en cualquier sistema que interactúe con bases de datos. Aprenderemos cómo gestionar las transacciones para garantizar la integridad y consistencia de los datos. Desarrollaremos programas que utilizan bases de datos a través de herramientas ORM, aplicando todo lo aprendido hasta ahora.
+
+A lo largo de esta subunidad, hemos cubierto desde el concepto básico del mapeo objeto-relacional hasta las operaciones avanzadas en un sistema ORM. Cada paso ha sido diseñado para proporcionar una comprensión profunda y práctica del acceso a las funciones del gestor de base de datos objeto-relacional, preparándonos para aplicar estos conocimientos en proyectos futuros que involucren el uso de bases de datos orientadas a objetos.

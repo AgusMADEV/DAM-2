@@ -1,0 +1,9 @@
+La carpeta `Segundo/Desarrollo de interfaces/002-Generación de interfaces naturales de usuario` se centra en el estudio avanzado de cómo crear interfaces que sean intuitivas y accesibles para los usuarios finales. En este nivel, se aborda la implementación de tecnologías emergentes como aprendizaje automático y realidad aumentada, que permiten una interacción más natural y fluida con las aplicaciones.
+
+El enfoque principal es explorar cómo estas tecnologías pueden ser integradas para crear interfaces que no solo sean funcionales, sino que también sean agradables y eficientes de usar. Se examinan los principios de diseño de interfaces naturales de usuario (NUI), incluyendo la usabilidad y accesibilidad, y se presentan herramientas gráficas y librerías que facilitan el desarrollo de estas interfaces.
+
+El recorrido conceptual típico en esta carpeta comienza con una introducción a los conceptos básicos de NUI, seguido por un análisis detallado de las tecnologías emergentes. A continuación, se profundiza en la implementación práctica de estas tecnologías mediante el uso de herramientas y librerías específicas. Se exploran ejemplos de aplicaciones reales que utilizan NUI para mejorar la experiencia del usuario.
+
+Además, se aborda el diseño de interfaces naturales de usuario desde diferentes perspectivas, como la voz y el movimiento corporal, y cómo estas pueden ser integradas en aplicaciones móviles y de escritorio. También se discute la importancia de la documentación y la distribución de aplicaciones que utilizan NUI.
+
+El objetivo final es proporcionar a los estudiantes una comprensión profunda de cómo crear interfaces naturales de usuario que no solo sean funcionales, sino que también sean agradables y eficientes de usar. A través de este enfoque, se espera que los alumnos desarrollen habilidades prácticas para diseñar e implementar interfaces naturales de usuario utilizando las últimas tecnologías disponibles.

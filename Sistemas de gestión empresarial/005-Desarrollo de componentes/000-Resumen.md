@@ -1,0 +1,13 @@
+La carpeta `Segundo/Sistemas de gestión empresarial/005-Desarrollo de componentes` aborda un aspecto crucial del desarrollo de sistemas ERP-CRM: la creación y gestión de componentes. Este nivel del contenido se centra en cómo los desarrolladores pueden crear, modificar y mantener unidades reutilizables de código que forman parte del sistema global. El propósito es proporcionar una comprensión profunda de las técnicas y herramientas utilizadas para el desarrollo de componentes, así como su integración dentro del contexto general de la gestión empresarial.
+
+El enfoque aquí es práctico y teórico simultáneamente. Comienza con una introducción a la arquitectura del ERP-CRM y los lenguajes proporcionados por el sistema. A continuación, se detalla cómo configurar entornos de desarrollo y herramientas específicas para este tipo de proyectos. Se explican las operaciones básicas como inserción, modificación y eliminación de datos en los objetos, así como cómo realizar consultas utilizando herramientas disponibles.
+
+El recorrido conceptual típico comienza con la definición de componentes, incluyendo sus propiedades, atributos y métodos. A continuación, se aborda el enlace de eventos a acciones, lo que es fundamental para la interactividad de los sistemas. Se explica cómo persistir los componentes y cómo utilizar herramientas para desarrollar, empaquetar y utilizar componentes de manera eficiente.
+
+El contenido también cubre aspectos avanzados como la depuración y tratamiento de errores, lo cual es esencial para mantener el sistema funcional y confiable. Se proporcionan ejemplos prácticos de cómo crear formularios e informes personalizados, así como cómo procesar datos y obtener información relevante.
+
+Además, se aborda el uso de APIs (Interfaces de Programación de Aplicaciones) para realizar llamadas a funciones y librerías de funciones. Este aspecto es crucial para la integración con otros sistemas y para la creación de soluciones escalables y flexibles.
+
+Finalmente, el recorrido concluye con una sección dedicada a la depuración y tratamiento de errores, lo cual es un paso fundamental en cualquier proceso de desarrollo. Se proporcionan técnicas y herramientas específicas para identificar y resolver problemas comunes que pueden surgir durante el desarrollo de componentes.
+
+En resumen, esta carpeta ofrece una visión integral del desarrollo de componentes dentro del contexto de los sistemas ERP-CRM, desde la definición básica hasta las técnicas avanzadas de depuración y mantenimiento. El enfoque práctico y teórico proporcionado asegura que los estudiantes o profesionales adquieran una comprensión sólida y aplicable de este aspecto crucial del desarrollo empresarial.

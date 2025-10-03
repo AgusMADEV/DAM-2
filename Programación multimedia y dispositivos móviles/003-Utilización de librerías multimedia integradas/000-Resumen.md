@@ -1,0 +1,15 @@
+La carpeta `Segundo/Programación multimedia y dispositivos móviles/003-Utilización de librerías multimedia integradas` se centra en la exploración práctica de las herramientas y bibliotecas que facilitan el desarrollo de aplicaciones multimedia y para dispositivos móviles. Este nivel del contenido ofrece una introducción a los conceptos básicos, pasando por las técnicas avanzadas y hasta la implementación de soluciones reales.
+
+El propósito principal es proporcionar a los estudiantes un enfoque práctico sobre cómo utilizar librerías multimedia integradas para crear aplicaciones que pueden reproducir audio y video, manejar imágenes y videos, y aprovechar características específicas del hardware de dispositivos móviles. Esta unidad busca no solo enseñar las teorías fundamentales, sino también mostrar cómo aplicarlas en situaciones reales.
+
+El recorrido conceptual típico comienza con una introducción a los conceptos básicos sobre aplicaciones multimedia y dispositivos móviles, explicando qué son y cuáles son sus principales características. A continuación, se profundiza en las arquitecturas de API utilizadas para desarrollar estas aplicaciones, destacando la importancia de entender cómo funcionan y cómo interactuar con ellas.
+
+El contenido avanza hacia el estudio de fuentes de datos multimedia, incluyendo clases y métodos que permiten procesar objetos multimedia. Se enseña cómo reproducir audio y video, manejar imágenes y videos, y optimizar su visualización en dispositivos móviles. Además, se exploran técnicas avanzadas como la animación de objetos multimedia, lo cual es crucial para crear aplicaciones interactivas y atractivas.
+
+El recorrido también incluye el análisis de tecnologías específicas utilizadas para desarrollar aplicaciones en dispositivos móviles, como Android y iOS. Se explican las herramientas y entornos de desarrollo disponibles, así como los patrones de diseño que son recomendados para crear aplicaciones eficientes y seguras.
+
+Además, se aborda el manejo de preferencias de la aplicación y la persistencia de datos, lo cual es fundamental para mantener la experiencia del usuario entre sesiones. También se discute sobre las tareas en segundo plano y los servicios, que permiten realizar operaciones importantes sin interrumpir la experiencia del usuario.
+
+Finalmente, el contenido concluye con una exploración de temas avanzados como la conectividad HTTP y HTTPS, el uso de sensores y la posición y localización. Estos temas son cruciales para desarrollar aplicaciones que pueden interactuar con el mundo real y ofrecer servicios personalizados basados en los datos del usuario.
+
+En resumen, esta carpeta proporciona un recorrido completo desde las bases hasta los conceptos avanzados de la utilización de librerías multimedia integradas en el desarrollo de aplicaciones para dispositivos móviles. El objetivo es preparar a los estudiantes no solo con conocimientos teóricos, sino también con habilidades prácticas que les permitan desarrollar soluciones reales y eficientes en este campo.

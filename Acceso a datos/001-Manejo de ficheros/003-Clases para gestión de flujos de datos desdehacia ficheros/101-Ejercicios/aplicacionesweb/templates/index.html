@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Demo — Texto → Imagen (RGB)</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>Codificar datos de cliente en imagen</h1>
+    <p class="muted">Introduce nombre, apellidos, email y teléfono. El backend Flask generará una imagen PNG con los datos embebidos.</p>
+  </header>
+
+  <main>
+    <form id="customer-form" autocomplete="on" novalidate>
+      <div class="grid">
+        <label>Nombre
+          <input type="text" name="name" placeholder="Ana" required />
+        </label>
+        <label>Apellidos
+          <input type="text" name="surname" placeholder="García Pérez" required />
+        </label>
+      </div>
+
+      <div class="grid">
+        <label>Email
+          <input type="email" name="email" placeholder="ana@example.com" required />
+        </label>
+        <label>Teléfono
+          <input type="tel" name="phone" placeholder="+34 600 123 456" required />
+        </label>
+      </div>
+
+      <div class="actions">
+        <button type="submit" id="btn-encode">Generar imagen</button>
+        <button type="reset" class="secondary">Limpiar</button>
+      </div>
+      <p id="status" class="status muted"></p>
+    </form>
+
+    <section id="result" class="result hidden">
+      <h2>Resultado</h2>
+      <div class="preview">
+        <img id="preview-img" alt="Imagen generada" />
+      </div>
+      <div class="download">
+        <a id="download-link" download="cliente.png">Descargar PNG</a>
+      </div>
+      <details class="raw">
+        <summary>Ver JSON que se codificó</summary>
+        <pre id="raw-json"></pre>
+      </details>
+    </section>
+  </main>
+
+  <footer>
+    <small>Demo Flask + PIL • Codifica con cabecera (MAGIC+LENGTH+CRC32) • UTF-8</small>
+  </footer>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
+

@@ -1,0 +1,20 @@
+[
+    {
+        "nombre": "Agust\u00edn",
+        "telefono": [
+            "543534",
+            "543534",
+            "543534"
+        ],
+        "email": "info@agusmadev.com"
+    },
+    {
+        "nombre": "Elena",
+        "telefono": [
+            "543534",
+            "543534",
+            "543534"
+        ],
+        "email": "info@evoluciona.com"
+    }
+]

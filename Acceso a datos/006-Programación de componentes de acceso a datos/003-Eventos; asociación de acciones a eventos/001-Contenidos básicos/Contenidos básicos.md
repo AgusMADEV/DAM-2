@@ -1,0 +1,13 @@
+En este capítulo, nos adentramos en la programación de componentes de acceso a datos, un aspecto crucial para el desarrollo eficiente de aplicaciones que interactúan con bases de datos. Los componentes de acceso a datos son entidades que encapsulan las operaciones necesarias para manipular los datos almacenados en una base de datos, proporcionando una interfaz simplificada y segura para su uso.
+
+La programación de eventos es un concepto fundamental en la interacción entre el usuario y los componentes de acceso a datos. Los eventos son acciones o ocurrencias que pueden producirse dentro del sistema, como el clic de un botón, la entrada de texto en una caja de texto o la recepción de un mensaje de red. Al asociar acciones a estos eventos, podemos controlar cómo se responde el componente de acceso a datos a diferentes situaciones.
+
+Para asociar acciones a eventos, los componentes de acceso a datos suelen proporcionar métodos específicos que permiten definir qué debe hacerse cuando ocurre un evento particular. Por ejemplo, en una interfaz gráfica, podríamos asociar el clic de un botón con un método que ejecuta una consulta SQL para actualizar la base de datos.
+
+Es importante destacar que la programación de eventos no solo permite responder a acciones del usuario, sino también a cambios internos dentro del componente de acceso a datos. Por ejemplo, cuando se inserta o actualiza un registro en la base de datos, el componente puede emitir un evento que notifica a otros componentes sobre este cambio.
+
+La gestión adecuada de eventos es esencial para mantener la coherencia y la integridad de los datos. Al asociar acciones a eventos, podemos asegurarnos de que las operaciones en la base de datos se realicen correctamente y que el estado del sistema esté actualizado en tiempo real.
+
+Además, la programación de eventos facilita la creación de interfaces de usuario más interactivas y dinámicas. Al permitir asociar acciones a eventos, podemos crear componentes que respondan de manera inmediata a las acciones del usuario, proporcionando una experiencia de usuario más fluida y satisfactoria.
+
+En resumen, la programación de eventos es un concepto fundamental en el desarrollo de componentes de acceso a datos. Al asociar acciones a eventos, podemos controlar cómo se responde el componente a diferentes situaciones, mantener la coherencia y la integridad de los datos, y crear interfaces de usuario más interactivas y dinámicas. Este conocimiento es esencial para desarrolladores que trabajan con bases de datos y necesitan crear aplicaciones que interactúen eficientemente con ellas.

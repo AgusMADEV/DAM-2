@@ -1,0 +1,9 @@
+# WINDOWS
+
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install flask pillow
+
+arrancar flask:
+python app.py
+http://127.0.0.1:5000

@@ -1,0 +1,13 @@
+En este capítulo, nos adentramos en la generación de servicios en red, una área crucial para el desarrollo de aplicaciones que requieren comunicación entre clientes y servidores. Comenzamos explorando los protocolos estándar de comunicación en red a nivel de aplicación, como HTTP y TCP/IP, que son fundamentales para establecer conexiones seguras y eficientes.
+
+A continuación, nos sumergimos en el estudio de servicios web, una forma popular de implementar aplicaciones distribuidas. Aprenderemos cómo crear servidores web utilizando librerías y componentes específicos, así como cómo manejar las solicitudes y respuestas entre clientes y servidores. Este conocimiento es esencial para desarrollar aplicaciones que requieren acceso a recursos remotos.
+
+Además, exploramos técnicas avanzadas de programación segura en el contexto de servicios web, incluyendo la implementación de criptografía y políticas de seguridad robustas. Aprenderemos cómo proteger nuestras aplicaciones contra amenazas comunes como ataques de inyección SQL y cross-site scripting (XSS), lo que es crucial para mantener la confidencialidad y integridad de los datos.
+
+Continuamos con el estudio de técnicas de programación segura en el contexto de servicios web, incluyendo la implementación de criptografía y políticas de seguridad robustas. Aprenderemos cómo proteger nuestras aplicaciones contra amenazas comunes como ataques de inyección SQL y cross-site scripting (XSS), lo que es crucial para mantener la confidencialidad y integridad de los datos.
+
+A medida que avanzamos, nos familiarizamos con técnicas avanzadas de programación segura en el contexto de servicios web, incluyendo la implementación de criptografía y políticas de seguridad robustas. Aprenderemos cómo proteger nuestras aplicaciones contra amenazas comunes como ataques de inyección SQL y cross-site scripting (XSS), lo que es crucial para mantener la confidencialidad y integridad de los datos.
+
+Finalmente, exploramos técnicas avanzadas de programación segura en el contexto de servicios web, incluyendo la implementación de criptografía y políticas de seguridad robustas. Aprenderemos cómo proteger nuestras aplicaciones contra amenazas comunes como ataques de inyección SQL y cross-site scripting (XSS), lo que es crucial para mantener la confidencialidad y integridad de los datos.
+
+En este capítulo, hemos cubierto una amplia gama de temas relacionados con la generación de servicios en red. Aprendimos sobre protocolos estándar, servicios web, técnicas avanzadas de programación segura y cómo implementarlas en nuestras aplicaciones. Este conocimiento es fundamental para desarrollar sistemas robustos y seguros que puedan comunicarse eficientemente entre clientes y servidores.

@@ -1,0 +1,11 @@
+En la creación de interfaces de usuario, los informes desempeñan un papel crucial para presentar datos de manera clara y accesible a los usuarios finales. Los informes pueden ser incrustados dentro del propio software o estar disponibles como recursos separados, cada uno con sus ventajas y desventajas.
+
+Los informes incrustados en la aplicación son aquellos que se generan directamente dentro del entorno de trabajo del usuario. Estos informes suelen ser más interactivos y personalizados, ya que pueden adaptarse a las necesidades específicas del usuario y proporcionar una experiencia fluida dentro del mismo contexto de trabajo. Además, los informes incrustados permiten una mejor integridad de datos, ya que están vinculados directamente al sistema principal.
+
+Por otro lado, los informes no incrustados son aquellos que se generan fuera del entorno principal y suelen estar disponibles en formatos como PDF o Excel. Estos informes ofrecen la ventaja de ser portátiles y accesibles desde cualquier lugar, lo que puede facilitar el compartir información con otros usuarios o almacenarlo para referencias futuras. Además, los informes no incrustados pueden ser más fáciles de mantener y actualizar, ya que no están dependientes del sistema principal.
+
+La elección entre informes incrustados y no incrustados dependerá de las necesidades específicas del proyecto y del usuario final. Los informes incrustados son ideales para aplicaciones donde la interactividad y personalización son cruciales, mientras que los informes no incrustados son más adecuados cuando se requiere una mayor portabilidad y accesibilidad.
+
+Para implementar informes en cualquier tipo de aplicación, es importante considerar factores como la complejidad de los datos a presentar, el nivel de interactividad requerido y las preferencias del usuario. Además, es fundamental que los informes sean fáciles de entender y visualizar, lo cual puede implicar el uso de gráficos, tablas y formatos adecuados.
+
+En resumen, la creación de informes incrustados y no incrustados en aplicaciones requiere una consideración cuidadosa de las necesidades del usuario y los objetivos del proyecto. Cada tipo de informe tiene sus ventajas y desventajas, y la elección correcta dependerá de cómo se utilicen estos informes dentro del contexto general de la aplicación.

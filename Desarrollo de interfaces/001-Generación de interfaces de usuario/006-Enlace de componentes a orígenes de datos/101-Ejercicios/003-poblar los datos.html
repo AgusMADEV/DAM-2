@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <title>Estilizar</title>
+    <style>
+     body {
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 40px;
+    }
+
+    table {
+      width: 80%;
+      margin: auto;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+    }
+
+    th {
+      background: #4CAF50;
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    tr:nth-child(even) {
+      background: #f2f2f2;
+    }
+
+    tr:hover {
+      background: #eafaf1;
+    }
+
+    td {
+      color: #333;
+    }
+    </style>
+  </head>
+  <body>
+    <table></table>
+    <script>
+     clientes = [
+          {
+            "id": 1,
+            "nombre": "Laura Gómez",
+            "email": "laura.gomez@example.com",
+            "telefono": "+34 612 345 678",
+            "fecha_alta": "2023-05-14",
+            "activo": true
+          },
+          {
+            "id": 2,
+            "nombre": "Carlos Martínez",
+            "email": "carlos.martinez@example.com",
+            "telefono": "+34 698 765 432",
+          
+            "fecha_alta": "2024-01-20",
+            "activo": false
+          },
+          {
+            "id": 3,
+            "nombre": "Ana Torres",
+            "email": "ana.torres@example.com",
+            "telefono": "+34 634 112 233",
+            
+            "fecha_alta": "2022-11-03",
+            "activo": true
+          },
+          {
+            "id": 4,
+            "nombre": "David López",
+            "email": "david.lopez@example.com",
+            "telefono": "+34 622 987 654",
+            
+            "fecha_alta": "2024-07-08",
+            "activo": true
+          },
+          {
+            "id": 5,
+            "nombre": "María Fernández",
+            "email": "maria.fernandez@example.com",
+            "telefono": "+34 655 443 221",
+            
+            "fecha_alta": "2023-03-25",
+            "activo": false
+          }
+        ]
+
+      let tabla = document.querySelector("table")
+      let primerelemento = clientes[0]
+      let claves = Object.keys(primerelemento)
+      
+      cadena = "<tr>";
+      claves.forEach(function(clave){
+        cadena += "<th>"+clave+"</th>";
+      })
+      cadena += "</tr>";
+      clientes.forEach(function(cliente){
+        cadena += "<tr>";
+        for(let clave in cliente){
+          cadena += "<td>"+cliente[clave]+"</td>"
+        }
+        cadena += "</tr>";
+      })
+      tabla.innerHTML = cadena;
+    </script>
+  </body>
+</html>
+
+
+

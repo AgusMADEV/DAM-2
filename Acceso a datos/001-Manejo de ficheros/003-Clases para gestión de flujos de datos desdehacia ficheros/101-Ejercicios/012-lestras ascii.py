@@ -1,0 +1,24 @@
+from PIL import Image
+
+img = Image.new("RGB", size=(200, 200), color="white")
+
+# Fuerza UTF-8 y sustituye cualquier byte raro para evitar el UnicodeDecodeError
+texto = open("texto.txt", 'r', encoding='utf-8', errors='replace')
+lineas = texto.readlines()
+letras = []
+for linea in lineas:
+  for letra in linea:
+    letras.append(letra)
+
+contador = 0
+for i in range(0, len(letras), 3):
+  try:
+    print("r:", letras[i],   ord(letras[i]))
+    print("g:", letras[i+1], ord(letras[i+1]))
+    print("b:", letras[i+2], ord(letras[i+2]))
+    print("siguiente pixel")
+  except:
+    pass
+
+texto.close()
+img.save("mensaje.png")

@@ -1,0 +1,13 @@
+En este capítulo, nos adentramos en la comprensión y aplicación de las clases persistentes en el contexto del mapeo objeto-relacional (ORM). Las clases persistentes son una parte fundamental del ORM, ya que representan los objetos que interactúan con la base de datos. Estas clases definen cómo se estructuran los datos y cómo se manipulan dentro del sistema.
+
+Las clases persistentes deben ser diseñadas cuidadosamente para reflejar las entidades y relaciones de la base de datos. Cada propiedad de la clase corresponde a un campo en la tabla de la base de datos, mientras que los métodos definen las operaciones que pueden realizarse sobre estos objetos. Por ejemplo, si tenemos una entidad "Cliente", nuestra clase persistente podría incluir propiedades como `nombre`, `email` y `id`, así como métodos para actualizar o eliminar un cliente.
+
+La implementación de clases persistentes en ORM facilita la manipulación de datos complejos, ya que permite trabajar con objetos en lugar de sentencias SQL. Esto no solo mejora la legibilidad del código, sino que también reduce el riesgo de errores tipográficos y aumenta la eficiencia al utilizar las capacidades de optimización internas del ORM.
+
+Además, las clases persistentes permiten una mayor abstracción sobre los detalles de la base de datos. Esto significa que podemos cambiar el esquema de la base de datos sin necesidad de modificar el código fuente de nuestras clases persistentes, siempre y cuando sigamos un enfoque consistente en cómo se representan las entidades.
+
+En el mundo real, trabajar con ORM implica no solo diseñar y implementar clases persistentes, sino también gestionar sesiones de conexión a la base de datos. Las sesiones son contenedores que mantienen el estado del sistema durante una operación de acceso a la base de datos. Es importante asegurarse de manejar adecuadamente las transacciones dentro de estas sesiones para mantener la integridad y consistencia de los datos.
+
+La persistencia de objetos es un concepto clave en el mapeo objeto-relacional, y las clases persistentes son la implementación concreta de este concepto. Al diseñar y utilizar clases persistentes correctamente, podemos aprovechar al máximo las ventajas del ORM, como la simplificación del acceso a datos y la reducción de errores comunes.
+
+En resumen, las clases persistentes son una herramienta poderosa en el mapeo objeto-relacional, que nos permiten trabajar con objetos en lugar de sentencias SQL. Su diseño cuidadoso y correcta implementación son fundamentales para aprovechar al máximo las capacidades del ORM y mantener la eficiencia y consistencia de nuestro sistema.

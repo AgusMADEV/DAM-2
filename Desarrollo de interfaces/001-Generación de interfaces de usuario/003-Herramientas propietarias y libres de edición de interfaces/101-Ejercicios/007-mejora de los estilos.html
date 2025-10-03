@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Diseñador de formularios</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root{
+        --bg: #0f172a;           /* slate-900 */
+        --bg-soft: #111827;      /* gray-900 */
+        --card: #0b1224e6;       /* glassy */
+        --text: #e5e7eb;         /* gray-200 */
+        --muted: #9ca3af;        /* gray-400 */
+        --brand: #7c3aed;        /* violet-600 */
+        --brand-2: #22d3ee;      /* cyan-400 */
+        --line: #1f2937;         /* gray-800 */
+        --ok: #10b981;           /* emerald-500 */
+        --warn: #f59e0b;         /* amber-500 */
+        --radius-xl: 18px;
+        --radius-lg: 14px;
+        --shadow-1: 0 10px 30px rgba(0,0,0,.35);
+        --shadow-2: 0 6px 16px rgba(0,0,0,.25);
+        --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      }
+
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body{
+        margin:0;
+        font-family: var(--font);
+        color: var(--text);
+        background:
+          radial-gradient(1200px 600px at 10% -10%, rgba(124,58,237,.25), transparent 60%),
+          radial-gradient(1000px 600px at 110% 10%, rgba(34,211,238,.20), transparent 60%),
+          linear-gradient(180deg, #0b1022 0%, var(--bg) 100%);
+      }
+
+      /* Header */
+      header{
+        padding: 28px clamp(16px, 4vw, 40px);
+        border-bottom: 1px solid var(--line);
+        backdrop-filter: blur(8px);
+        position: sticky; top: 0; z-index: 10;
+        background: linear-gradient(180deg, rgba(11,16,34,.75), rgba(11,16,34,.35));
+      }
+      .title{
+        display:flex; align-items:center; gap:14px;
+      }
+      .logo{
+        width:40px; height:40px; border-radius:12px;
+        background: conic-gradient(from 180deg, var(--brand), var(--brand-2), var(--brand));
+        filter: saturate(1.1) brightness(1.1);
+        box-shadow: var(--shadow-2);
+      }
+      h1{ margin:0; font-size: clamp(18px, 1.6vw, 24px); letter-spacing:.3px; }
+      .subtitle{ margin:4px 0 0 54px; color: var(--muted); font-size: 14px; }
+
+      /* Layout */
+      .wrapper{
+        padding: clamp(16px, 4vw, 40px);
+        display:grid;
+        grid-template-columns: 1.2fr .8fr;
+        gap: 24px;
+        max-width: 1280px;
+        margin: 0 auto;
+      }
+
+      .card{
+        background: var(--card);
+        border: 1px solid rgba(255,255,255,.06);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-1);
+      }
+
+      /* Work area + Components */
+      #contenedor{
+        display:grid;
+        grid-template-columns: 1fr .8fr;
+        gap: 20px;
+        border: none;
+        background: transparent;
+      }
+
+      #areadetrabajo{
+        min-height: 360px;
+        padding: 18px;
+        border-radius: var(--radius-xl);
+        outline: 1px dashed rgba(255,255,255,.12);
+        outline-offset: -8px;
+        transition: outline-color .2s ease, background .2s ease;
+      }
+      #areadetrabajo:hover{ outline-color: rgba(124,58,237,.4); background: rgba(124,58,237,.05); }
+
+      #componentes{
+        padding: 18px;
+        border-radius: var(--radius-xl);
+      }
+      .components-grid{
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+      #componentes h3{
+        margin: 0 0 12px 0;
+        font-size: 14px;
+        color: var(--muted);
+        letter-spacing:.2px;
+      }
+      #componentes button{
+        width:100%;
+        border: 1px solid rgba(255,255,255,.08);
+        background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+        color: var(--text);
+        padding: 10px 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: transform .06s ease, border-color .2s ease, background .2s ease;
+        backdrop-filter: blur(2px);
+      }
+      #componentes button:hover{
+        transform: translateY(-1px);
+        border-color: rgba(124,58,237,.5);
+        background: linear-gradient(180deg, rgba(124,58,237,.18), rgba(255,255,255,.02));
+      }
+      #componentes button:active{ transform: translateY(0); }
+
+      /* Inputs inside work area */
+      #areadetrabajo input{
+        display:block;
+        width:100%;
+        margin: 10px 0;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #0d1530;
+        border: 1px solid rgba(255,255,255,.08);
+        color: var(--text);
+        outline: none;
+        transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+      }
+      #areadetrabajo input:hover{
+        border-color: rgba(255,255,255,.14);
+      }
+      #areadetrabajo input:focus{
+        border-color: rgba(124,58,237,.7);
+        box-shadow: 0 0 0 4px rgba(124,58,237,.18);
+        background: #0f1a3b;
+      }
+
+      /* Actions + Result */
+      .actions{
+        display:flex; gap:12px; align-items:center; justify-content:flex-end;
+        margin-top: 8px;
+      }
+      .btn{
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 12px;
+        padding: 10px 14px;
+        background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+        color: var(--text);
+        cursor:pointer;
+        transition: transform .06s ease, border-color .2s ease, background .2s ease;
+      }
+      .btn:hover{
+        transform: translateY(-1px);
+        border-color: rgba(34,211,238,.6);
+        background: linear-gradient(180deg, rgba(34,211,238,.16), rgba(255,255,255,.02));
+      }
+      .btn--primary{
+        border-color: rgba(124,58,237,.6);
+        background: linear-gradient(180deg, rgba(124,58,237,.35), rgba(124,58,237,.15));
+      }
+      .btn--primary:hover{
+        background: linear-gradient(180deg, rgba(124,58,237,.5), rgba(124,58,237,.18));
+      }
+
+      .result-card{
+        padding:16px;
+      }
+      .result-head{
+        display:flex; align-items:center; justify-content:space-between; gap:12px;
+        margin-bottom:8px;
+      }
+      .result-head h3{ margin:0; font-size: 14px; color: var(--muted); }
+      .codewrap{
+        position: relative;
+        border: 1px solid rgba(255,255,255,.08);
+        border-radius: 12px;
+        background: #0b1224;
+        padding: 12px;
+        max-height: 320px;
+        overflow: auto;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+        line-height: 1.45;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      /* Tiny toast */
+      .toast{
+        position: fixed; bottom: 22px; right: 22px;
+        background: #0f1a3b; color: var(--text);
+        border:1px solid rgba(124,58,237,.5);
+        border-radius: 12px; padding: 10px 14px;
+        box-shadow: var(--shadow-2);
+        opacity: 0; transform: translateY(8px);
+        transition: opacity .2s ease, transform .2s ease;
+        pointer-events: none;
+      }
+      .toast.show{ opacity:1; transform: translateY(0); }
+
+      /* Responsive */
+      @media (max-width: 980px){
+        .wrapper{ grid-template-columns: 1fr; }
+        #contenedor{ grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="title">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Diseñador de formularios</h1>
+          <p class="subtitle">Clic en un componente para añadirlo. Se te pedirá id, class y name.</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrapper">
+      <!-- Panel principal -->
+      <section class="card" style="padding: 20px;">
+        <div id="contenedor" class="grid">
+          <div id="areadetrabajo" class="card" aria-label="Área de trabajo (previsualización)">
+            <!-- Inputs generados aparecerán aquí -->
+          </div>
+          <aside id="componentes" class="card">
+            <h3>Componentes</h3>
+            <div class="components-grid">
+              <button value="text">Text</button>
+              <button value="date">Date</button>
+              <button value="password">Password</button>
+              <button value="email">Email</button>
+              <button value="number">Number</button>
+              <button value="time">Time</button>
+              <button value="datetime-local">Datetime-local</button>
+              <button value="month">Month</button>
+              <button value="week">Week</button>
+              <button value="color">Color</button>
+            </div>
+          </aside>
+        </div>
+
+        <div class="actions">
+          <button id="clear" class="btn" title="Vaciar el área de trabajo">Vaciar</button>
+          <button id="html" class="btn btn--primary">Generar HTML</button>
+        </div>
+      </section>
+
+      <!-- Resultado -->
+      <section class="card result-card">
+        <div class="result-head">
+          <h3>HTML generado</h3>
+          <div style="display:flex; gap:8px;">
+            <button id="copy" class="btn" title="Copiar al portapapeles">Copiar</button>
+          </div>
+        </div>
+        <div id="resultado" class="codewrap" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script>
+      const areadetrabajo = document.querySelector("#areadetrabajo");
+      const componentes = document.querySelector("#componentes");
+      const btnHTML = document.querySelector("#html");
+      const btnCopy = document.querySelector("#copy");
+      const btnClear = document.querySelector("#clear");
+      const resultado = document.querySelector("#resultado");
+      const toast = document.querySelector("#toast");
+
+      function showToast(msg){
+        toast.textContent = msg;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 1600);
+      }
+
+      // Añadir componentes con prompts
+      componentes.addEventListener("click", (e) => {
+        if(e.target.tagName !== "BUTTON") return;
+        const tipo = e.target.value;
+
+        const identificador = prompt("Introduce el identificador único del elemento (id)", `${tipo}_${Math.random().toString(36).slice(2,6)}`) || "";
+        const clase = prompt("Introduce la clase del elemento (class)", "campo") || "";
+        const nombre = prompt("Introduce el nombre único del elemento (name)", identificador || tipo) || "";
+
+        // Plantilla de input
+        const input = document.createElement("input");
+        input.type = tipo;
+        if(identificador) input.id = identificador;
+        if(clase) input.className = clase;
+        if(nombre) input.name = nombre;
+        input.placeholder = nombre || tipo;
+
+        areadetrabajo.appendChild(input);
+        input.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+
+      // Generar HTML
+      btnHTML.addEventListener("click", () => {
+        resultado.textContent = areadetrabajo.innerHTML.trim() || "<!-- vacío -->";
+        showToast("HTML generado");
+      });
+
+      // Copiar al portapapeles
+      btnCopy.addEventListener("click", async () => {
+        const code = resultado.textContent;
+        if(!code){ showToast("Nada que copiar"); return; }
+        try{
+          await navigator.clipboard.writeText(code);
+          showToast("Copiado al portapapeles");
+        }catch(err){
+          showToast("No se pudo copiar");
+        }
+      });
+
+      // Vaciar área de trabajo
+      btnClear.addEventListener("click", () => {
+        areadetrabajo.innerHTML = "";
+        resultado.textContent = "";
+        showToast("Área de trabajo vaciada");
+      });
+    </script>
+  </body>
+</html>
+

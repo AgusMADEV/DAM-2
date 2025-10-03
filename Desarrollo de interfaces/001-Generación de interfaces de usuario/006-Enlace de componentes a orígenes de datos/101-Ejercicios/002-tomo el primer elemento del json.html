@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <title>Estilizar</title>
+    <style>
+     
+    </style>
+  </head>
+  <body>
+    <table></table>
+    <script>
+     clientes = [
+          {
+            "id": 1,
+            "nombre": "Laura Gómez",
+            "email": "laura.gomez@example.com",
+            "telefono": "+34 612 345 678",
+            "direccion": {
+              "calle": "Calle Mayor 12",
+              "ciudad": "Valencia",
+              "cp": "46001",
+              "pais": "España"
+            },
+            "fecha_alta": "2023-05-14",
+            "activo": true
+          },
+          {
+            "id": 2,
+            "nombre": "Carlos Martínez",
+            "email": "carlos.martinez@example.com",
+            "telefono": "+34 698 765 432",
+            "direccion": {
+              "calle": "Avenida de la Constitución 45",
+              "ciudad": "Madrid",
+              "cp": "28001",
+              "pais": "España"
+            },
+            "fecha_alta": "2024-01-20",
+            "activo": false
+          },
+          {
+            "id": 3,
+            "nombre": "Ana Torres",
+            "email": "ana.torres@example.com",
+            "telefono": "+34 634 112 233",
+            "direccion": {
+              "calle": "Plaza del Carmen 7",
+              "ciudad": "Sevilla",
+              "cp": "41003",
+              "pais": "España"
+            },
+            "fecha_alta": "2022-11-03",
+            "activo": true
+          },
+          {
+            "id": 4,
+            "nombre": "David López",
+            "email": "david.lopez@example.com",
+            "telefono": "+34 622 987 654",
+            "direccion": {
+              "calle": "Carrer de la Pau 30",
+              "ciudad": "Barcelona",
+              "cp": "08002",
+              "pais": "España"
+            },
+            "fecha_alta": "2024-07-08",
+            "activo": true
+          },
+          {
+            "id": 5,
+            "nombre": "María Fernández",
+            "email": "maria.fernandez@example.com",
+            "telefono": "+34 655 443 221",
+            "direccion": {
+              "calle": "Camino Viejo 15",
+              "ciudad": "Bilbao",
+              "cp": "48005",
+              "pais": "España"
+            },
+            "fecha_alta": "2023-03-25",
+            "activo": false
+          }
+        ]
+
+      let tabla = document.querySelector("table")
+      let primerelemento = clientes[0]
+      let claves = Object.keys(primerelemento)
+      
+      cadena = "<tr>";
+      claves.forEach(function(clave){
+        cadena += "<th>"+clave+"</th>";
+      })
+      cadena += "</tr>";
+      tabla.innerHTML = cadena;
+    </script>
+  </body>
+</html>
+
+
+

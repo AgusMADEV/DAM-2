@@ -1,0 +1,17 @@
+[
+    {
+        "nombre": "Kylian Mbappe",
+        "edad": "26",
+        "posicion preferida": "Delantero"
+    },
+    {
+        "nombre": "Cristiano Ronaldo",
+        "edad": "40",
+        "posicion preferida": "Delantero"
+    },
+    {
+        "nombre": "Agustin",
+        "edad": "25",
+        "posicion preferida": "Extremo izquierdo"
+    }
+]

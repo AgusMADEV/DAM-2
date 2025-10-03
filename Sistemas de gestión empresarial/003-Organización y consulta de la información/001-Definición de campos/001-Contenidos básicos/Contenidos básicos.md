@@ -1,0 +1,17 @@
+En este capítulo, nos adentramos en la definición de campos, un concepto fundamental para el correcto funcionamiento de sistemas ERP-CRM. Los campos son las unidades básicas de información que se almacenan y manipulan dentro del sistema. Cada campo tiene un nombre descriptivo, un tipo de dato específico y una serie de atributos que determinan su comportamiento y uso.
+
+El primer paso para definir un campo es elegir un nombre adecuado que refleje el propósito del mismo. Este nombre debe ser claro y conciso, evitando términos técnicos innecesarios o ambiguos. Por ejemplo, si estamos creando un sistema de gestión de clientes, un campo podría llamarse "Nombre del Cliente" en lugar de "nombre_cli".
+
+El tipo de dato es otro aspecto crucial en la definición de campos. Determina qué tipo de información puede almacenar el campo y cómo se debe tratar. Algunos ejemplos comunes de tipos de datos son texto, número entero, número decimal, fecha y hora, booleano, etc. Cada tipo de dato tiene sus propias características y restricciones que deben ser consideradas al momento de su definición.
+
+Además de los campos básicos, es común incluir atributos adicionales para mejorar la funcionalidad del campo. Por ejemplo, se pueden establecer restricciones como obligatoriedad (que el campo debe tener un valor), longitud máxima (para cadenas de texto), valores predeterminados o incluso opciones de selección predefinidas. Estos atributos ayudan a garantizar que los datos ingresados sean consistentes y cumplen con las necesidades del sistema.
+
+La organización de campos en tablas es otro aspecto importante. Una tabla en un sistema ERP-CRM es una colección de campos que representan un concepto o entidad específica. Por ejemplo, podríamos tener una tabla llamada "Clientes" que contenga campos como Nombre del Cliente, DNI, Dirección, Teléfono, Email, etc. La organización de los campos en tablas permite una estructura lógica y coherente del sistema.
+
+La definición de campos también implica considerar la integridad de los datos. Esto significa asegurarse de que los valores ingresados en un campo sean válidos según las reglas establecidas. Por ejemplo, si un campo es de tipo número entero, se debe evitar que se ingrese texto o números decimales. Las restricciones de validación son herramientas clave para mantener la calidad y precisión de los datos almacenados.
+
+Además de la definición de campos básicos, también es importante considerar la escalabilidad del sistema. A medida que el sistema crece y evoluciona, puede ser necesario agregar nuevos campos o modificar los existentes. Por lo tanto, es recomendable diseñar los campos con flexibilidad en mente, permitiendo futuras modificaciones sin afectar la funcionalidad del sistema.
+
+La definición de campos también implica considerar la seguridad de los datos. Es crucial asegurarse de que solo los usuarios autorizados puedan acceder y modificar ciertos campos. Esto se puede lograr mediante el uso de roles y permisos dentro del sistema, permitiendo un control preciso sobre quién puede ver o editar qué información.
+
+En resumen, la definición de campos es una tarea fundamental en la configuración de sistemas ERP-CRM. Al elegir nombres descriptivos, tipos de datos apropiados y atributos adicionales, podemos crear tablas estructuradas y funcionales que almacenen y manipulen los datos de manera eficiente y segura. Esta fase es crucial para garantizar que el sistema cumpla con las necesidades del negocio y pueda ser utilizado de manera efectiva por sus usuarios finales.

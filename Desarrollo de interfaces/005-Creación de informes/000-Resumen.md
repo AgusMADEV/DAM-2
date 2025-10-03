@@ -1,0 +1,11 @@
+En esta unidad didáctica del curso, nos adentramos en el fascinante mundo de la creación de informes, un aspecto crucial para cualquier aplicación informática. El propósito principal es proporcionar a los estudiantes una comprensión profunda y práctica sobre cómo diseñar, generar y distribuir informes de manera efectiva y segura.
+
+El enfoque aquí es práctico y teórico simultáneamente, guiando al estudiante desde la generación básica de informes hasta su optimización y personalización. Comenzamos explorando las herramientas gráficas integradas en el IDE y las externas al mismo, introduciendo conceptos como estructura general, secciones, filtrado de datos, numeración de líneas, recuentos y totales, gráficos y librerías para generación de informes.
+
+Además, nos centramos en la conexión con las fuentes de datos, lo que implica aprender a ejecutar consultas eficientemente. Este proceso es fundamental para obtener los datos necesarios y presentarlos de manera coherente y precisa. También abordamos el tema de la documentación de aplicaciones, destacando la importancia de ficheros de ayuda y herramientas de generación de ayudas.
+
+La distribución de aplicaciones también es un aspecto crucial que exploramos en esta unidad, incluyendo componentes de una aplicación, empaquetado, instaladores y paquetes autoinstalables. Además, se aborda la firma digital de aplicaciones y las herramientas para crear paquetes de instalación, asegurando que los estudiantes tengan conocimientos completos sobre cómo distribuir sus aplicaciones de manera segura y eficiente.
+
+Finalmente, el recorrido conceptual incluye la realización de pruebas exhaustivas, abordando tanto pruebas manuales como automáticas. Esto es fundamental para garantizar que los informes sean precisos, fáciles de usar y cumplen con las necesidades del usuario final.
+
+En resumen, esta unidad didáctica ofrece una visión integral y práctica sobre la creación de informes en aplicaciones informáticas, desde su diseño hasta su distribución y mantenimiento. A través de un enfoque práctico y teórico, los estudiantes adquirirán habilidades valiosas que les permitirán crear informes efectivos y seguros, optimizar sus aplicaciones y asegurar una experiencia óptima para los usuarios finales.

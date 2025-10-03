@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Diseñador de formularios</title>
+  <style>
+    :root {
+      /* Paleta base (puedes ajustarla a tu gusto) */
+      --bg: #0f1226;
+      --bg-soft: #171a33;
+      --card: #1f2342;
+      --text: #e6e8ef;
+      --muted: #9aa0b4;
+      --brand: #7c5cff;
+
+      /* Dinámico según tipo de mensaje */
+      --bg-dynamic: var(--bg);
+      --accent-dynamic: var(--brand);
+    }
+
+    /* Temas dinámicos disparados por data-message-type en <body> */
+    body[data-message-type="consulta"] { --bg-dynamic: #0d1b2a; --accent-dynamic: #3a86ff; }
+    body[data-message-type="sugerencia"] { --bg-dynamic: #0f2a19; --accent-dynamic: #2ec4b6; }
+    body[data-message-type="queja"] { --bg-dynamic: #2a0f10; --accent-dynamic: #ff595e; }
+    body[data-message-type="soporte"] { --bg-dynamic: #1b0f2a; --accent-dynamic: #b5179e; }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 70% -10%, var(--bg-soft), transparent 60%), var(--bg-dynamic);
+      transition: background-color .3s ease, background .3s ease;
+    }
+
+    header {
+      padding: 24px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    header h1 { margin: 0; font-weight: 700; letter-spacing: .3px; }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px 32px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 920px) {
+      .container { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: linear-gradient(0deg, rgba(255,255,255,0.02), rgba(255,255,255,0.02)), var(--card);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0));
+      font-weight: 600;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-content { padding: 20px; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 18px;
+    }
+    .form-grid .full { grid-column: 1 / -1; }
+
+    label { font-size: 14px; color: var(--muted); display:block; margin-bottom: 6px; }
+
+    input[type="text"], input[type="email"], textarea, input[list] {
+      width: 100%;
+      padding: 12px 14px;
+      background: rgba(0,0,0,.25);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px;
+      outline: none;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    input::placeholder, textarea::placeholder { color: #aab1c3; }
+
+    input:focus, textarea:focus {
+      border-color: var(--accent-dynamic);
+      box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent-dynamic) 30%, transparent);
+    }
+
+    textarea { min-height: 140px; resize: vertical; }
+
+    .actions { display: flex; gap: 12px; align-items: center; }
+
+    button {
+      appearance: none; border: none; cursor: pointer;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: transform .02s ease, opacity .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, color-mix(in oklab, var(--accent-dynamic) 85%, #ffffff 5%), var(--accent-dynamic));
+      color: white;
+      box-shadow: 0 8px 24px color-mix(in oklab, var(--accent-dynamic) 30%, transparent);
+      opacity: .9;
+    }
+    .btn-primary:hover { opacity: 1; }
+    .btn-primary:active { transform: translateY(1px); }
+    .btn-primary:disabled {
+      opacity: .4; cursor: not-allowed; box-shadow: none; filter: grayscale(.4);
+    }
+
+    .btn-ghost {
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    pre {
+      width: 100%;
+      padding: 16px;
+      margin: 0;
+      background: #0a0c18;
+      color: #e5ebff;
+      border-top: 1px solid rgba(255,255,255,.06);
+      overflow: auto;
+      max-height: 60vh;
+    }
+
+    .hint { font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Diseñador de formularios</h1>
+  </header>
+
+  <main class="container">
+    <!-- Área de trabajo / Formulario -->
+    <section class="panel" id="areadetrabajo">
+      <div class="panel-header">Formulario de contacto</div>
+      <div class="panel-content">
+        <form id="contactForm" novalidate>
+          <div class="form-grid">
+            <div>
+              <label for="name">Nombre</label>
+              <input id="name" name="name" type="text" placeholder="Tu nombre" required />
+            </div>
+
+            <div>
+              <label for="email">Correo electrónico</label>
+              <input id="email" name="email" type="email" placeholder="tunombre@ejemplo.com" required />
+            </div>
+
+            <div class="full">
+              <label for="messageType">Tipo de mensaje (opcional)</label>
+              <input id="messageType" name="messageType" list="tipos" placeholder="Elige o escribe…" />
+              <datalist id="tipos">
+                <option value="consulta"></option>
+                <option value="sugerencia"></option>
+                <option value="queja"></option>
+                <option value="soporte"></option>
+              </datalist>
+              <p class="hint">Al elegir un tipo, el color del fondo cambia para reflejarlo.</p>
+            </div>
+
+            <div class="full">
+              <label for="message">Mensaje</label>
+              <textarea id="message" name="message" placeholder="Cuéntanos cómo podemos ayudarte" required></textarea>
+            </div>
+          </div>
+
+          <div class="actions" style="margin-top:16px;">
+            <button id="generateBtn" type="button" class="btn-primary" disabled>Generar HTML</button>
+            <button id="resetBtn" type="reset" class="btn-ghost">Limpiar</button>
+          </div>
+        </form>
+      </div>
+      <pre id="output" hidden></pre>
+    </section>
+
+    <!-- Panel de componentes (decorativo, como en el enunciado) -->
+    <aside class="panel" id="componentes">
+      <div class="panel-header">Componentes</div>
+      <div class="panel-content">
+        <div class="actions" style="flex-wrap:wrap;">
+          <button type="button" class="btn-ghost">Input text</button>
+          <button type="button" class="btn-ghost">Input password</button>
+        </div>
+        <p class="hint" style="margin-top:12px;">(Demostrativo) — El formulario principal está a la izquierda.</p>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const form = document.getElementById('contactForm');
+    const requiredFields = [
+      document.getElementById('name'),
+      document.getElementById('email'),
+      document.getElementById('message')
+    ];
+    const messageTypeInput = document.getElementById('messageType');
+    const generateBtn = document.getElementById('generateBtn');
+    const output = document.getElementById('output');
+
+    // 1) Activar / desactivar botón cuando todos los campos requeridos estén completos y válidos
+    function validateForm() {
+      const allFilled = requiredFields.every(el => el.value.trim().length > 0);
+      const emailValid = requiredFields[1].validity.valid; // email
+      generateBtn.disabled = !(allFilled && emailValid);
+    }
+
+    requiredFields.forEach(el => el.addEventListener('input', validateForm));
+
+    // 2) Cambiar tema según tipo seleccionado en datalist
+    const typeToTheme = {
+      'consulta': 'consulta',
+      'sugerencia': 'sugerencia',
+      'queja': 'queja',
+      'soporte': 'soporte'
+    };
+
+    function applyMessageTypeTheme(value) {
+      const v = (value || '').toLowerCase().trim();
+      const themeKey = typeToTheme[v] || '';
+      if (themeKey) document.body.setAttribute('data-message-type', themeKey);
+      else document.body.removeAttribute('data-message-type');
+    }
+
+    messageTypeInput.addEventListener('input', (e) => applyMessageTypeTheme(e.target.value));
+
+    // 3) Generar el HTML del formulario y mostrarlo
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function serializeFormTemplate() {
+      // Clonamos el formulario y reseteamos valores para generar plantilla limpia
+      const clone = form.cloneNode(true);
+      // Quitamos los IDs únicos para evitar colisiones si se pega en otro documento
+      clone.id = 'contactFormGenerado';
+
+      // Reseteo de valores en inputs/textarea
+      clone.querySelectorAll('input, textarea').forEach((el) => {
+        if (el.tagName.toLowerCase() === 'textarea') {
+          el.textContent = '';
+        }
+        el.value = '';
+      });
+
+      // Quitar el panel de acciones dinámicas (habilitado/deshabilitado)
+      clone.querySelector('#generateBtn')?.setAttribute('disabled', '');
+
+      // Opcional: eliminar la pista de ayuda si no se quiere incluir
+      // clone.querySelectorAll('.hint').forEach(n => n.remove());
+
+      // Devuelve el string de HTML bonito
+      const container = document.createElement('div');
+      container.appendChild(clone);
+      // Extra: identar simple
+      return container.innerHTML
+        .replace(/></g, '>\n<')
+        .replace(/\n\s*\n/g, '\n');
+    }
+
+    generateBtn.addEventListener('click', () => {
+      const htmlCode = serializeFormTemplate();
+      output.hidden = false;
+      output.textContent = `<!-- HTML generado del formulario -->\n${htmlCode}`;
+      // Scroll al resultado
+      output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    // 4) Reset también quita estado visual
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.body.removeAttribute('data-message-type');
+      validateForm();
+      output.hidden = true;
+      output.textContent = '';
+    });
+
+    // Estado inicial
+    validateForm();
+  </script>
+</body>
+</html>
