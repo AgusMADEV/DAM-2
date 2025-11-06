@@ -1,0 +1,123 @@
+{
+  "jugadores": [
+    {
+      "id": 1,
+      "nombre_usuario": "AgusmaDEV",
+      "historial_compras": [
+        {
+          "id_compra": "GAME-2025-001",
+          "fecha": "2025-01-15",
+          "total": 179.98,
+          "productos": [
+            {
+              "id_producto": 101,
+              "nombre": "Elden Ring: Edición Coleccionista",
+              "plataforma": "PS5",
+              "cantidad": 1,
+              "precio_unitario": 99.99
+            },
+            {
+              "id_producto": 205,
+              "nombre": "Mando DualSense - Edición Limitada",
+              "plataforma": "PS5",
+              "cantidad": 1,
+              "precio_unitario": 79.99
+            }
+          ]
+        },
+        {
+          "id_compra": "GAME-2025-002",
+          "fecha": "2025-05-20",
+          "total": 129.99,
+          "productos": {
+            "id_producto": 307,
+            "nombre": "Suscripción Xbox Game Pass Ultimate (12 meses)",
+            "plataforma": "Xbox/PC",
+            "cantidad": 1,
+            "precio_unitario": 129.99
+          }
+        }
+      ],
+      "informacion_contacto": {
+        "email": "agusmadev@gamerhub.com",
+        "direccion": {
+          "calle": "Calle Pixel",
+          "numero": 45,
+          "piso": "3º B",
+          "ciudad": "Alicante",
+          "codigo_postal": "03001",
+          "pais": "España"
+        },
+        "telefonos": {
+          "tipo": "móvil",
+          "numero": "+34 600 123 456"
+        }
+      },
+      "preferencias": {
+        "idioma": "español",
+        "generos_favoritos": [
+          "RPG",
+          "Souls-like",
+          "Aventura"
+        ],
+        "notificaciones": {
+          "email": 1,
+          "sms": 0,
+          "push": 1
+        },
+        "plataformas": [
+          "PS5",
+          "PC"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "nombre_usuario": "ElenaBotezatu03",
+      "historial_compras": {
+        "id_compra": "GAME-2025-003",
+        "fecha": "2025-03-10",
+        "total": 59.99,
+        "productos": {
+          "id_producto": 402,
+          "nombre": "The Legend of Zelda: Tears of the Kingdom",
+          "plataforma": "Nintendo Switch",
+          "cantidad": 1,
+          "precio_unitario": 59.99
+        }
+      },
+      "informacion_contacto": {
+        "email": "elena.bote@gamerhub.com",
+        "direccion": {
+          "calle": "Avenida Nintendo",
+          "numero": 123,
+          "piso": "1º A",
+          "ciudad": "Barcelona",
+          "codigo_postal": "08018",
+          "pais": "España"
+        },
+        "telefonos": {
+          "tipo": "móvil",
+          "numero": "+34 678 901 234"
+        }
+      },
+      "preferencias": {
+        "idioma": "catalán",
+        "generos_favoritos": [
+          "Aventura",
+          "Puzzle",
+          "Indie"
+        ],
+        "notificaciones": {
+          "email": 1,
+          "sms": 1,
+          "push": 0
+        },
+        "plataformas": [
+          "Nintendo Switch",
+          "PC"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+[
+    {
+        "nombre": "Kratos",
+        "apellido": "Sparta",
+        "edad": 45,
+        "ciudad": "Córdoba",
+        "profesion": "Guerrero"
+    },
+    {
+        "nombre": "Kobe",
+        "apellido": "Bryant",
+        "edad": 41,
+        "ciudad": "Madrid",
+        "profesion": "Baloncestista"
+    },
+    {
+        "nombre": "Kirby",
+        "apellido": "Star",
+        "edad": 30,
+        "ciudad": "Santander",
+        "profesion": "Héroe"
+    },
+    {
+        "nombre": "Kratos",
+        "apellido": "Sparta",
+        "edad": 45,
+        "ciudad": "Córdoba",
+        "profesion": "Guerrero"
+    },
+    {
+        "nombre": "Kobe",
+        "apellido": "Bryant",
+        "edad": 41,
+        "ciudad": "Madrid",
+        "profesion": "Baloncestista"
+    },
+    {
+        "nombre": "Kirby",
+        "apellido": "Star",
+        "edad": 30,
+        "ciudad": "Santander",
+        "profesion": "Héroe"
+    },
+    {
+        "nombre": "Kratos",
+        "apellido": "Sparta",
+        "edad": 45,
+        "ciudad": "Córdoba",
+        "profesion": "Guerrero"
+    },
+    {
+        "nombre": "Kobe",
+        "apellido": "Bryant",
+        "edad": 41,
+        "ciudad": "Madrid",
+        "profesion": "Baloncestista"
+    },
+    {
+        "nombre": "Kirby",
+        "apellido": "Star",
+        "edad": 30,
+        "ciudad": "Santander",
+        "profesion": "Héroe"
+    }
+]

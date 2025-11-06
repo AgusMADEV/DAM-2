@@ -1,0 +1,44 @@
+[
+    {
+        "nombre": "Duke",
+        "apellido": "Nukem",
+        "edad": 50,
+        "ciudad": "Vigo",
+        "profesion": "Héroe"
+    },
+    {
+        "nombre": "Dante",
+        "apellido": "Sparda",
+        "edad": 40,
+        "ciudad": "Murcia",
+        "profesion": "Cazademonios"
+    },
+    {
+        "nombre": "Duke",
+        "apellido": "Nukem",
+        "edad": 50,
+        "ciudad": "Vigo",
+        "profesion": "Héroe"
+    },
+    {
+        "nombre": "Dante",
+        "apellido": "Sparda",
+        "edad": 40,
+        "ciudad": "Murcia",
+        "profesion": "Cazademonios"
+    },
+    {
+        "nombre": "Duke",
+        "apellido": "Nukem",
+        "edad": 50,
+        "ciudad": "Vigo",
+        "profesion": "Héroe"
+    },
+    {
+        "nombre": "Dante",
+        "apellido": "Sparda",
+        "edad": 40,
+        "ciudad": "Murcia",
+        "profesion": "Cazademonios"
+    }
+]

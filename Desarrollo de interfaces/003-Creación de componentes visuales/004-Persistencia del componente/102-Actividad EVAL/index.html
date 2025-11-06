@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>boton-tooltip con buscador (juegos favoritos)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script type="module" src="boton-tooltip.js"></script>
+  <style>
+    body{ font-family: system-ui, sans-serif; background:#fafafa; margin:2rem; }
+    h1{ font-weight:600; color:#333; }
+    section{
+      background:#fff; padding:1.5rem; border-radius:1rem;
+      box-shadow: 0 6px 18px rgba(0,0,0,.06); max-width: 740px;
+    }
+    .grid{ display:grid; gap:1.2rem; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+  </style>
+</head>
+<body>
+  <h1>🎮 Componentes con buscador + tooltip</h1>
+  <section>
+    <p>
+      Escribe para filtrar y selecciona un juego. Al pulsar <em>“Mostrar info”</em> verás un tooltip con la descripción.
+    </p>
+
+    <div class="grid">
+      <!-- Instancia 1 -->
+      <boton-tooltip label="Mostrar info" placeholder="Busca un videojuego…">
+        <!-- Fuente de datos (solo lectura). Cada <option> aporta texto + data-desc -->
+        <option data-desc="Acción y aventuras; mundo abierto y resolución de puzles.">
+          The Legend of Zelda: Tears of the Kingdom
+        </option>
+        <option data-desc="Arcade de coches + fútbol; muy competitivo y con física divertida.">
+          Rocket League
+        </option>
+        <option data-desc="Metroidvania desafiante con gran diseño de niveles y ambientación.">
+          Hollow Knight
+        </option>
+        <option data-desc="Shooter hero-based 5v5 con trabajo en equipo y habilidades únicas.">
+          Overwatch 2
+        </option>
+        <option data-desc="Simulador deportivo con licencias oficiales y modos competitivos.">
+          EA Sports FC 25 (FIFA)
+        </option>
+        <option data-desc="Acción/rol en mundo abierto, combate exigente y jefes memorables.">
+          Elden Ring
+        </option>
+      </boton-tooltip>
+    </div>
+  </section>
+</body>
+</html>

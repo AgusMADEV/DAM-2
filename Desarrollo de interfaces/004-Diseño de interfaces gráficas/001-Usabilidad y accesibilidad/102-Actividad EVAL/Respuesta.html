@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academia Digital - Aprende Online</title>
+    <!-- Medición didáctica de la anchura de pantalla -->
+    <script>
+        (function () {
+            try {
+                const w = window.innerWidth || document.documentElement.clientWidth;
+                localStorage.setItem("anchura_pantalla", String(w));
+            } catch (e) {}
+        })();
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --text-color: #1f2937;
+            --bg-color: #ffffff;
+            --light-bg: #f3f4f6;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --font-size-base: 16px;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            font-size: var(--font-size-base);
+        }
+
+        body.high-contrast {
+            --primary-color: #000000;
+            --text-color: #000000;
+            --bg-color: #ffff00;
+            --light-bg: #ffffff;
+        }
+
+        /* Header - Logo arriba a la izquierda */
+        header {
+            background-color: var(--bg-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        /* Navegación horizontal en la parte superior */
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Herramientas de accesibilidad */
+        .accessibility-tools {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: var(--bg-color);
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 999;
+        }
+
+        .accessibility-tools h3 {
+            font-size: 0.9em;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .tool-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .tool-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Banner/Hero - Above the fold */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero h1 {
+            font-size: 2.5em;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.3em;
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        .cta-button {
+            background-color: white;
+            color: var(--primary-color);
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Buscador prominente */
+        .search-section {
+            max-width: 1200px;
+            margin: -50px auto 0;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .search-container {
+            background: var(--bg-color);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .search-btn {
+            padding: 1rem 2rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .search-results {
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        /* Contenido principal */
+        .content {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-card {
+            background: var(--light-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        /* Formulario sencillo y automatizado */
+        .form-section {
+            max-width: 600px;
+            margin: 4rem auto;
+            padding: 2rem;
+            background: var(--light-bg);
+            border-radius: 12px;
+        }
+
+        .form-section h2 {
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-group input.valid {
+            border-color: var(--success-color);
+            background-color: #f0fdf4;
+        }
+
+        .form-group input.invalid {
+            border-color: var(--error-color);
+            background-color: #fef2f2;
+        }
+
+        .validation-message {
+            font-size: 0.9em;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .validation-message.success {
+            color: var(--success-color);
+            display: block;
+        }
+
+        .validation-message.error {
+            color: var(--error-color);
+            display: block;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .privacy-notice {
+            margin-top: 1rem;
+            font-size: 0.9em;
+            color: #6b7280;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+
+            .hero h1 {
+                font-size: 2em;
+            }
+
+            .accessibility-tools {
+                right: 10px;
+                padding: 0.5rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header con logo arriba a la izquierda -->
+    <header>
+        <div class="header-content">
+            <div class="logo">🎓 Academia Digital</div>
+            <!-- Navegación horizontal -->
+            <nav>
+                <ul>
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#cursos">Cursos</a></li>
+                    <li><a href="#sobre-nosotros">Sobre Nosotros</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Herramientas de accesibilidad -->
+    <div class="accessibility-tools">
+        <h3>Accesibilidad</h3>
+        <div class="tool-buttons">
+            <button class="tool-btn" onclick="increaseFontSize()" style="background-color: #10b981; color: white;">A+</button>
+            <button class="tool-btn" onclick="decreaseFontSize()" style="background-color: #f59e0b; color: white;">A-</button>
+            <button class="tool-btn" onclick="toggleContrast()" style="background-color: #6b7280; color: white;">Alto Contraste</button>
+            <button class="tool-btn" onclick="resetAccessibility()" style="background-color: #ef4444; color: white;">Resetear</button>
+        </div>
+    </div>
+
+    <!-- Banner/Hero - Contenido principal above the fold -->
+    <section class="hero">
+        <h1>Aprende a Tu Ritmo, Desde Cualquier Lugar</h1>
+        <p>Descubre más de 500 cursos online diseñados por expertos. Empieza hoy y transforma tu futuro.</p>
+        <button class="cta-button" onclick="document.getElementById('formulario').scrollIntoView({behavior: 'smooth'})">
+            Comienza Gratis
+        </button>
+    </section>
+
+    <!-- Buscador prominente -->
+    <section class="search-section">
+        <div class="search-container">
+            <h2>¿Qué quieres aprender hoy?</h2>
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="Busca cursos, temas, habilidades..." onkeyup="performSearch()">
+                <button class="search-btn" onclick="performSearch()">Buscar</button>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+    </section>
+
+    <!-- Contenido principal -->
+    <main class="content">
+        <h2 style="text-align: center; margin-bottom: 2rem;">¿Por qué elegirnos?</h2>
+        <div class="features">
+            <div class="feature-card">
+                <h3>📚 500+ Cursos</h3>
+                <p>Amplio catálogo en múltiples áreas del conocimiento</p>
+            </div>
+            <div class="feature-card">
+                <h3>👨‍🏫 Expertos</h3>
+                <p>Aprende de profesionales con años de experiencia</p>
+            </div>
+            <div class="feature-card">
+                <h3>📱 Acceso 24/7</h3>
+                <p>Estudia cuando quieras, desde donde quieras</p>
+            </div>
+            <div class="feature-card">
+                <h3>🎓 Certificados</h3>
+                <p>Obtén certificaciones reconocidas internacionalmente</p>
+            </div>
+        </div>
+
+        <!-- Formulario sencillo y automatizado -->
+        <div class="form-section" id="formulario">
+            <h2>Registro Rápido</h2>
+            <form onsubmit="return handleSubmit(event)">
+                <div class="form-group">
+                    <label for="nombre">Nombre Completo *</label>
+                    <input type="text" id="nombre" name="nombre" required onblur="validateName(this)" oninput="validateName(this)">
+                    <div class="validation-message" id="nombreMsg"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Correo Electrónico *</label>
+                    <input type="email" id="email" name="email" required onblur="validateEmail(this)" oninput="validateEmail(this)">
+                    <div class="validation-message" id="emailMsg"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pais">País *</label>
+                    <select id="pais" name="pais" required>
+                        <option value="">Selecciona tu país</option>
+                        <option value="es">España</option>
+                        <option value="mx">México</option>
+                        <option value="ar">Argentina</option>
+                        <option value="co">Colombia</option>
+                        <option value="cl">Chile</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="interes">Área de Interés *</label>
+                    <select id="interes" name="interes" required>
+                        <option value="">¿Qué te gustaría aprender?</option>
+                        <option value="programacion">Programación</option>
+                        <option value="diseno">Diseño</option>
+                        <option value="marketing">Marketing</option>
+                        <option value="negocios">Negocios</option>
+                        <option value="idiomas">Idiomas</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="submit-btn">Crear Cuenta Gratis</button>
+
+                <p class="privacy-notice">
+                    Al registrarte, aceptas nuestra <a href="#" style="color: var(--primary-color);">Política de Privacidad</a>. 
+                    Tus datos están protegidos y nunca serán compartidos con terceros.
+                </p>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // Base de datos de cursos simulada
+        const cursos = [
+            'Desarrollo Web con HTML y CSS',
+            'JavaScript para Principiantes',
+            'Python Avanzado',
+            'Diseño UX/UI',
+            'Marketing Digital',
+            'Fotografía Profesional',
+            'Inglés para Negocios',
+            'Excel Avanzado',
+            'Gestión de Proyectos',
+            'Inteligencia Artificial'
+        ];
+
+        let currentFontSize = 16;
+
+        // Función para aumentar tamaño de fuente
+        function increaseFontSize() {
+            if (currentFontSize < 24) {
+                currentFontSize += 2;
+                document.documentElement.style.setProperty('--font-size-base', currentFontSize + 'px');
+            }
+        }
+
+        // Función para disminuir tamaño de fuente
+        function decreaseFontSize() {
+            if (currentFontSize > 12) {
+                currentFontSize -= 2;
+                document.documentElement.style.setProperty('--font-size-base', currentFontSize + 'px');
+            }
+        }
+
+        // Función para alto contraste
+        function toggleContrast() {
+            document.body.classList.toggle('high-contrast');
+        }
+
+        // Función para resetear accesibilidad
+        function resetAccessibility() {
+            currentFontSize = 16;
+            document.documentElement.style.setProperty('--font-size-base', '16px');
+            document.body.classList.remove('high-contrast');
+        }
+
+        // Función de búsqueda en tiempo real
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (query.length < 2) {
+                resultsDiv.classList.remove('active');
+                return;
+            }
+
+            const results = cursos.filter(curso => curso.toLowerCase().includes(query));
+            
+            if (results.length > 0) {
+                resultsDiv.innerHTML = '<h3>Resultados encontrados:</h3>';
+                results.forEach(resultado => {
+                    resultsDiv.innerHTML += `<div class="search-result-item">📖 ${resultado}</div>`;
+                });
+                resultsDiv.classList.add('active');
+            } else {
+                resultsDiv.innerHTML = '<div class="search-result-item">No se encontraron resultados</div>';
+                resultsDiv.classList.add('active');
+            }
+        }
+
+        // Validación en tiempo real del nombre
+        function validateName(input) {
+            const msg = document.getElementById('nombreMsg');
+            if (input.value.length >= 3) {
+                input.classList.add('valid');
+                input.classList.remove('invalid');
+                msg.textContent = '✓ Nombre válido';
+                msg.className = 'validation-message success';
+            } else if (input.value.length > 0) {
+                input.classList.add('invalid');
+                input.classList.remove('valid');
+                msg.textContent = '✗ El nombre debe tener al menos 3 caracteres';
+                msg.className = 'validation-message error';
+            } else {
+                input.classList.remove('valid', 'invalid');
+                msg.className = 'validation-message';
+            }
+        }
+
+        // Validación en tiempo real del email
+        function validateEmail(input) {
+            const msg = document.getElementById('emailMsg');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (emailRegex.test(input.value)) {
+                input.classList.add('valid');
+                input.classList.remove('invalid');
+                msg.textContent = '✓ Email válido';
+                msg.className = 'validation-message success';
+            } else if (input.value.length > 0) {
+                input.classList.add('invalid');
+                input.classList.remove('valid');
+                msg.textContent = '✗ Por favor, introduce un email válido';
+                msg.className = 'validation-message error';
+            } else {
+                input.classList.remove('valid', 'invalid');
+                msg.className = 'validation-message';
+            }
+        }
+
+        // Manejo del envío del formulario
+        function handleSubmit(event) {
+            event.preventDefault();
+            
+            const formData = {
+                nombre: document.getElementById('nombre').value,
+                email: document.getElementById('email').value,
+                pais: document.getElementById('pais').value,
+                interes: document.getElementById('interes').value
+            };
+
+            alert('¡Registro exitoso! Bienvenido ' + formData.nombre + '\n\nTe hemos enviado un email de confirmación a: ' + formData.email);
+            
+            // Limpiar formulario
+            event.target.reset();
+            document.querySelectorAll('input').forEach(input => {
+                input.classList.remove('valid', 'invalid');
+            });
+            document.querySelectorAll('.validation-message').forEach(msg => {
+                msg.className = 'validation-message';
+            });
+
+            return false;
+        }
+    </script>
+</body>
+</html>

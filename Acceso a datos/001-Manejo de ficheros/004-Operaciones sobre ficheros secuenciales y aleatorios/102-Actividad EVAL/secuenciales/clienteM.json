@@ -1,0 +1,107 @@
+[
+    {
+        "nombre": "Mario",
+        "apellido": "Bros",
+        "edad": 35,
+        "ciudad": "Valencia",
+        "profesion": "Fontanero"
+    },
+    {
+        "nombre": "Master",
+        "apellido": "Chief",
+        "edad": 41,
+        "ciudad": "Bilbao",
+        "profesion": "Supersoldado"
+    },
+    {
+        "nombre": "Megan",
+        "apellido": "Rapinoe",
+        "edad": 38,
+        "ciudad": "Murcia",
+        "profesion": "Futbolista"
+    },
+    {
+        "nombre": "Marcus",
+        "apellido": "Fenix",
+        "edad": 38,
+        "ciudad": "Granada",
+        "profesion": "Soldado"
+    },
+    {
+        "nombre": "Misty",
+        "apellido": "Waterflower",
+        "edad": 21,
+        "ciudad": "Madrid",
+        "profesion": "Entrenadora"
+    },
+    {
+        "nombre": "Mario",
+        "apellido": "Bros",
+        "edad": 35,
+        "ciudad": "Valencia",
+        "profesion": "Fontanero"
+    },
+    {
+        "nombre": "Master",
+        "apellido": "Chief",
+        "edad": 41,
+        "ciudad": "Bilbao",
+        "profesion": "Supersoldado"
+    },
+    {
+        "nombre": "Megan",
+        "apellido": "Rapinoe",
+        "edad": 38,
+        "ciudad": "Murcia",
+        "profesion": "Futbolista"
+    },
+    {
+        "nombre": "Marcus",
+        "apellido": "Fenix",
+        "edad": 38,
+        "ciudad": "Granada",
+        "profesion": "Soldado"
+    },
+    {
+        "nombre": "Misty",
+        "apellido": "Waterflower",
+        "edad": 21,
+        "ciudad": "Madrid",
+        "profesion": "Entrenadora"
+    },
+    {
+        "nombre": "Mario",
+        "apellido": "Bros",
+        "edad": 35,
+        "ciudad": "Valencia",
+        "profesion": "Fontanero"
+    },
+    {
+        "nombre": "Master",
+        "apellido": "Chief",
+        "edad": 41,
+        "ciudad": "Bilbao",
+        "profesion": "Supersoldado"
+    },
+    {
+        "nombre": "Megan",
+        "apellido": "Rapinoe",
+        "edad": 38,
+        "ciudad": "Murcia",
+        "profesion": "Futbolista"
+    },
+    {
+        "nombre": "Marcus",
+        "apellido": "Fenix",
+        "edad": 38,
+        "ciudad": "Granada",
+        "profesion": "Soldado"
+    },
+    {
+        "nombre": "Misty",
+        "apellido": "Waterflower",
+        "edad": 21,
+        "ciudad": "Madrid",
+        "profesion": "Entrenadora"
+    }
+]

@@ -1,0 +1,2 @@
+El banner principal de una web que generalmente se denomina héroe es lo primero que ve un usuario al visitar la web así que lo primero y lo principal que hay que cuidar cuando creamos un sitio web en el próximo día estaremos haciendo ejemplos de todo esto que hoy estoy comentando en la teoría lo primero que tenemos que hacer es cuidar lo que comunica tanto la imagen como el texto del banner o del héroe 
+

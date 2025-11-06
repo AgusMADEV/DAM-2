@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Gráficas</title>
+    <meta charset="utf-8">
+    <style>
+      
+    </style>
+  </head>
+  <body>
+    <div class="grafica">
+
+    </div>  
+    <script>
+      let datos1 = [
+        {
+          "Etiqueta":"España",
+          "Valor":74
+        },
+        {
+          "Etiqueta":"Francia",
+          "Valor":78
+        },
+        {
+          "Etiqueta":"Alemania",
+          "Valor":76
+        },
+        {
+          "Etiqueta":"Austria",
+          "Valor":87
+        },
+        {
+          "Etiqueta":"Italia",
+          "Valor":127
+        }
+      ]
+      
+      function getRandomHexColor() {
+        return "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0");
+      }
+      function jvgraficatarta(selector,datos1){
+        let suma = 0;
+        for(let i = 0;i<datos1.length;i++){
+          suma += datos1[i].Valor
+        }
+        console.log("La suma es:",suma)
+        let cursor = 0
+        let cadena = ""
+        console.log(datos1)
+        for(let i = 0;i<datos1.length;i++){
+          inicio = cursor*100+"%"
+          cursor += (datos1[i].Valor)/suma
+          final = cursor*100+"%"
+          cadena += getRandomHexColor()+" "+inicio+" "+final+","
+        }
+        console.log(cadena)
+        cadena = cadena.slice(0, -1);
+        let grafica = document.querySelector(selector)
+        grafica.style.position = "relative"
+        grafica.style.width = "240px"
+        grafica.style.aspectRatio = 1
+        grafica.style.borderRadius = "50%";
+        grafica.style.background = `
+          conic-gradient(
+            `+cadena+`
+          )
+        `;
+      }
+      
+      jvgraficatarta(".grafica",datos1)
+    </script>
+    
+  </body>
+</html>

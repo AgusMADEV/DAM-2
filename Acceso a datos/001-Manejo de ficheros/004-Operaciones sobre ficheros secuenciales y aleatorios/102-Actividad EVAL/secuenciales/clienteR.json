@@ -1,0 +1,65 @@
+[
+    {
+        "nombre": "Rafael",
+        "apellido": "Nadal",
+        "edad": 37,
+        "ciudad": "Palma",
+        "profesion": "Tenista"
+    },
+    {
+        "nombre": "Ryu",
+        "apellido": "Hayabusa",
+        "edad": 30,
+        "ciudad": "Málaga",
+        "profesion": "Ninja"
+    },
+    {
+        "nombre": "Raiden",
+        "apellido": "Thunder",
+        "edad": 33,
+        "ciudad": "Vigo",
+        "profesion": "Cyborg"
+    },
+    {
+        "nombre": "Rafael",
+        "apellido": "Nadal",
+        "edad": 37,
+        "ciudad": "Palma",
+        "profesion": "Tenista"
+    },
+    {
+        "nombre": "Ryu",
+        "apellido": "Hayabusa",
+        "edad": 30,
+        "ciudad": "Málaga",
+        "profesion": "Ninja"
+    },
+    {
+        "nombre": "Raiden",
+        "apellido": "Thunder",
+        "edad": 33,
+        "ciudad": "Vigo",
+        "profesion": "Cyborg"
+    },
+    {
+        "nombre": "Rafael",
+        "apellido": "Nadal",
+        "edad": 37,
+        "ciudad": "Palma",
+        "profesion": "Tenista"
+    },
+    {
+        "nombre": "Ryu",
+        "apellido": "Hayabusa",
+        "edad": 30,
+        "ciudad": "Málaga",
+        "profesion": "Ninja"
+    },
+    {
+        "nombre": "Raiden",
+        "apellido": "Thunder",
+        "edad": 33,
+        "ciudad": "Vigo",
+        "profesion": "Cyborg"
+    }
+]

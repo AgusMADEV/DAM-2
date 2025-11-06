@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Gráficas</title>
+    <meta charset="utf-8">
+    <style>
+      .amdev-barras {
+        font-family:sans-serif;
+      }
+      .amdev-barras td:first-child{
+        text-align:right;
+      }
+      .barra {
+        min-width:0px;
+        height:10px;
+        background:blue;
+        border-radius:5px;
+        padding:5px;
+        color:white;
+        font-size:10px;
+        line-height:10px;
+        font-weight:bold;
+      }
+    </style>
+
+  </head>
+  <body>
+    
+    <div class="grafica1"></div>
+    <div class="grafica2"></div>
+    <div class="grafica3"></div>
+    <div class="grafica4"></div>
+    <script>
+      let datos1 = [
+        { "Etiqueta": "The Legend of Zelda", "Valor": 95 },
+        { "Etiqueta": "Super Mario Bros", "Valor": 88 },
+        { "Etiqueta": "Minecraft", "Valor": 92 },
+        { "Etiqueta": "Fortnite", "Valor": 79 },
+        { "Etiqueta": "Elden Ring", "Valor": 97 }
+      ];
+
+      let datos2 = [
+        { "Etiqueta": "PlayStation", "Valor": 120 },
+        { "Etiqueta": "Xbox", "Valor": 95 },
+        { "Etiqueta": "Nintendo Switch", "Valor": 135 },
+        { "Etiqueta": "PC", "Valor": 150 },
+        { "Etiqueta": "Steam Deck", "Valor": 60 }
+      ];
+
+      let datos3 = [
+        { "Etiqueta": "Acción", "Valor": 110 },
+        { "Etiqueta": "Aventura", "Valor": 90 },
+        { "Etiqueta": "Rol", "Valor": 85 },
+        { "Etiqueta": "Deportes", "Valor": 70 },
+        { "Etiqueta": "Simulación", "Valor": 65 }
+      ];
+
+      let datos4 = [
+        { "Etiqueta": "Epic Games", "Valor": 45 },
+        { "Etiqueta": "Valve", "Valor": 82 },
+        { "Etiqueta": "Ubisoft", "Valor": 73 },
+        { "Etiqueta": "Square Enix", "Valor": 68 },
+        { "Etiqueta": "Rockstar Games", "Valor": 89 }
+      ];
+
+      let datos5 = [
+        { "Etiqueta": "España", "Valor": 65 },
+        { "Etiqueta": "Japón", "Valor": 120 },
+        { "Etiqueta": "EEUU", "Valor": 130 },
+        { "Etiqueta": "Corea del Sur", "Valor": 95 },
+        { "Etiqueta": "Reino Unido", "Valor": 85 }
+      ];
+
+      
+      function graficaBarras(selector,misdatos,color){
+      
+        let grafica = document.querySelector(selector);
+        
+        let tabla = document.createElement("table");
+        tabla.classList.add("amdev-barras")
+        grafica.appendChild(tabla)
+        
+        let cabecera = document.createElement("thead");
+        tabla.appendChild(cabecera)
+        
+        let filacabecera = document.createElement("tr");
+        filacabecera.innerHTML = "<th>Valor</th><th>Gráfica</th>"
+        cabecera.appendChild(filacabecera)
+        
+        let cuerpo = document.createElement("tbody");
+        tabla.appendChild(cuerpo);
+        
+        misdatos.forEach(function(dato){
+        console.log("hola")
+       
+          let fila = document.createElement("tr")
+          cuerpo.appendChild(fila);
+           
+          let valor = document.createElement("td")
+          valor.textContent = dato.Valor
+          fila.appendChild(valor)
+          
+          let contienebarra = document.createElement("td")
+          let barra = document.createElement("div")
+          barra.classList.add("barra")
+          barra.textContent = dato.Etiqueta
+          barra.style.width = dato.Valor+"px"
+          barra.style.backgroundColor = color
+          contienebarra.appendChild(barra)
+          
+          fila.appendChild(contienebarra)
+          
+        })
+      }
+      
+      graficaBarras(".grafica1",datos1,"red")
+      graficaBarras(".grafica2",datos2,"blue")
+      graficaBarras(".grafica3",datos3,"green")
+      graficaBarras(".grafica4",datos4,"pink")
+    </script>
+  </body>
+</html>

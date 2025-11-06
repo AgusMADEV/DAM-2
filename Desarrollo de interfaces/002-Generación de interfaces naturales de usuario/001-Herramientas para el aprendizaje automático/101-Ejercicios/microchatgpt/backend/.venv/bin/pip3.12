@@ -1,0 +1,10 @@
+#!/bin/sh
+'''exec' "/var/www/html/dam2526/Segundo/Desarrollo de interfaces/002-Generación de interfaces naturales de usuario/001-Herramientas para el aprendizaje automático/101-Ejercicios/microchatgpt/backend/.venv/bin/python3" "$0" "$@"
+' '''
+# -*- coding: utf-8 -*-
+import re
+import sys
+from pip._internal.cli.main import main
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(main())

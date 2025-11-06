@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Progreso</title>
+  </head>
+  <body>
+
+    <button>Mostrar progreso</button>
+
+    <script>
+      let boton = document.querySelector("button");
+
+      let progresoDeportes = 60;  
+      let progresoVideojuegos = 85;  
+
+      function mostrarProgreso() {
+        console.log("Progreso en deportes: " + progresoDeportes + "%");
+        console.log("Progreso en videojuegos: " + progresoVideojuegos + "%");
+      }
+
+      boton.ondblclick = function() {
+        console.log("Se ha hecho doble clic en el botón");
+        mostrarProgreso();
+      };
+    </script>
+  </body>
+</html>

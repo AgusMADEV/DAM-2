@@ -77,7 +77,8 @@ tabla.innerHTML = cadena;
 
 AL cargar la página, gracias a los estilos CSS, he conseguido que la tabla se vea de esta forma, y  como se puede apreciar aparece completa con todos los equipos. 
 
-<enlace a la foto>
+![Tabla de equipos](https://github.com/AgusMADEV/DAM-2/raw/main/Desarrollo%20de%20interfaces/001-Generaci%C3%B3n%20de%20interfaces%20de%20usuario/006-Enlace%20de%20componentes%20a%20or%C3%ADgenes%20de%20datos/102-Actividad%20EVAL/tabla.png)
+
 
 Para mostrar este concepto de una forma consistente, aquí presento el ejercicio completo, en el que podemos enlazar un componente HTML (tabla) a un origen de datos, en este caso JSON. En este ejemplo se puede ver como muestro la información de los equipos de fútbol que he visitado en mis viajes.
 

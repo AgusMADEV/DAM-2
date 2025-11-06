@@ -1,0 +1,44 @@
+[
+    {
+        "nombre": "Jill",
+        "apellido": "Valentine",
+        "edad": 34,
+        "ciudad": "Palma",
+        "profesion": "Agente"
+    },
+    {
+        "nombre": "Joel",
+        "apellido": "Miller",
+        "edad": 52,
+        "ciudad": "Valencia",
+        "profesion": "Contrabandista"
+    },
+    {
+        "nombre": "Jill",
+        "apellido": "Valentine",
+        "edad": 34,
+        "ciudad": "Palma",
+        "profesion": "Agente"
+    },
+    {
+        "nombre": "Joel",
+        "apellido": "Miller",
+        "edad": 52,
+        "ciudad": "Valencia",
+        "profesion": "Contrabandista"
+    },
+    {
+        "nombre": "Jill",
+        "apellido": "Valentine",
+        "edad": 34,
+        "ciudad": "Palma",
+        "profesion": "Agente"
+    },
+    {
+        "nombre": "Joel",
+        "apellido": "Miller",
+        "edad": 52,
+        "ciudad": "Valencia",
+        "profesion": "Contrabandista"
+    }
+]

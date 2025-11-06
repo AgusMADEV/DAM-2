@@ -1,0 +1,53 @@
+[
+  {
+    "fecha": "22/12/2023",
+    "hora": "22:00",
+    "paciente": "agusyelena",
+    "descripcion": "amor",
+    "id": "2a0e7838-552e-4d29-bb9e-34b942607403",
+    "duracion_min": 30,
+    "telefono": "677321410",
+    "estado": "Programada",
+    "created_at": "2025-11-05T23:22:43.216532",
+    "updated_at": "2025-11-05T23:22:43.216533",
+    "historial": {},
+    "notas_seguimiento": "",
+    "cita_anterior_id": null,
+    "cita_siguiente_id": null,
+    "motivo_cambio": null
+  },
+  {
+    "fecha": "12/05/2025",
+    "hora": "12:30",
+    "paciente": "adad",
+    "descripcion": "asdasdsa",
+    "id": "e9201b48-6e2e-4b51-bf3c-75babd827045",
+    "duracion_min": 30,
+    "telefono": "152635426",
+    "estado": "Atendida",
+    "created_at": "2025-11-05T23:22:43.216518",
+    "updated_at": "2025-11-05T23:22:43.216523",
+    "historial": {},
+    "notas_seguimiento": "",
+    "cita_anterior_id": null,
+    "cita_siguiente_id": null,
+    "motivo_cambio": null
+  },
+  {
+    "fecha": "15/12/2025",
+    "hora": "12:00",
+    "paciente": "agus",
+    "descripcion": "dolor",
+    "id": "a74d294d-21a8-4b1f-ad80-10b815f3859e",
+    "duracion_min": 30,
+    "telefono": "642512265",
+    "estado": "Atendida",
+    "created_at": "2025-11-05T23:22:43.216528",
+    "updated_at": "2025-11-05T23:22:43.216529",
+    "historial": {},
+    "notas_seguimiento": "",
+    "cita_anterior_id": null,
+    "cita_siguiente_id": null,
+    "motivo_cambio": null
+  }
+]

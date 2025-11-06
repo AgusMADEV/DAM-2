@@ -1,0 +1,44 @@
+[
+    {
+        "nombre": "Brock",
+        "apellido": "Harrison",
+        "edad": 24,
+        "ciudad": "Barcelona",
+        "profesion": "Criador"
+    },
+    {
+        "nombre": "Bayonetta",
+        "apellido": "Umbra",
+        "edad": 500,
+        "ciudad": "Palma",
+        "profesion": "Bruja"
+    },
+    {
+        "nombre": "Brock",
+        "apellido": "Harrison",
+        "edad": 24,
+        "ciudad": "Barcelona",
+        "profesion": "Criador"
+    },
+    {
+        "nombre": "Bayonetta",
+        "apellido": "Umbra",
+        "edad": 500,
+        "ciudad": "Palma",
+        "profesion": "Bruja"
+    },
+    {
+        "nombre": "Brock",
+        "apellido": "Harrison",
+        "edad": 24,
+        "ciudad": "Barcelona",
+        "profesion": "Criador"
+    },
+    {
+        "nombre": "Bayonetta",
+        "apellido": "Umbra",
+        "edad": 500,
+        "ciudad": "Palma",
+        "profesion": "Bruja"
+    }
+]

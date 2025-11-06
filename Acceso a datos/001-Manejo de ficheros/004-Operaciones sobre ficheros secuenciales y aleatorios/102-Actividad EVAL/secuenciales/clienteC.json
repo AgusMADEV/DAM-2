@@ -1,0 +1,107 @@
+[
+    {
+        "nombre": "Cristiano",
+        "apellido": "Ronaldo",
+        "edad": 38,
+        "ciudad": "Madrid",
+        "profesion": "Futbolista"
+    },
+    {
+        "nombre": "Cloud",
+        "apellido": "Strife",
+        "edad": 27,
+        "ciudad": "Alicante",
+        "profesion": "Mercenario"
+    },
+    {
+        "nombre": "Chell",
+        "apellido": "Johnson",
+        "edad": 29,
+        "ciudad": "Córdoba",
+        "profesion": "Científica"
+    },
+    {
+        "nombre": "Cortana",
+        "apellido": "AI",
+        "edad": 8,
+        "ciudad": "Santander",
+        "profesion": "IA"
+    },
+    {
+        "nombre": "Cammy",
+        "apellido": "White",
+        "edad": 29,
+        "ciudad": "Zaragoza",
+        "profesion": "Agente"
+    },
+    {
+        "nombre": "Cristiano",
+        "apellido": "Ronaldo",
+        "edad": 38,
+        "ciudad": "Madrid",
+        "profesion": "Futbolista"
+    },
+    {
+        "nombre": "Cloud",
+        "apellido": "Strife",
+        "edad": 27,
+        "ciudad": "Alicante",
+        "profesion": "Mercenario"
+    },
+    {
+        "nombre": "Chell",
+        "apellido": "Johnson",
+        "edad": 29,
+        "ciudad": "Córdoba",
+        "profesion": "Científica"
+    },
+    {
+        "nombre": "Cortana",
+        "apellido": "AI",
+        "edad": 8,
+        "ciudad": "Santander",
+        "profesion": "IA"
+    },
+    {
+        "nombre": "Cammy",
+        "apellido": "White",
+        "edad": 29,
+        "ciudad": "Zaragoza",
+        "profesion": "Agente"
+    },
+    {
+        "nombre": "Cristiano",
+        "apellido": "Ronaldo",
+        "edad": 38,
+        "ciudad": "Madrid",
+        "profesion": "Futbolista"
+    },
+    {
+        "nombre": "Cloud",
+        "apellido": "Strife",
+        "edad": 27,
+        "ciudad": "Alicante",
+        "profesion": "Mercenario"
+    },
+    {
+        "nombre": "Chell",
+        "apellido": "Johnson",
+        "edad": 29,
+        "ciudad": "Córdoba",
+        "profesion": "Científica"
+    },
+    {
+        "nombre": "Cortana",
+        "apellido": "AI",
+        "edad": 8,
+        "ciudad": "Santander",
+        "profesion": "IA"
+    },
+    {
+        "nombre": "Cammy",
+        "apellido": "White",
+        "edad": 29,
+        "ciudad": "Zaragoza",
+        "profesion": "Agente"
+    }
+]

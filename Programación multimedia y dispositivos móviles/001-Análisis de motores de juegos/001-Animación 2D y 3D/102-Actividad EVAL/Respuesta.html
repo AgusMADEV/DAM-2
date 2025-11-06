@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+  <body>
+    <canvas width="1024" height="1024"></canvas>
+    <script>
+      // === Carga de la imagen del spritesheet ===
+      const rejilla = new Image();
+      rejilla.src = "spritesheet.png";
+
+      // === Variables requeridas por el enunciado ===
+      let posx = 64;          // posición en píxeles (x)
+      let posy = 64;          // posición en píxeles (y)
+      let temporizador = null; // id devuelto por setTimeout
+
+      // === Mínimos necesarios para dibujar ===
+      const lienzo = document.querySelector("canvas");
+      const contexto = lienzo.getContext("2d");
+      contexto.imageSmoothingEnabled = false;
+
+      // Grid 16x16 (1024/16 = 64 px por celda)
+      const TAM_CELDA = 64;
+
+      // Matriz de escenario 16x16 (1 = pintar bloque)
+      const escenario = [
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0],
+        [0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
+        [0,1,0,0,0,1,1,1,1,1,0,0,0,0,1,0],
+        [0,1,0,0,0,1,0,0,0,1,0,0,0,0,1,0],
+        [0,1,0,0,0,1,0,0,0,1,0,0,0,0,1,0],
+        [0,1,0,0,0,1,1,1,1,1,0,0,0,0,1,0],
+        [0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
+        [0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
+        [0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
+        [0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
+        [0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
+        [0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
+        [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+      ];
+
+      // === Dibuja el escenario (grid 16×16 y celdas con 1) ===
+      function pintaEscenario(){
+        contexto.clearRect(0,0,1024,1024);
+
+        // Grid
+        contexto.strokeStyle = "#222";
+        for(let i=0;i<=16;i++){
+          contexto.beginPath();
+          contexto.moveTo(i*TAM_CELDA, 0);
+          contexto.lineTo(i*TAM_CELDA, 1024);
+          contexto.stroke();
+          contexto.beginPath();
+          contexto.moveTo(0, i*TAM_CELDA);
+          contexto.lineTo(1024, i*TAM_CELDA);
+          contexto.stroke();
+        }
+
+        // Celdas con valor 1
+        contexto.fillStyle = "#2b2b2b";
+        for(let y=0; y<16; y++){
+          for(let x=0; x<16; x++){
+            if(escenario[y][x] === 1){
+              contexto.fillRect(
+                x*TAM_CELDA, y*TAM_CELDA, TAM_CELDA, TAM_CELDA
+              );
+            }
+          }
+        }
+      }
+
+      // === Animación del personaje con setTimeout (cambia tramo) ===
+      let frame = 0;            // tramo actual del spritesheet
+      const FRAME_W = 64;       // ancho de frame
+      const FRAME_H = 64;       // alto de frame
+      const TOTAL_FRAMES = 8;   // nº tramos en fila
+
+      function animar(){
+        pintaEscenario();
+        // pinta el frame actual en (posx,posy)
+        const sx = frame * FRAME_W;
+        contexto.drawImage(
+          rejilla,
+          sx, 0, FRAME_W, FRAME_H,
+          posx, posy, FRAME_W, FRAME_H
+        );
+        frame = (frame + 1) % TOTAL_FRAMES;
+        temporizador = setTimeout(animar, 150);
+      }
+
+      // === Interacción con ratón: mover el personaje al hacer clic ===
+      lienzo.addEventListener("click", (e)=>{
+        const r = lienzo.getBoundingClientRect();
+        const cx = Math.floor((e.clientX - r.left)/TAM_CELDA);
+        const cy = Math.floor((e.clientY - r.top)/TAM_CELDA);
+        posx = cx * TAM_CELDA;
+        posy = cy * TAM_CELDA;
+        // repinta inmediato
+        pintaEscenario();
+        contexto.drawImage(rejilla, frame*FRAME_W, 0, FRAME_W, FRAME_H, posx, posy, FRAME_W, FRAME_H);
+      });
+
+      // === Inicio cuando cargue el spritesheet ===
+      rejilla.onload = function(){
+        pintaEscenario();
+        animar();
+      };
+    </script>
+  </body>
+</html>

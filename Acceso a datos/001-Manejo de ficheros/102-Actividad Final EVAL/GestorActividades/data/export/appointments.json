@@ -1,0 +1,53 @@
+[
+  {
+    "fecha": "12/05/2025",
+    "hora": "12:30",
+    "paciente": "adad",
+    "descripcion": "asdasdsa",
+    "id": "e9201b48-6e2e-4b51-bf3c-75babd827045",
+    "duracion_min": 30,
+    "telefono": "152635426",
+    "estado": "Atendida",
+    "created_at": "2025-11-05T23:16:49.620883",
+    "updated_at": "2025-11-05T23:16:49.620884",
+    "historial": {},
+    "notas_seguimiento": "",
+    "cita_anterior_id": null,
+    "cita_siguiente_id": null,
+    "motivo_cambio": null
+  },
+  {
+    "fecha": "12/11/2025",
+    "hora": "12:30",
+    "paciente": "Paco",
+    "descripcion": "Ansiedad crónica",
+    "id": "514eef41-1da8-467d-9f4f-fc1f1615c1a7",
+    "duracion_min": 30,
+    "telefono": "677321410",
+    "estado": "Atendida",
+    "created_at": "2025-11-05T23:16:49.620869",
+    "updated_at": "2025-11-05T23:16:49.620875",
+    "historial": {},
+    "notas_seguimiento": "",
+    "cita_anterior_id": null,
+    "cita_siguiente_id": null,
+    "motivo_cambio": null
+  },
+  {
+    "fecha": "15/12/2025",
+    "hora": "12:00",
+    "paciente": "agus",
+    "descripcion": "dolor",
+    "id": "a74d294d-21a8-4b1f-ad80-10b815f3859e",
+    "duracion_min": 30,
+    "telefono": "642512265",
+    "estado": "Atendida",
+    "created_at": "2025-11-05T23:16:49.620879",
+    "updated_at": "2025-11-05T23:16:49.620880",
+    "historial": {},
+    "notas_seguimiento": "",
+    "cita_anterior_id": null,
+    "cita_siguiente_id": null,
+    "motivo_cambio": null
+  }
+]

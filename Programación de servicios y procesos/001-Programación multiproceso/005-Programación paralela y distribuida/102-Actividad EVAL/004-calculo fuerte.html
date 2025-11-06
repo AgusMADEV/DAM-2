@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+  <body>
+    <div id="output">Calculando...</div>
+
+    <script>
+      let worker = new Worker("004worker.js");
+      let output = document.getElementById("output");
+
+      worker.onmessage = (e) => {
+        console.log(e.data);
+        output.textContent = `El worker ha terminado.\nResultado: ${e.data}`;
+      };
+
+      worker.postMessage("start");
+    </script>
+  </body>
+</html>

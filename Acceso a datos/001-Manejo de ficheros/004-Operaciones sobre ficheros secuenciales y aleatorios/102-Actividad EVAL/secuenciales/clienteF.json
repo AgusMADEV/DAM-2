@@ -1,0 +1,44 @@
+[
+    {
+        "nombre": "Fernando",
+        "apellido": "Alonso",
+        "edad": 42,
+        "ciudad": "Santander",
+        "profesion": "Piloto F1"
+    },
+    {
+        "nombre": "Fox",
+        "apellido": "McCloud",
+        "edad": 28,
+        "ciudad": "Granada",
+        "profesion": "Piloto"
+    },
+    {
+        "nombre": "Fernando",
+        "apellido": "Alonso",
+        "edad": 42,
+        "ciudad": "Santander",
+        "profesion": "Piloto F1"
+    },
+    {
+        "nombre": "Fox",
+        "apellido": "McCloud",
+        "edad": 28,
+        "ciudad": "Granada",
+        "profesion": "Piloto"
+    },
+    {
+        "nombre": "Fernando",
+        "apellido": "Alonso",
+        "edad": 42,
+        "ciudad": "Santander",
+        "profesion": "Piloto F1"
+    },
+    {
+        "nombre": "Fox",
+        "apellido": "McCloud",
+        "edad": 28,
+        "ciudad": "Granada",
+        "profesion": "Piloto"
+    }
+]

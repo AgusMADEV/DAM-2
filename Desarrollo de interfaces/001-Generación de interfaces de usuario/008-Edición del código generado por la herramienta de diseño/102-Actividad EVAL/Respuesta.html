@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Gráficas</title>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    
+    <div class="grafica1"></div>
+    <div class="grafica2"></div>
+    <div class="grafica3"></div>
+    <div class="grafica4"></div>
+    <div class="grafica5"></div>
+    <link rel="Stylesheet" href="https://agusmadev.github.io/amdev-barras/amdev-barras.css">
+    <script src="https://agusmadev.github.io/amdev-barras/amdev-barras.js"></script>
+
+    <script>
+      let datos1 = [
+        { "Etiqueta": "The Legend of Zelda", "Valor": 95 },
+        { "Etiqueta": "Super Mario Bros", "Valor": 88 },
+        { "Etiqueta": "Minecraft", "Valor": 92 },
+        { "Etiqueta": "Fortnite", "Valor": 79 },
+        { "Etiqueta": "Elden Ring", "Valor": 97 }
+      ];
+
+      let datos2 = [
+        { "Etiqueta": "PlayStation", "Valor": 120 },
+        { "Etiqueta": "Xbox", "Valor": 95 },
+        { "Etiqueta": "Nintendo Switch", "Valor": 135 },
+        { "Etiqueta": "PC", "Valor": 150 },
+        { "Etiqueta": "Steam Deck", "Valor": 60 }
+      ];
+
+      let datos3 = [
+        { "Etiqueta": "Acción", "Valor": 110 },
+        { "Etiqueta": "Aventura", "Valor": 90 },
+        { "Etiqueta": "Rol", "Valor": 85 },
+        { "Etiqueta": "Deportes", "Valor": 70 },
+        { "Etiqueta": "Simulación", "Valor": 65 }
+      ];
+
+      let datos4 = [
+        { "Etiqueta": "Epic Games", "Valor": 45 },
+        { "Etiqueta": "Valve", "Valor": 82 },
+        { "Etiqueta": "Ubisoft", "Valor": 73 },
+        { "Etiqueta": "Square Enix", "Valor": 68 },
+        { "Etiqueta": "Rockstar Games", "Valor": 89 }
+      ];
+
+      let datos5 = [
+        { "Etiqueta": "España", "Valor": 65 },
+        { "Etiqueta": "Japón", "Valor": 120 },
+        { "Etiqueta": "EEUU", "Valor": 130 },
+        { "Etiqueta": "Corea del Sur", "Valor": 95 },
+        { "Etiqueta": "Reino Unido", "Valor": 85 }
+      ];
+
+      graficaBarras(".grafica1",datos1,"red")
+      graficaBarras(".grafica2",datos2,"blue")
+      graficaBarras(".grafica3",datos3,"green")
+      graficaBarras(".grafica4",datos4,"pink")
+      graficaBarras(".grafica5",datos5,"orange")
+    </script>
+  </body>
+</html>

@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Gráficas</title>
+    <meta charset="utf-8">
+    <style>
+      table{
+        font-family:sans-serif;
+      }
+      table td:first-child{
+        text-align:right;
+      }
+      .barra{
+        min-width:0px;
+        height:10px;
+        background:blue;
+        border-radius:5px;
+        padding:5px;
+        color:white;
+        font-size:10px;
+        line-height:10px;
+        font-weight:bold;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <div class="grafica"></div>
+    <script>
+      let datos = [
+        {
+          "Etiqueta":"Fifa",
+          "Valor":42
+        },
+        {
+          "Etiqueta":"Call of Duty",
+          "Valor":84
+        },
+        {
+          "Etiqueta":"NBA 2K",
+          "Valor":30
+        },
+        {
+          "Etiqueta":"Inazuma Eleven",
+          "Valor":12
+        },
+        {
+          "Etiqueta":"Pokemon",
+          "Valor":180
+        }
+      ]
+      let grafica = document.querySelector(".grafica");
+      
+      let tabla = document.createElement("table");
+      grafica.appendChild(tabla)
+      
+      let cabecera = document.createElement("thead");
+      tabla.appendChild(cabecera)
+      
+      let filacabecera = document.createElement("tr");
+      filacabecera.innerHTML = "<th>Valor</th><th>Gráfica</th>"
+      cabecera.appendChild(filacabecera)
+      
+      let cuerpo = document.createElement("tbody");
+      tabla.appendChild(cuerpo);
+      
+      datos.forEach(function(dato){
+      console.log("hola")
+     
+        let fila = document.createElement("tr")
+        cuerpo.appendChild(fila);
+         
+        let valor = document.createElement("td")
+        valor.textContent = dato.Valor
+        fila.appendChild(valor)
+        
+        let contienebarra = document.createElement("td")
+        let barra = document.createElement("div")
+        barra.classList.add("barra")
+        barra.textContent = dato.Etiqueta
+        barra.style.width = dato.Valor+"px"
+        contienebarra.appendChild(barra)
+        
+        fila.appendChild(contienebarra)
+        
+      })
+      
+    </script>
+  </body>
+</html>

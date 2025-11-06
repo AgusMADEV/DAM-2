@@ -1,0 +1,44 @@
+[
+    {
+        "nombre": "Geralt",
+        "apellido": "Rivia",
+        "edad": 95,
+        "ciudad": "Valencia",
+        "profesion": "Brujo"
+    },
+    {
+        "nombre": "Gordon",
+        "apellido": "Freeman",
+        "edad": 43,
+        "ciudad": "Valladolid",
+        "profesion": "Físico"
+    },
+    {
+        "nombre": "Geralt",
+        "apellido": "Rivia",
+        "edad": 95,
+        "ciudad": "Valencia",
+        "profesion": "Brujo"
+    },
+    {
+        "nombre": "Gordon",
+        "apellido": "Freeman",
+        "edad": 43,
+        "ciudad": "Valladolid",
+        "profesion": "Físico"
+    },
+    {
+        "nombre": "Geralt",
+        "apellido": "Rivia",
+        "edad": 95,
+        "ciudad": "Valencia",
+        "profesion": "Brujo"
+    },
+    {
+        "nombre": "Gordon",
+        "apellido": "Freeman",
+        "edad": 43,
+        "ciudad": "Valladolid",
+        "profesion": "Físico"
+    }
+]

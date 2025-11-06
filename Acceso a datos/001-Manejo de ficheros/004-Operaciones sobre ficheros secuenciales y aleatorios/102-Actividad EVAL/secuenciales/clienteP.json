@@ -1,0 +1,44 @@
+[
+    {
+        "nombre": "Pikachu",
+        "apellido": "Electric",
+        "edad": 5,
+        "ciudad": "Pamplona",
+        "profesion": "Pokémon"
+    },
+    {
+        "nombre": "Pac",
+        "apellido": "Man",
+        "edad": 42,
+        "ciudad": "Gijón",
+        "profesion": "Comecocos"
+    },
+    {
+        "nombre": "Pikachu",
+        "apellido": "Electric",
+        "edad": 5,
+        "ciudad": "Pamplona",
+        "profesion": "Pokémon"
+    },
+    {
+        "nombre": "Pac",
+        "apellido": "Man",
+        "edad": 42,
+        "ciudad": "Gijón",
+        "profesion": "Comecocos"
+    },
+    {
+        "nombre": "Pikachu",
+        "apellido": "Electric",
+        "edad": 5,
+        "ciudad": "Pamplona",
+        "profesion": "Pokémon"
+    },
+    {
+        "nombre": "Pac",
+        "apellido": "Man",
+        "edad": 42,
+        "ciudad": "Gijón",
+        "profesion": "Comecocos"
+    }
+]

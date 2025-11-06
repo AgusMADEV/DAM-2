@@ -1,0 +1,44 @@
+[
+    {
+        "nombre": "Tom",
+        "apellido": "Brady",
+        "edad": 46,
+        "ciudad": "Zaragoza",
+        "profesion": "Quarterback"
+    },
+    {
+        "nombre": "Tifa",
+        "apellido": "Lockhart",
+        "edad": 25,
+        "ciudad": "Sevilla",
+        "profesion": "Luchadora"
+    },
+    {
+        "nombre": "Tom",
+        "apellido": "Brady",
+        "edad": 46,
+        "ciudad": "Zaragoza",
+        "profesion": "Quarterback"
+    },
+    {
+        "nombre": "Tifa",
+        "apellido": "Lockhart",
+        "edad": 25,
+        "ciudad": "Sevilla",
+        "profesion": "Luchadora"
+    },
+    {
+        "nombre": "Tom",
+        "apellido": "Brady",
+        "edad": 46,
+        "ciudad": "Zaragoza",
+        "profesion": "Quarterback"
+    },
+    {
+        "nombre": "Tifa",
+        "apellido": "Lockhart",
+        "edad": 25,
+        "ciudad": "Sevilla",
+        "profesion": "Luchadora"
+    }
+]

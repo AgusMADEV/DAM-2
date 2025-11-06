@@ -1,0 +1,86 @@
+[
+    {
+        "nombre": "Aloy",
+        "apellido": "Sobeck",
+        "edad": 26,
+        "ciudad": "Gijón",
+        "profesion": "Cazadora"
+    },
+    {
+        "nombre": "Arthur",
+        "apellido": "Morgan",
+        "edad": 36,
+        "ciudad": "Granada",
+        "profesion": "Forajido"
+    },
+    {
+        "nombre": "Ash",
+        "apellido": "Ketchum",
+        "edad": 20,
+        "ciudad": "Barcelona",
+        "profesion": "Entrenador Pokémon"
+    },
+    {
+        "nombre": "Altair",
+        "apellido": "Ibn-La",
+        "edad": 40,
+        "ciudad": "Valladolid",
+        "profesion": "Asesino"
+    },
+    {
+        "nombre": "Aloy",
+        "apellido": "Sobeck",
+        "edad": 26,
+        "ciudad": "Gijón",
+        "profesion": "Cazadora"
+    },
+    {
+        "nombre": "Arthur",
+        "apellido": "Morgan",
+        "edad": 36,
+        "ciudad": "Granada",
+        "profesion": "Forajido"
+    },
+    {
+        "nombre": "Ash",
+        "apellido": "Ketchum",
+        "edad": 20,
+        "ciudad": "Barcelona",
+        "profesion": "Entrenador Pokémon"
+    },
+    {
+        "nombre": "Altair",
+        "apellido": "Ibn-La",
+        "edad": 40,
+        "ciudad": "Valladolid",
+        "profesion": "Asesino"
+    },
+    {
+        "nombre": "Aloy",
+        "apellido": "Sobeck",
+        "edad": 26,
+        "ciudad": "Gijón",
+        "profesion": "Cazadora"
+    },
+    {
+        "nombre": "Arthur",
+        "apellido": "Morgan",
+        "edad": 36,
+        "ciudad": "Granada",
+        "profesion": "Forajido"
+    },
+    {
+        "nombre": "Ash",
+        "apellido": "Ketchum",
+        "edad": 20,
+        "ciudad": "Barcelona",
+        "profesion": "Entrenador Pokémon"
+    },
+    {
+        "nombre": "Altair",
+        "apellido": "Ibn-La",
+        "edad": 40,
+        "ciudad": "Valladolid",
+        "profesion": "Asesino"
+    }
+]

@@ -1,0 +1,17 @@
+ .jvgraficabarras{
+  font-family:sans-serif;
+}
+.jvgraficabarras td:first-child{
+  text-align:right;
+}
+.jvgraficabarras .barra{
+  min-width:0px;
+  height:10px;
+  background:blue;
+  border-radius:5px;
+  padding:5px;
+  color:white;
+  font-size:10px;
+  line-height:10px;
+  font-weight:bold;
+}

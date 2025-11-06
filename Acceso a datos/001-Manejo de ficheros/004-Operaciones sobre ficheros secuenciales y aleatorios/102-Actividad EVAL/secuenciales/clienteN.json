@@ -1,0 +1,44 @@
+[
+    {
+        "nombre": "Neymar",
+        "apellido": "Junior",
+        "edad": 31,
+        "ciudad": "Zaragoza",
+        "profesion": "Futbolista"
+    },
+    {
+        "nombre": "Nathan",
+        "apellido": "Drake",
+        "edad": 40,
+        "ciudad": "Valladolid",
+        "profesion": "Cazatesoros"
+    },
+    {
+        "nombre": "Neymar",
+        "apellido": "Junior",
+        "edad": 31,
+        "ciudad": "Zaragoza",
+        "profesion": "Futbolista"
+    },
+    {
+        "nombre": "Nathan",
+        "apellido": "Drake",
+        "edad": 40,
+        "ciudad": "Valladolid",
+        "profesion": "Cazatesoros"
+    },
+    {
+        "nombre": "Neymar",
+        "apellido": "Junior",
+        "edad": 31,
+        "ciudad": "Zaragoza",
+        "profesion": "Futbolista"
+    },
+    {
+        "nombre": "Nathan",
+        "apellido": "Drake",
+        "edad": 40,
+        "ciudad": "Valladolid",
+        "profesion": "Cazatesoros"
+    }
+]

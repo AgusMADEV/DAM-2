@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Gráficas</title>
+    <meta charset="utf-8">
+    <style>
+      table{
+        font-family:sans-serif;
+      }
+      table td:first-child{
+        text-align:right;
+      }
+      .barra{
+        min-width:0px;
+        height:10px;
+        background:blue;
+        border-radius:5px;
+        padding:5px;
+        color:white;
+        font-size:10px;
+        line-height:10px;
+        font-weight:bold;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <div class="grafica1"></div>
+    <div class="grafica2"></div>
+    <div class="grafica3"></div>
+    <div class="grafica4"></div>
+    <script>
+      let datos1 = [
+        {
+          "Etiqueta":"España",
+          "Valor":34
+        },
+        {
+          "Etiqueta":"Francia",
+          "Valor":78
+        },
+        {
+          "Etiqueta":"Alemania",
+          "Valor":76
+        },
+        {
+          "Etiqueta":"Austria",
+          "Valor":87
+        },
+        {
+          "Etiqueta":"Italia",
+          "Valor":127
+        }
+      ]
+      let datos2 = [
+          {
+            "Etiqueta": "Valencia",
+            "Valor": 56
+          },
+          {
+            "Etiqueta": "Madrid",
+            "Valor": 102
+          },
+          {
+            "Etiqueta": "Barcelona",
+            "Valor": 88
+          },
+          {
+            "Etiqueta": "Sevilla",
+            "Valor": 74
+          },
+          {
+            "Etiqueta": "Bilbao",
+            "Valor": 61
+          }
+        ]
+
+      
+      let datos3 = [
+          {
+            "Etiqueta": "Python",
+            "Valor": 120
+          },
+          {
+            "Etiqueta": "JavaScript",
+            "Valor": 98
+          },
+          {
+            "Etiqueta": "C++",
+            "Valor": 77
+          },
+          {
+            "Etiqueta": "Java",
+            "Valor": 110
+          },
+          {
+            "Etiqueta": "Go",
+            "Valor": 45
+          }
+        ]
+
+      
+      let datos4 = [
+          {
+            "Etiqueta": "Manzana",
+            "Valor": 34
+          },
+          {
+            "Etiqueta": "Plátano",
+            "Valor": 52
+          },
+          {
+            "Etiqueta": "Naranja",
+            "Valor": 46
+          },
+          {
+            "Etiqueta": "Uva",
+            "Valor": 29
+          },
+          {
+            "Etiqueta": "Sandía",
+            "Valor": 67
+          }
+        ]
+
+      
+      function graficaBarras(selector,misdatos){
+      
+        let grafica = document.querySelector(selector);
+        
+        let tabla = document.createElement("table");
+        grafica.appendChild(tabla)
+        
+        let cabecera = document.createElement("thead");
+        tabla.appendChild(cabecera)
+        
+        let filacabecera = document.createElement("tr");
+        filacabecera.innerHTML = "<th>Valor</th><th>Gráfica</th>"
+        cabecera.appendChild(filacabecera)
+        
+        let cuerpo = document.createElement("tbody");
+        tabla.appendChild(cuerpo);
+        
+        misdatos.forEach(function(dato){
+        console.log("hola")
+       
+          let fila = document.createElement("tr")
+          cuerpo.appendChild(fila);
+           
+          let valor = document.createElement("td")
+          valor.textContent = dato.Valor
+          fila.appendChild(valor)
+          
+          let contienebarra = document.createElement("td")
+          let barra = document.createElement("div")
+          barra.classList.add("barra")
+          barra.textContent = dato.Etiqueta
+          barra.style.width = dato.Valor+"px"
+          contienebarra.appendChild(barra)
+          
+          fila.appendChild(contienebarra)
+          
+        })
+      }
+      
+      graficaBarras(".grafica1",datos1)
+      graficaBarras(".grafica2",datos2)
+      graficaBarras(".grafica3",datos3)
+      graficaBarras(".grafica4",datos4)
+    </script>
+  </body>
+</html>

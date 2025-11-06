@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Gráficas</title>
+    <meta charset="utf-8">
+    <style>
+      
+    </style>
+  </head>
+  <body>
+    <div class="grafica">
+
+    </div>  
+    <script>
+      let datos1 = [
+        { "Etiqueta": "The Legend of Zelda", "Valor": 95 },
+        { "Etiqueta": "Super Mario Bros", "Valor": 88 },
+        { "Etiqueta": "Minecraft", "Valor": 92 },
+        { "Etiqueta": "Fortnite", "Valor": 79 },
+        { "Etiqueta": "Elden Ring", "Valor": 97 }
+      ];
+      let grafica = document.querySelector(".grafica")
+      grafica.style.position = "relative"
+      grafica.style.width = "240px"
+      grafica.style.aspectRatio = 1
+      grafica.style.borderRadius = "50%";
+      grafica.style.background = `
+        conic-gradient(
+          #60a5fa 0% 25%,
+          #34d399 25% 55%,
+          #f59e0b 55% 78%,
+          #00ff00 78% 88%,
+          #f43f5e 88% 100%
+        )
+      `;
+    </script>
+    
+  </body>
+</html>

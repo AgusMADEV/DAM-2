@@ -1,0 +1,107 @@
+[
+    {
+        "nombre": "Sonic",
+        "apellido": "Hedgehog",
+        "edad": 28,
+        "ciudad": "Bilbao",
+        "profesion": "Velocista"
+    },
+    {
+        "nombre": "Serena",
+        "apellido": "Williams",
+        "edad": 42,
+        "ciudad": "Murcia",
+        "profesion": "Tenista"
+    },
+    {
+        "nombre": "Samus",
+        "apellido": "Aran",
+        "edad": 32,
+        "ciudad": "Sevilla",
+        "profesion": "Cazarrecompensas"
+    },
+    {
+        "nombre": "Sam",
+        "apellido": "Porter",
+        "edad": 35,
+        "ciudad": "Gijón",
+        "profesion": "Repartidor"
+    },
+    {
+        "nombre": "Solid",
+        "apellido": "Snake",
+        "edad": 42,
+        "ciudad": "Alicante",
+        "profesion": "Espía"
+    },
+    {
+        "nombre": "Sonic",
+        "apellido": "Hedgehog",
+        "edad": 28,
+        "ciudad": "Bilbao",
+        "profesion": "Velocista"
+    },
+    {
+        "nombre": "Serena",
+        "apellido": "Williams",
+        "edad": 42,
+        "ciudad": "Murcia",
+        "profesion": "Tenista"
+    },
+    {
+        "nombre": "Samus",
+        "apellido": "Aran",
+        "edad": 32,
+        "ciudad": "Sevilla",
+        "profesion": "Cazarrecompensas"
+    },
+    {
+        "nombre": "Sam",
+        "apellido": "Porter",
+        "edad": 35,
+        "ciudad": "Gijón",
+        "profesion": "Repartidor"
+    },
+    {
+        "nombre": "Solid",
+        "apellido": "Snake",
+        "edad": 42,
+        "ciudad": "Alicante",
+        "profesion": "Espía"
+    },
+    {
+        "nombre": "Sonic",
+        "apellido": "Hedgehog",
+        "edad": 28,
+        "ciudad": "Bilbao",
+        "profesion": "Velocista"
+    },
+    {
+        "nombre": "Serena",
+        "apellido": "Williams",
+        "edad": 42,
+        "ciudad": "Murcia",
+        "profesion": "Tenista"
+    },
+    {
+        "nombre": "Samus",
+        "apellido": "Aran",
+        "edad": 32,
+        "ciudad": "Sevilla",
+        "profesion": "Cazarrecompensas"
+    },
+    {
+        "nombre": "Sam",
+        "apellido": "Porter",
+        "edad": 35,
+        "ciudad": "Gijón",
+        "profesion": "Repartidor"
+    },
+    {
+        "nombre": "Solid",
+        "apellido": "Snake",
+        "edad": 42,
+        "ciudad": "Alicante",
+        "profesion": "Espía"
+    }
+]
