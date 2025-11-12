@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejemplos Avanzados JocarsaUX</title>
+    <style>
+        body, html {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .example-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        .example-card:hover {
+            transform: translateY(-5px);
+        }
+        .example-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #5a6fd8;
+        }
+        .full-width-demo {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Ejemplos Avanzados JocarsaUX</h1>
+            <p>Demostraciones especializadas de funcionalidades avanzadas del framework</p>
+        </div>
+
+        <div class="examples-grid">
+            <div class="example-card">
+                <div class="example-title">🔀 Datos Mixtos y Complejos</div>
+                <p>Demuestra cómo JocarsaUX maneja automáticamente diferentes tipos de datos anidados y arrays.</p>
+                <button class="btn" onclick="mostrarDatosMixtos()">Ver Ejemplo</button>
+            </div>
+
+            <div class="example-card">
+                <div class="example-title">📊 Análisis de Rendimiento</div>
+                <p>Comparación de rendimiento entre diferentes renderizadores con grandes volúmenes de datos.</p>
+                <button class="btn" onclick="mostrarAnalisisRendimiento()">Ejecutar Análisis</button>
+            </div>
+
+            <div class="example-card">
+                <div class="example-title">🎨 Personalización de Estilos</div>
+                <p>Ejemplo de cómo personalizar la apariencia y tema del framework para diferentes necesidades.</p>
+                <button class="btn" onclick="mostrarPersonalizacion()">Ver Estilos</button>
+            </div>
+
+            <div class="example-card">
+                <div class="example-title">🔄 Datos Dinámicos en Tiempo Real</div>
+                <p>Simulación de datos que se actualizan automáticamente, como un dashboard en vivo.</p>
+                <button class="btn" onclick="mostrarDatosDinamicos()">Iniciar Simulación</button>
+            </div>
+
+            <div class="example-card">
+                <div class="example-title">📱 Optimización Móvil</div>
+                <p>Demostración específica de cómo el framework se adapta a dispositivos móviles y táctiles.</p>
+                <button class="btn" onclick="mostrarOptimizacionMovil()">Test Móvil</button>
+            </div>
+
+            <div class="example-card">
+                <div class="example-title">🔧 Integración con APIs</div>
+                <p>Ejemplo de integración con APIs externas y manejo de datos asíncronos.</p>
+                <button class="btn" onclick="mostrarIntegracionAPI()">Conectar API</button>
+            </div>
+        </div>
+
+        <div class="full-width-demo" id="demo-container">
+            <h3 style="text-align: center; color: #333;">Selecciona un ejemplo arriba para ver la demostración</h3>
+        </div>
+    </div>
+
+    <script src="../101-Ejercicios/jocarsaux4.js"></script>
+    <script src="datos-deportivos.js"></script>
+    <script src="datos-gaming.js"></script>
+    <script src="datos-turismo.js"></script>
+    <script>
+        const demoContainer = document.getElementById('demo-container');
+
+        // Datos de ejemplo con estructuras complejas
+        const datosMixtos = [
+            {
+                empresa: "TechCorp Global",
+                fundacion: 2010,
+                empleados: 1250,
+                departamentos: ["IT", "Marketing", "Ventas", "HR"],
+                sede: {
+                    pais: "España",
+                    ciudad: "Madrid",
+                    direccion: "Calle Alcalá 123"
+                },
+                ingresos_anuales: 45000000,
+                productos: [
+                    { nombre: "Software A", precio: 299.99, categoria: "Enterprise" },
+                    { nombre: "App Mobile", precio: 9.99, categoria: "Consumer" }
+                ],
+                certificaciones: ["ISO 9001", "ISO 27001"],
+                activa: true,
+                rating: 4.7
+            },
+            {
+                empresa: "InnovaSoft Solutions",
+                fundacion: 2015,
+                empleados: 750,
+                departamentos: ["Desarrollo", "QA", "DevOps"],
+                sede: {
+                    pais: "España",
+                    ciudad: "Barcelona",
+                    direccion: "Passeig de Gràcia 456"
+                },
+                ingresos_anuales: 28000000,
+                productos: [
+                    { nombre: "Cloud Platform", precio: 199.99, categoria: "SaaS" },
+                    { nombre: "Analytics Tool", precio: 149.99, categoria: "Business" }
+                ],
+                certificaciones: ["ISO 9001"],
+                activa: true,
+                rating: 4.5
+            }
+        ];
+
+        function mostrarDatosMixtos() {
+            demoContainer.innerHTML = '';
+            const ux = new JocarsaUX();
+            ux.tableRenderer({
+                target: demoContainer,
+                data: datosMixtos,
+                title: '🔀 Manejo de Datos Complejos',
+                subtitle: 'JocarsaUX aplana automáticamente objetos anidados y arrays',
+                rowsPerPage: 10,
+                flattenObjects: true
+            });
+        }
+
+        function mostrarAnalisisRendimiento() {
+            demoContainer.innerHTML = '<div style="text-align: center; padding: 40px;"><h3>🚀 Ejecutando análisis de rendimiento...</h3><div id="progress"></div></div>';
+            
+            const progressDiv = document.getElementById('progress');
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressDiv.innerHTML = `<div style="background: #667eea; height: 20px; width: ${progress}%; border-radius: 10px; transition: width 0.3s;"></div><p>${progress}% completado</p>`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        const datosGrandes = [];
+                        for (let i = 0; i < 500; i++) {
+                            datosGrandes.push({
+                                id: i + 1,
+                                jugador: `Jugador_${i + 1}`,
+                                puntuacion: Math.floor(Math.random() * 100000),
+                                nivel: Math.floor(Math.random() * 100),
+                                activo: Math.random() > 0.5
+                            });
+                        }
+                        
+                        const ux = new JocarsaUX();
+                        ux.tableRenderer({
+                            target: demoContainer,
+                            data: datosGrandes,
+                            title: '📊 Test de Rendimiento - 500 Registros',
+                            subtitle: 'El framework maneja eficientemente grandes volúmenes de datos',
+                            rowsPerPage: 25
+                        });
+                    }, 1000);
+                }
+            }, 200);
+        }
+
+        function mostrarPersonalizacion() {
+            demoContainer.innerHTML = '';
+            
+            // Crear una versión personalizada con tema oscuro
+            const style = document.createElement('style');
+            style.id = 'tema-personalizado';
+            style.innerHTML = `
+                .jux-root { 
+                    --jux-bg: #1e1e1e; 
+                    --jux-text: #ffffff; 
+                    --jux-muted: #a0a0a0; 
+                    --jux-line: #404040; 
+                    --jux-chip: #2a2a2a; 
+                    --jux-accent: #ff6b6b; 
+                }
+                .jux-card { background: #2a2a2a !important; }
+                .jux-scroll { background: #1e1e1e; }
+            `;
+            document.head.appendChild(style);
+            
+            const ux = new JocarsaUX();
+            ux.gridRenderer({
+                target: demoContainer,
+                data: datosGaming.slice(0, 6),
+                title: '🎨 Tema Personalizado - Modo Oscuro',
+                subtitle: 'Personalización de colores y estilos del framework',
+                cardsPerPage: 6,
+                titleField: 'jugador'
+            });
+            
+            // Limpiar estilos después de 10 segundos
+            setTimeout(() => {
+                const customStyle = document.getElementById('tema-personalizado');
+                if (customStyle) customStyle.remove();
+            }, 10000);
+        }
+
+        let intervaloDinamico = null;
+        
+        function mostrarDatosDinamicos() {
+            if (intervaloDinamico) {
+                clearInterval(intervaloDinamico);
+                intervaloDinamico = null;
+            }
+            
+            let datosEnVivo = [...datosDeportivos.slice(0, 6)];
+            
+            const ux = new JocarsaUX();
+            
+            function actualizarDatos() {
+                // Simular cambios en los puntos y goles
+                datosEnVivo = datosEnVivo.map(equipo => ({
+                    ...equipo,
+                    puntos: Math.max(0, equipo.puntos + Math.floor(Math.random() * 7) - 3),
+                    goles_favor: Math.max(0, equipo.goles_favor + Math.floor(Math.random() * 3)),
+                    partidos_jugados: equipo.partidos_jugados + (Math.random() > 0.8 ? 1 : 0)
+                }));
+                
+                demoContainer.innerHTML = '';
+                ux.tableRenderer({
+                    target: demoContainer,
+                    data: datosEnVivo,
+                    title: '🔄 Datos en Tiempo Real',
+                    subtitle: `Última actualización: ${new Date().toLocaleTimeString()}`,
+                    rowsPerPage: 6
+                });
+            }
+            
+            actualizarDatos();
+            intervaloDinamico = setInterval(actualizarDatos, 3000);
+            
+            // Agregar botón para detener
+            const stopBtn = document.createElement('button');
+            stopBtn.textContent = '⏹️ Detener Actualización';
+            stopBtn.className = 'btn';
+            stopBtn.style.position = 'absolute';
+            stopBtn.style.top = '10px';
+            stopBtn.style.right = '10px';
+            stopBtn.onclick = () => {
+                if (intervaloDinamico) {
+                    clearInterval(intervaloDinamico);
+                    intervaloDinamico = null;
+                    stopBtn.textContent = '✅ Detenido';
+                }
+            };
+            demoContainer.style.position = 'relative';
+            demoContainer.appendChild(stopBtn);
+        }
+
+        function mostrarOptimizacionMovil() {
+            demoContainer.innerHTML = '';
+            
+            // Simular viewport móvil
+            demoContainer.style.maxWidth = '375px';
+            demoContainer.style.margin = '0 auto';
+            
+            const ux = new JocarsaUX();
+            ux.formRenderer({
+                target: demoContainer,
+                data: [datosTurismo[0]],
+                title: '📱 Vista Optimizada para Móvil',
+                subtitle: 'Formulario adaptado a pantallas pequeñas',
+                columns: 1, // Una columna para móvil
+                onSubmit: (datos) => {
+                    alert('✅ Formulario enviado desde dispositivo móvil');
+                }
+            });
+            
+            // Restaurar ancho después de 10 segundos
+            setTimeout(() => {
+                demoContainer.style.maxWidth = 'none';
+                demoContainer.style.margin = '0';
+            }, 10000);
+        }
+
+        function mostrarIntegracionAPI() {
+            demoContainer.innerHTML = '<div style="text-align: center; padding: 40px;"><h3>🔗 Conectando con API...</h3><div class="loading">Cargando datos...</div></div>';
+            
+            // Simular llamada a API
+            setTimeout(() => {
+                // Simular respuesta de API con datos de países
+                const datosAPI = [
+                    {
+                        pais: "Países Bajos",
+                        capital: "Ámsterdam", 
+                        poblacion: 17440000,
+                        continente: "Europa",
+                        moneda: "Euro",
+                        idioma: "Neerlandés",
+                        superficie: 41850,
+                        pib_per_capita: 53000,
+                        esperanza_vida: 82.1
+                    },
+                    {
+                        pais: "Suecia",
+                        capital: "Estocolmo",
+                        poblacion: 10380000,
+                        continente: "Europa", 
+                        moneda: "Corona Sueca",
+                        idioma: "Sueco",
+                        superficie: 450295,
+                        pib_per_capita: 51600,
+                        esperanza_vida: 82.8
+                    },
+                    {
+                        pais: "Singapur",
+                        capital: "Singapur",
+                        poblacion: 5850000,
+                        continente: "Asia",
+                        moneda: "Dólar de Singapur",
+                        idioma: "Inglés",
+                        superficie: 719,
+                        pib_per_capita: 65000,
+                        esperanza_vida: 83.2
+                    }
+                ];
+                
+                const ux = new JocarsaUX();
+                ux.gridRenderer({
+                    target: demoContainer,
+                    data: datosAPI,
+                    title: '🔗 Datos Obtenidos de API Externa',
+                    subtitle: 'Información actualizada de países (simulación)',
+                    cardsPerPage: 3,
+                    titleField: 'pais',
+                    onCardClick: (pais) => {
+                        alert(`Información de ${pais.pais}:\\n\\nCapital: ${pais.capital}\\nPoblación: ${pais.poblacion.toLocaleString()}\\nPIB per cápita: $${pais.pib_per_capita.toLocaleString()}`);
+                    }
+                });
+                
+                // Agregar indicador de fuente de datos
+                const apiInfo = document.createElement('div');
+                apiInfo.innerHTML = '<p style="text-align: center; margin-top: 20px; color: #666; font-size: 12px;">📡 Datos simulados de API REST • Actualizado cada 5 minutos</p>';
+                demoContainer.appendChild(apiInfo);
+                
+            }, 2000);
+        }
+
+        // Limpiar intervalos al salir
+        window.addEventListener('beforeunload', () => {
+            if (intervaloDinamico) {
+                clearInterval(intervaloDinamico);
+            }
+        });
+    </script>
+</body>
+</html>

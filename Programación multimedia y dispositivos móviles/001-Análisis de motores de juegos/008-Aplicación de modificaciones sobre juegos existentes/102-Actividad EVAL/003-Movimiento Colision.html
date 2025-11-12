@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ejercicio 3: Movimiento y Colisión - Clon Minecraft</title>
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            font-family: Arial, sans-serif;
+        }
+        canvas { 
+            display: block; 
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            max-width: 350px;
+            line-height: 1.6;
+        }
+        #info h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: #4CAF50;
+        }
+        #info p {
+            margin: 5px 0;
+        }
+        #info .key {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        #info .objective {
+            background: rgba(76, 175, 80, 0.2);
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border-left: 3px solid #4CAF50;
+        }
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 24px;
+            height: 24px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1000;
+        }
+        #crosshair::before, #crosshair::after {
+            content: '';
+            position: absolute;
+            background: white;
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+        }
+        #crosshair::before {
+            width: 2px;
+            height: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #crosshair::after {
+            width: 24px;
+            height: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        #instructions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            color: white;
+            padding: 35px;
+            border-radius: 15px;
+            text-align: center;
+            font-family: Arial;
+            max-width: 450px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        #instructions h2 {
+            margin: 0 0 20px 0;
+            color: #4CAF50;
+            font-size: 24px;
+        }
+        #instructions p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        #instructions .highlight {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        #stats {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            min-width: 180px;
+        }
+        #stats div {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+        #stats .label {
+            color: #aaa;
+        }
+        #stats .value {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        #collision-indicator {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(244, 67, 54, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            display: none;
+        }
+        #collision-indicator.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Crosshair (retícula) -->
+    <div id="crosshair"></div>
+    
+    <!-- Panel de información -->
+    <div id="info">
+        <h3>Ejercicio 3: Movimiento y Colisión</h3>
+        <div class="objective">
+            <strong>🎯 Objetivo:</strong> Implementar movimiento con detección de colisiones
+        </div>
+        <p><span class="key">W A S D</span> Mover personaje</p>
+        <p><span class="key">Mouse</span> Mirar alrededor</p>
+        <p><span class="key">Space</span> Saltar</p>
+        <p><span class="key">Shift</span> Correr</p>
+        <p style="margin-top: 10px; font-size: 11px; opacity: 0.8;">
+            💡 El personaje NO puede atravesar bloques<br>
+            💡 La gravedad te mantiene en el suelo
+        </p>
+    </div>
+
+    <!-- Estadísticas -->
+    <div id="stats">
+        <div>
+            <span class="label">Posición:</span>
+            <span class="value" id="position">0, 0, 0</span>
+        </div>
+        <div>
+            <span class="label">Velocidad:</span>
+            <span class="value" id="velocity">0.0 m/s</span>
+        </div>
+        <div>
+            <span class="label">En suelo:</span>
+            <span class="value" id="onGround">No</span>
+        </div>
+        <div>
+            <span class="label">Colisiones:</span>
+            <span class="value" id="collisionCount">0</span>
+        </div>
+    </div>
+
+    <!-- Indicador de colisión -->
+    <div id="collision-indicator">⚠️ COLISIÓN DETECTADA</div>
+    
+    <!-- Instrucciones iniciales -->
+    <div id="instructions">
+        <h2>🎮 Movimiento y Colisión</h2>
+        <p><strong>Haz clic para comenzar a jugar</strong></p>
+        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 20px 0;">
+        <p>Usa <span class="highlight">WASD</span> para moverte por el mundo</p>
+        <p>Mueve el <span class="highlight">ratón</span> para mirar</p>
+        <p><span class="highlight">Espacio</span> para saltar obstáculos</p>
+        <p><span class="highlight">Shift</span> para correr más rápido</p>
+        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 20px 0;">
+        <p style="font-size: 13px; opacity: 0.8;">
+            ⚡ Las colisiones te impedirán atravesar bloques<br>
+            ⚡ Intenta esquivar los obstáculos del escenario
+        </p>
+        <p style="margin-top: 20px; font-size: 12px; opacity: 0.6;">
+            Presiona <strong>ESC</strong> para salir
+        </p>
+    </div>
+
+    <!-- Incluir Three.js y PointerLockControls desde CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.min.js"></script>
+    
+    <script>
+        // ==========================================
+        // CLASE BLOCK - Representa un bloque del mundo
+        // ==========================================
+        class Block {
+            constructor(x, y, z, type = 'grass') {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.type = type;
+                this.mesh = null;
+                
+                this.createMesh();
+            }
+            
+            createMesh() {
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                
+                const colors = {
+                    'grass': 0x4CAF50,  // Verde para césped
+                    'dirt': 0x795548,   // Marrón para tierra
+                    'stone': 0x9E9E9E   // Gris para piedra
+                };
+                
+                const material = new THREE.MeshPhongMaterial({ 
+                    color: colors[this.type] || 0x4CAF50,
+                    flatShading: true
+                });
+                
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.position.set(this.x, this.y, this.z);
+                
+                // Habilitar sombras
+                this.mesh.castShadow = true;
+                this.mesh.receiveShadow = true;
+            }
+            
+            addToScene(scene) {
+                if (this.mesh) {
+                    scene.add(this.mesh);
+                }
+            }
+            
+            /**
+             * Obtiene el bounding box del bloque para detección de colisiones
+             */
+            getBoundingBox() {
+                return new THREE.Box3().setFromObject(this.mesh);
+            }
+        }
+
+        // ==========================================
+        // CLASE MINECRAFTGAME - Controla el juego
+        // ==========================================
+        class MinecraftGame {
+            constructor() {
+                // Configuración de la escena
+                this.scene = new THREE.Scene();
+                this.scene.background = new THREE.Color(0x87CEEB); // Cielo azul
+                
+                // Configuración de la cámara
+                this.camera = new THREE.PerspectiveCamera(
+                    75, 
+                    window.innerWidth / window.innerHeight, 
+                    0.1, 
+                    1000
+                );
+                this.camera.position.set(0, 2, 0);
+                
+                // Configuración del renderizador
+                this.renderer = new THREE.WebGLRenderer({ antialias: true });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                document.body.appendChild(this.renderer.domElement);
+                
+                // Variables de control
+                this.controls = null;
+                this.blocks = [];
+                this.moveState = { 
+                    forward: false, 
+                    backward: false, 
+                    left: false, 
+                    right: false, 
+                    jump: false,
+                    sprint: false  // Nueva: estado de correr
+                };
+                
+                // Propiedades de física
+                this.velocity = new THREE.Vector3();
+                this.onGround = false;
+                this.gravity = -25;          // Gravedad más fuerte
+                this.jumpForce = 9;          // Salto más alto
+                this.playerHeight = 1.8;     // Altura del jugador
+                this.playerRadius = 0.4;     // Radio de colisión
+                
+                // Estadísticas
+                this.collisionCount = 0;
+                this.lastCollisionTime = 0;
+                
+                // Clock para delta time
+                this.clock = new THREE.Clock();
+                
+                // Referencias a elementos UI
+                this.positionEl = document.getElementById('position');
+                this.velocityEl = document.getElementById('velocity');
+                this.onGroundEl = document.getElementById('onGround');
+                this.collisionCountEl = document.getElementById('collisionCount');
+                this.collisionIndicator = document.getElementById('collision-indicator');
+                
+                // Inicialización
+                this.setupLights();
+                this.createWorld();
+                this.setupControls();
+                this.setupEventListeners();
+                
+                this.animate();
+            }
+            
+            /**
+             * Configura las luces de la escena
+             */
+            setupLights() {
+                // Luz ambiental
+                const ambientLight = new THREE.AmbientLight(0x606060, 0.7);
+                this.scene.add(ambientLight);
+                
+                // Luz direccional (sol)
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+                directionalLight.position.set(50, 50, 50);
+                directionalLight.castShadow = true;
+                
+                // Configuración de sombras
+                directionalLight.shadow.mapSize.width = 2048;
+                directionalLight.shadow.mapSize.height = 2048;
+                directionalLight.shadow.camera.near = 0.5;
+                directionalLight.shadow.camera.far = 500;
+                directionalLight.shadow.camera.left = -50;
+                directionalLight.shadow.camera.right = 50;
+                directionalLight.shadow.camera.top = 50;
+                directionalLight.shadow.camera.bottom = -50;
+                
+                this.scene.add(directionalLight);
+            }
+            
+            /**
+             * Crea el mundo con bloques y obstáculos
+             */
+            createWorld() {
+                const gridSize = 16;
+                
+                console.log('🌍 Creando mundo con obstáculos...');
+                
+                // Crear suelo
+                for (let x = -gridSize/2; x < gridSize/2; x++) {
+                    for (let z = -gridSize/2; z < gridSize/2; z++) {
+                        let type = 'grass';
+                        if (Math.random() > 0.85) type = 'dirt';
+                        if (Math.random() > 0.97) type = 'stone';
+                        
+                        const block = new Block(x, -0.5, z, type);
+                        block.addToScene(this.scene);
+                        this.blocks.push(block);
+                    }
+                }
+                
+                // Crear paredes perimetrales (para probar colisiones)
+                console.log('🧱 Creando paredes...');
+                for (let i = -gridSize/2; i < gridSize/2; i++) {
+                    // Paredes norte y sur
+                    const wallN = new Block(i, 0.5, -gridSize/2, 'stone');
+                    wallN.addToScene(this.scene);
+                    this.blocks.push(wallN);
+                    
+                    const wallS = new Block(i, 0.5, gridSize/2 - 1, 'stone');
+                    wallS.addToScene(this.scene);
+                    this.blocks.push(wallS);
+                    
+                    // Paredes este y oeste
+                    const wallE = new Block(-gridSize/2, 0.5, i, 'stone');
+                    wallE.addToScene(this.scene);
+                    this.blocks.push(wallE);
+                    
+                    const wallW = new Block(gridSize/2 - 1, 0.5, i, 'stone');
+                    wallW.addToScene(this.scene);
+                    this.blocks.push(wallW);
+                }
+                
+                // Crear obstáculos en el centro para probar colisiones
+                console.log('🚧 Creando obstáculos...');
+                
+                // Laberinto simple
+                const obstacles = [
+                    // Pared horizontal central
+                    { x: -3, z: 0 }, { x: -2, z: 0 }, { x: -1, z: 0 }, 
+                    { x: 1, z: 0 }, { x: 2, z: 0 }, { x: 3, z: 0 },
+                    
+                    // Torres en las esquinas
+                    { x: -5, z: -5 }, { x: -5, z: -5, y: 1 }, { x: -5, z: -5, y: 2 },
+                    { x: 5, z: -5 }, { x: 5, z: -5, y: 1 },
+                    { x: -5, z: 5 }, { x: -5, z: 5, y: 1 },
+                    { x: 5, z: 5 }, { x: 5, z: 5, y: 1 }, { x: 5, z: 5, y: 2 },
+                    
+                    // Obstáculos aleatorios
+                    { x: 2, z: 3 }, { x: -2, z: -3 },
+                    { x: 4, z: 2 }, { x: -4, z: 2 },
+                    { x: 0, z: -4 }, { x: 0, z: 4 },
+                    
+                    // Pequeña casa
+                    { x: -3, z: 3 }, { x: -2, z: 3 }, { x: -3, z: 4 }, { x: -2, z: 4 },
+                    { x: -3, z: 3, y: 1 }, { x: -2, z: 3, y: 1 },
+                ];
+                
+                obstacles.forEach(pos => {
+                    const y = pos.y !== undefined ? pos.y + 0.5 : 0.5;
+                    const type = y > 1 ? 'stone' : (Math.random() > 0.5 ? 'dirt' : 'stone');
+                    const block = new Block(pos.x, y, pos.z, type);
+                    block.addToScene(this.scene);
+                    this.blocks.push(block);
+                });
+                
+                console.log(`✅ Mundo creado con ${this.blocks.length} bloques`);
+            }
+            
+            /**
+             * Configura los controles de primera persona (PointerLockControls)
+             */
+            setupControls() {
+                this.controls = new THREE.PointerLockControls(this.camera, document.body);
+                
+                const instructions = document.getElementById('instructions');
+                
+                // Iniciar el juego al hacer clic
+                const startGame = () => {
+                    this.controls.lock();
+                };
+                
+                instructions.addEventListener('click', startGame);
+                
+                // Eventos de PointerLock
+                this.controls.addEventListener('lock', () => {
+                    instructions.style.display = 'none';
+                });
+                
+                this.controls.addEventListener('unlock', () => {
+                    instructions.style.display = 'block';
+                });
+            }
+            
+            /**
+             * Configura los event listeners del teclado
+             */
+            setupEventListeners() {
+                // Teclas presionadas
+                document.addEventListener('keydown', (event) => {
+                    switch (event.code) {
+                        case 'KeyW':
+                            this.moveState.forward = true;
+                            break;
+                        case 'KeyS':
+                            this.moveState.backward = true;
+                            break;
+                        case 'KeyA':
+                            this.moveState.left = true;
+                            break;
+                        case 'KeyD':
+                            this.moveState.right = true;
+                            break;
+                        case 'Space':
+                            if (this.onGround) {
+                                this.moveState.jump = true;
+                            }
+                            event.preventDefault();
+                            break;
+                        case 'ShiftLeft':
+                        case 'ShiftRight':
+                            this.moveState.sprint = true;
+                            break;
+                    }
+                });
+                
+                // Teclas soltadas
+                document.addEventListener('keyup', (event) => {
+                    switch (event.code) {
+                        case 'KeyW':
+                            this.moveState.forward = false;
+                            break;
+                        case 'KeyS':
+                            this.moveState.backward = false;
+                            break;
+                        case 'KeyA':
+                            this.moveState.left = false;
+                            break;
+                        case 'KeyD':
+                            this.moveState.right = false;
+                            break;
+                        case 'Space':
+                            this.moveState.jump = false;
+                            break;
+                        case 'ShiftLeft':
+                        case 'ShiftRight':
+                            this.moveState.sprint = false;
+                            break;
+                    }
+                });
+                
+                // Redimensionamiento de ventana
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            }
+
+            /**
+             * FUNCIÓN PRINCIPAL DE COLISIÓN
+             * Verifica si una nueva posición colisionaría con algún bloque
+             * @param {THREE.Vector3} newPosition - Nueva posición a verificar
+             * @returns {boolean} - true si hay colisión, false si no
+             */
+            checkCollision(newPosition) {
+                // Crear un bounding box para el jugador en la nueva posición
+                const playerBox = new THREE.Box3(
+                    new THREE.Vector3(
+                        newPosition.x - this.playerRadius,
+                        newPosition.y - this.playerHeight,
+                        newPosition.z - this.playerRadius
+                    ),
+                    new THREE.Vector3(
+                        newPosition.x + this.playerRadius,
+                        newPosition.y + 0.2,  // Altura de la cabeza
+                        newPosition.z + this.playerRadius
+                    )
+                );
+                
+                // Verificar colisión con cada bloque
+                for (const block of this.blocks) {
+                    const blockBox = block.getBoundingBox();
+                    if (playerBox.intersectsBox(blockBox)) {
+                        return true;  // Hay colisión
+                    }
+                }
+                
+                return false;  // No hay colisión
+            }
+            
+            /**
+             * Registra una colisión (para estadísticas)
+             */
+            registerCollision() {
+                this.collisionCount++;
+                this.collisionCountEl.textContent = this.collisionCount;
+                
+                // Mostrar indicador visual
+                const now = Date.now();
+                if (now - this.lastCollisionTime > 200) {  // Evitar spam
+                    this.collisionIndicator.classList.add('show');
+                    setTimeout(() => {
+                        this.collisionIndicator.classList.remove('show');
+                    }, 500);
+                    this.lastCollisionTime = now;
+                }
+            }
+            
+            /**
+             * ACTUALIZACIÓN DEL MOVIMIENTO CON DETECCIÓN DE COLISIONES
+             */
+            updateMovement(delta) {
+                if (!this.controls.isLocked) return;
+                
+                // Velocidad base y sprint
+                const baseSpeed = 6.0;
+                const sprintMultiplier = 1.8;
+                const speed = this.moveState.sprint ? baseSpeed * sprintMultiplier : baseSpeed;
+                
+                // Obtener vectores de dirección de la cámara
+                const cameraDirection = new THREE.Vector3();
+                this.camera.getWorldDirection(cameraDirection);
+                cameraDirection.y = 0; // Mantener movimiento horizontal
+                cameraDirection.normalize();
+                
+                // Vector derecho (perpendicular a la dirección)
+                const cameraRight = new THREE.Vector3();
+                cameraRight.crossVectors(this.camera.up, cameraDirection).normalize();
+                
+                // Resetear velocidad horizontal
+                this.velocity.x = 0;
+                this.velocity.z = 0;
+                
+                // Aplicar movimiento según teclas presionadas
+                if (this.moveState.forward) {
+                    this.velocity.add(cameraDirection.clone().multiplyScalar(speed * delta));
+                }
+                if (this.moveState.backward) {
+                    this.velocity.add(cameraDirection.clone().multiplyScalar(-speed * delta));
+                }
+                if (this.moveState.left) {
+                    this.velocity.add(cameraRight.clone().multiplyScalar(speed * delta));
+                }
+                if (this.moveState.right) {
+                    this.velocity.add(cameraRight.clone().multiplyScalar(-speed * delta));
+                }
+                
+                // Aplicar gravedad
+                this.velocity.y += this.gravity * delta;
+                
+                // Aplicar salto
+                if (this.moveState.jump && this.onGround) {
+                    this.velocity.y = this.jumpForce;
+                    this.onGround = false;
+                    this.moveState.jump = false;
+                }
+                
+                // Calcular nueva posición
+                const currentPosition = this.controls.getObject().position.clone();
+                const newPosition = currentPosition.clone();
+                newPosition.add(this.velocity.clone().multiplyScalar(delta));
+                
+                // VERIFICAR COLISIÓN ANTES DE MOVER
+                // Probar movimiento en cada eje por separado para permitir deslizamiento
+                
+                // Probar movimiento en X
+                const testPositionX = currentPosition.clone();
+                testPositionX.x += this.velocity.x * delta;
+                if (!this.checkCollision(testPositionX)) {
+                    this.controls.getObject().position.x = testPositionX.x;
+                } else {
+                    this.registerCollision();
+                    this.velocity.x = 0;  // Detener movimiento en X
+                }
+                
+                // Probar movimiento en Z
+                const testPositionZ = this.controls.getObject().position.clone();
+                testPositionZ.z += this.velocity.z * delta;
+                if (!this.checkCollision(testPositionZ)) {
+                    this.controls.getObject().position.z = testPositionZ.z;
+                } else {
+                    this.registerCollision();
+                    this.velocity.z = 0;  // Detener movimiento en Z
+                }
+                
+                // Probar movimiento en Y (vertical - salto/caída)
+                const testPositionY = this.controls.getObject().position.clone();
+                testPositionY.y += this.velocity.y * delta;
+                if (!this.checkCollision(testPositionY)) {
+                    this.controls.getObject().position.y = testPositionY.y;
+                } else {
+                    if (this.velocity.y < 0) {
+                        // Colisión con el suelo
+                        this.onGround = true;
+                    }
+                    this.velocity.y = 0;  // Detener movimiento vertical
+                }
+                
+                // Verificar si está en el suelo (raycast hacia abajo)
+                const groundCheckPosition = this.controls.getObject().position.clone();
+                groundCheckPosition.y -= 0.1;
+                
+                if (this.checkCollision(groundCheckPosition)) {
+                    this.onGround = true;
+                    if (this.velocity.y < 0) {
+                        this.velocity.y = 0;
+                    }
+                } else {
+                    this.onGround = false;
+                }
+                
+                // Límite inferior (caer al vacío)
+                if (this.controls.getObject().position.y < -10) {
+                    console.log('💀 Has caído al vacío - Respawn');
+                    this.controls.getObject().position.set(0, 2, 0);
+                    this.velocity.set(0, 0, 0);
+                }
+            }
+            
+            /**
+             * Actualiza la UI con información del jugador
+             */
+            updateUI() {
+                const pos = this.controls.getObject().position;
+                this.positionEl.textContent = `${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}, ${pos.z.toFixed(1)}`;
+                
+                // Calcular velocidad horizontal
+                const horizontalVelocity = Math.sqrt(
+                    this.velocity.x * this.velocity.x + 
+                    this.velocity.z * this.velocity.z
+                );
+                this.velocityEl.textContent = (horizontalVelocity * 10).toFixed(1) + ' m/s';
+                
+                // Estado de suelo
+                this.onGroundEl.textContent = this.onGround ? 'Sí ✓' : 'No ✗';
+                this.onGroundEl.style.color = this.onGround ? '#4CAF50' : '#FF5722';
+            }
+            
+            /**
+             * Loop principal de animación
+             */
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                
+                const delta = this.clock.getDelta();
+                
+                // Actualizar movimiento con colisiones
+                this.updateMovement(delta);
+                
+                // Actualizar UI
+                if (this.controls.isLocked) {
+                    this.updateUI();
+                }
+                
+                // Renderizar escena
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        // ==========================================
+        // INICIAR EL JUEGO
+        // ==========================================
+        console.log('🎮 Iniciando Minecraft Clone - Movimiento y Colisión...');
+        const game = new MinecraftGame();
+        
+    </script>
+</body>
+</html>

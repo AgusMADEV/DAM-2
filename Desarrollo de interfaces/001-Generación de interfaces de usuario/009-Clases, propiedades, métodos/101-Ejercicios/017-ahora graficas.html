@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>jocarsa|ux – namespaced, JS‑built UI (v0.2)</title>
+  <style>
+    body,html{padding:0px;margin:0px;height:100%;}
+    body{display:flex;}
+    nav{flex:1;background:crimson;display:flex;flex-direction:column;gap:10px;padding:20px;overflow-y:auto;}
+    nav h3{color:white;margin:20px 0 10px 0;font-family:system-ui;font-size:14px;text-transform:uppercase;letter-spacing:1px;}
+    nav h3:first-child{margin-top:0;}
+    nav button{background:white;width:100%;border:none;padding:10px;border-radius:100px;transition:all 0.3s;border:2px solid white;cursor:pointer;font-family:system-ui;font-size:13px;font-weight:500;}
+    nav button:hover{background:crimson;color:white;}
+    main{flex:8;overflow:auto;}
+  </style>
+</head>
+<body>
+  <nav>
+  </nav>
+  <main>
+  </main>
+  <script src="jocarsaux3.js"></script>
+  <script>
+    const ux = new JocarsaUX();
+    let contenedor = document.querySelector("nav");
+
+    // Create section headers
+    const tableHeader = document.createElement("h3");
+    tableHeader.textContent = "📊 Tables";
+    contenedor.appendChild(tableHeader);
+
+    const tableContainer = document.createElement("div");
+    contenedor.appendChild(tableContainer);
+
+    const formHeader = document.createElement("h3");
+    formHeader.textContent = "📝 Forms";
+    contenedor.appendChild(formHeader);
+
+    const formContainer = document.createElement("div");
+    contenedor.appendChild(formContainer);
+
+    const chartHeader = document.createElement("h3");
+    chartHeader.textContent = "📈 Charts";
+    contenedor.appendChild(chartHeader);
+
+    const chartContainer = document.createElement("div");
+    contenedor.appendChild(chartContainer);
+
+    // Fetch tables and create buttons for each section
+    fetch("api2.php/tablas?action=tablas")
+      .then(function(respuesta){return respuesta.json()})
+      .then(function(datos){
+        // TABLE BUTTONS
+        datos.forEach(function(tabla){
+          let boton = document.createElement("button");
+          boton.textContent = tabla;
+          tableContainer.appendChild(boton);
+          boton.onclick = function(){
+            fetch("api2.php?action=tabla&name="+this.textContent)
+            .then(function(respuesta){return respuesta.json()})
+            .then(function(datos){
+              ux.tableRenderer({ 
+                target: 'main', 
+                data: datos,
+                title: tabla + ' - Table View',
+                subtitle: 'Searchable, sortable table with pagination',
+                rowsPerPage: 5  // Custom rows per page
+              });
+            })
+          }
+        });
+
+        // FORM BUTTONS
+        datos.forEach(function(tabla){
+          let boton = document.createElement("button");
+          boton.textContent = tabla;
+          formContainer.appendChild(boton);
+          boton.onclick = function(){
+            fetch("api2.php?action=tabla&name="+this.textContent)
+            .then(function(respuesta){return respuesta.json()})
+            .then(function(datos){
+              ux.formRenderer({
+                target: 'main',
+                data: datos,
+                title: tabla + ' - Form View',
+                subtitle: 'Smart form with auto-detected field types',
+                columns: 2,  // 2-column layout
+                onSubmit: (formData) => {
+                  console.log('Form submitted:', formData);
+                  alert('Form data logged to console!');
+                },
+                onReset: () => {
+                  console.log('Form reset');
+                }
+              });
+            })
+          }
+        });
+
+        // CHART BUTTONS
+        datos.forEach(function(tabla){
+          let boton = document.createElement("button");
+          boton.textContent = tabla;
+          chartContainer.appendChild(boton);
+          boton.onclick = function(){
+            fetch("api2.php?action=tabla&name="+this.textContent)
+            .then(function(respuesta){return respuesta.json()})
+            .then(function(datos){
+              ux.chartRenderer({
+                target: 'main',
+                data: datos,
+                title: tabla + ' - Chart Analysis',
+                subtitle: 'Automatic pie charts for categorical data'
+              });
+            })
+          }
+        });
+      })
+      .catch(function(error){
+        console.error('Error loading tables:', error);
+        contenedor.innerHTML = '<p style="color:white;padding:10px;font-family:system-ui;font-size:13px;">Error loading data. Please check your API.</p>';
+      });
+  </script>
+</body>
+</html>

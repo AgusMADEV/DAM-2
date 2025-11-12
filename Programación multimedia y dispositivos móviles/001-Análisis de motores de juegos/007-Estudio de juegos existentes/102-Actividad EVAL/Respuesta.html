@@ -1,0 +1,270 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Personaje Isométrico - Solución Completa</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+      }
+      #lienzo {
+        border: 2px solid #333;
+        background-color: white;
+        display: block;
+        margin: 0 auto;
+      }
+      .instrucciones {
+        max-width: 1024px;
+        margin: 10px auto;
+        padding: 8px 12px;
+        background-color: white;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+      h2 {
+        margin: 0 0 5px 0;
+        color: #333;
+        font-size: 16px;
+      }
+      .instrucciones p {
+        margin: 5px 0;
+        font-size: 13px;
+      }
+      .teclas {
+        display: inline-block;
+        padding: 3px 8px;
+        margin: 1px;
+        background-color: #4CAF50;
+        color: white;
+        border-radius: 3px;
+        font-weight: bold;
+        font-size: 12px;
+      }
+      .info {
+        text-align: center;
+        margin: 5px auto;
+        max-width: 1024px;
+        padding: 5px;
+        background-color: #e8f5e9;
+        border-radius: 5px;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="instrucciones">
+      <h2>🎮 Control del Personaje</h2>
+      <p>Usa las teclas para mover al personaje por la rejilla isométrica:</p>
+      <p>
+        <span class="teclas">W</span> Arriba | 
+        <span class="teclas">A</span> Izquierda | 
+        <span class="teclas">S</span> Abajo | 
+        <span class="teclas">D</span> Derecha
+      </p>
+    </div>
+
+    <div class="info" id="posicion">
+      Posición: (10, 10)
+    </div>
+
+    <canvas id="lienzo"></canvas>
+
+    <script>
+      // ============================================
+      // PASO 1: CONFIGURACIÓN INICIAL
+      // ============================================
+      var lienzo = document.querySelector("#lienzo")
+      var contexto = lienzo.getContext("2d")
+      lienzo.width = 1024
+      lienzo.height = 1024
+      
+      
+      // ============================================
+      // PASO 2: VARIABLES GLOBALES
+      // ============================================
+      var paso = 20  // Tamaño de cada celda de la rejilla
+      
+      
+      // ============================================
+      // PASO 3: FUNCIÓN DE PROYECCIÓN ISOMÉTRICA
+      // ============================================
+      function iso(i, j){
+        return {
+          x: 512 + (i - j) * paso,
+          y: 512 + (i + j) * (paso / 2)
+        }
+      }
+      
+      
+      // ============================================
+      // PASO 4: FUNCIÓN PARA DIBUJAR LA REJILLA
+      // ============================================
+      function dibujoRejilla(){
+        // Limpio fondo
+        contexto.fillStyle = "#fff"
+        contexto.fillRect(0, 0, 1024, 1024)
+        contexto.strokeStyle = "#d0d0d0"
+
+        // Líneas paralelas al eje U (j variable, i constante)
+        for (let i = -60; i <= 60; i++) {
+          const a = iso(i, -60);
+          const b = iso(i,  60);
+          contexto.beginPath();
+          contexto.moveTo(a.x, a.y);
+          contexto.lineTo(b.x, b.y);
+          contexto.stroke();
+        }
+
+        // Líneas paralelas al eje V (i variable, j constante)
+        for (let j = -60; j <= 60; j++) {
+          const a = iso(-60, j);
+          const b = iso( 60, j);
+          contexto.beginPath();
+          contexto.moveTo(a.x, a.y);
+          contexto.lineTo(b.x, b.y);
+          contexto.stroke();
+        }
+      }
+      
+      
+      // ============================================
+      // CLASE RECOGIBLE
+      // ============================================
+      class Recogible{
+        constructor(){
+          this.x = Math.round((Math.random() * 120) - 60); // [-60, 60]
+          this.y = Math.round((Math.random() * 120) - 60); // [-60, 60]
+        }
+        dibuja(){
+          let puntoiso = iso(this.x, this.y)
+          contexto.beginPath();
+          contexto.arc(puntoiso.x, puntoiso.y, 8, 0, Math.PI * 2)
+          contexto.fillStyle = "green"
+          contexto.fill()
+        }
+      }
+      
+      // ============================================
+      // DESAFÍO: FUNCIÓN DE DISTANCIA
+      // ============================================
+      function distancia(x1, y1, x2, y2) {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+      
+      // ============================================
+      // PASO 5: CLASE PERSONAJE
+      // ============================================
+      class Personaje{
+        constructor(){
+          this.x = 10;
+          this.y = 10;
+          this.puntos = 0;
+        }
+        dibuja(){
+          let puntoiso = iso(this.x, this.y)
+          contexto.beginPath()
+          contexto.arc(puntoiso.x, puntoiso.y, 5, 0, Math.PI * 2)
+          contexto.fillStyle = "red"
+          contexto.fill()
+        }
+      }
+      
+      
+      // ============================================
+      // PASO 6: CREAR INSTANCIA DEL PERSONAJE
+      // ============================================
+      var Personaje1 = new Personaje();
+      
+      // ============================================
+      // DESAFÍO: CREAR OBJETOS RECOGIBLES
+      // ============================================
+      var recogibles = []
+      var numeroRecogibles = 20;
+      for(let i = 0; i < numeroRecogibles; i++){
+        recogibles.push(new Recogible())
+      }
+      
+      
+      // ============================================
+      // PASO 7: CONTROL DE TECLADO
+      // ============================================
+      document.onkeydown = function(event){
+        // Guardamos la posición anterior para validar
+        let nuevoX = Personaje1.x;
+        let nuevoY = Personaje1.y;
+        
+        switch(event.key){
+          case "w":
+          case "W":
+            nuevoX--;
+            break;
+          case "s":
+          case "S":
+            nuevoX++;
+            break;
+          case "a":
+          case "A":
+            nuevoY++;
+            break;
+          case "d":
+          case "D":
+            nuevoY--;
+            break;
+        }
+        
+        // PASO 8: RESTRICCIONES - Validar límites
+        if(nuevoX >= -60 && nuevoX <= 60){
+          Personaje1.x = nuevoX;
+        }
+        if(nuevoY >= -60 && nuevoY <= 60){
+          Personaje1.y = nuevoY;
+        }
+        
+        // DESAFÍO: Detectar colisiones con recogibles
+        for(let i = recogibles.length - 1; i >= 0; i--){
+          if(distancia(Personaje1.x, Personaje1.y, recogibles[i].x, recogibles[i].y) < 2){
+            recogibles.splice(i, 1)
+            Personaje1.puntos++
+          }
+        }
+        
+        // Actualizar visualización de posición y puntos
+        document.getElementById("posicion").textContent = 
+          "Posición: (" + Personaje1.x + ", " + Personaje1.y + ") | Objetos recogidos: " + Personaje1.puntos + "/" + numeroRecogibles;
+        
+        // Redibujar todo
+        dibujoRejilla()
+        
+        // Dibujar recogibles
+        for(let i = 0; i < recogibles.length; i++){
+          recogibles[i].dibuja()
+        }
+        
+        Personaje1.dibuja()
+      }
+      
+      
+      // ============================================
+      // PASO 9: DIBUJO INICIAL
+      // ============================================
+      dibujoRejilla()
+      
+      // Dibujar recogibles iniciales
+      for(let i = 0; i < recogibles.length; i++){
+        recogibles[i].dibuja()
+      }
+      
+      Personaje1.dibuja()
+      
+      // Actualizar contador inicial
+      document.getElementById("posicion").textContent = 
+        "Posición: (" + Personaje1.x + ", " + Personaje1.y + ") | Objetos recogidos: 0/" + numeroRecogibles;
+      
+    </script>
+  </body>
+</html>

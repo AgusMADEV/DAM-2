@@ -1,0 +1,7 @@
+[
+  { "id": "P-1001", "cliente": "Acme S.A.", "importe": 1250.50, "nombre_pedido": "Pan", "estado": "Pendiente" },
+  { "id": "P-1002", "cliente": "Tecnologías Norte", "importe": 980.00,"nombre_pedido": "Salami", "estado": "Enviado" },
+  { "id": "P-1003", "cliente": "Grupo Logístico Sur", "importe": 430.75, "nombre_pedido": "Cartón","estado": "Entregado" },
+  { "id": "P-1004", "cliente": "Grupo 2", "importe": 400.75,"nombre_pedido": "Auriculares", "estado": "Entregado" },
+  { "id": "P-1005", "cliente": "Tecnologías Norte", "importe": 1500.00,"nombre_pedido": "Jamón Ibérico", "estado": "Pendiente" }
+]

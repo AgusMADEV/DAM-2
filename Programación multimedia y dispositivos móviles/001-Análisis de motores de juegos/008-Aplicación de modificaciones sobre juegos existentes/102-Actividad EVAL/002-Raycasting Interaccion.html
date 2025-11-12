@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ejercicio 2: Raycasting e Interacción - Clon Minecraft</title>
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            font-family: Arial, sans-serif;
+        }
+        canvas { 
+            display: block; 
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            max-width: 300px;
+        }
+        #info h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+        #info p {
+            margin: 5px 0;
+        }
+        #info .key {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        #crosshair::before, #crosshair::after {
+            content: '';
+            position: absolute;
+            background: white;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+        }
+        #crosshair::before {
+            width: 2px;
+            height: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #crosshair::after {
+            width: 20px;
+            height: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        #instructions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            font-family: Arial;
+            max-width: 400px;
+        }
+        #instructions h2 {
+            margin: 0 0 15px 0;
+            color: #4CAF50;
+        }
+        #instructions p {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+        #stats {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Crosshair (retícula) -->
+    <div id="crosshair"></div>
+    
+    <!-- Panel de información -->
+    <div id="info">
+        <h3>Ejercicio 2: Raycasting</h3>
+        <p><strong>Objetivo:</strong> Interactuar con bloques</p>
+        <p><span class="key">WASD</span> Mover</p>
+        <p><span class="key">Mouse</span> Mirar</p>
+        <p><span class="key">Space</span> Saltar</p>
+        <p><span class="key">Click Izq.</span> Eliminar bloque</p>
+        <p><span class="key">ESC</span> Mostrar cursor</p>
+    </div>
+
+    <!-- Estadísticas -->
+    <div id="stats">
+        <div>Bloques: <span id="blockCount">0</span></div>
+        <div>Posición: <span id="position">0, 0, 0</span></div>
+    </div>
+    
+    <!-- Instrucciones iniciales -->
+    <div id="instructions">
+        <h2>🎮 Minecraft Clone - Raycasting</h2>
+        <p><strong>Haz clic para comenzar</strong></p>
+        <p>Usa <strong>WASD</strong> para moverte</p>
+        <p>Mueve el <strong>ratón</strong> para mirar</p>
+        <p><strong>Espacio</strong> para saltar</p>
+        <p><strong>Click izquierdo</strong> para eliminar bloques</p>
+        <p style="margin-top: 15px; font-size: 12px; opacity: 0.8;">
+            Presiona <strong>ESC</strong> para salir
+        </p>
+    </div>
+
+    <!-- Incluir Three.js y PointerLockControls desde CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.min.js"></script>
+    
+    <script>
+        // ==========================================
+        // CLASE BLOCK - Representa un bloque del mundo
+        // ==========================================
+        class Block {
+            constructor(x, y, z, type = 'grass') {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.type = type;
+                this.mesh = null;
+                
+                this.createMesh();
+            }
+            
+            /**
+             * Crea el mesh 3D del bloque con su color según el tipo
+             */
+            createMesh() {
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                
+                const colors = {
+                    'grass': 0x4CAF50,  // Verde para césped
+                    'dirt': 0x795548,   // Marrón para tierra
+                    'stone': 0x9E9E9E   // Gris para piedra
+                };
+                
+                const material = new THREE.MeshPhongMaterial({ 
+                    color: colors[this.type] || 0x4CAF50,
+                    flatShading: true
+                });
+                
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.position.set(this.x, this.y, this.z);
+                
+                // Habilitar sombras
+                this.mesh.castShadow = true;
+                this.mesh.receiveShadow = true;
+            }
+            
+            addToScene(scene) {
+                if (this.mesh) {
+                    scene.add(this.mesh);
+                }
+            }
+            
+            removeFromScene(scene) {
+                if (this.mesh) {
+                    scene.remove(this.mesh);
+                }
+            }
+            
+            /**
+             * Obtiene el bounding box del bloque para detección de colisiones
+             */
+            getBoundingBox() {
+                return new THREE.Box3().setFromObject(this.mesh);
+            }
+        }
+
+        // ==========================================
+        // CLASE MINECRAFTGAME - Controla el juego
+        // ==========================================
+        class MinecraftGame {
+            constructor() {
+                // Configuración de la escena
+                this.scene = new THREE.Scene();
+                this.scene.background = new THREE.Color(0x87CEEB); // Cielo azul
+                
+                // Configuración de la cámara
+                this.camera = new THREE.PerspectiveCamera(
+                    75, 
+                    window.innerWidth / window.innerHeight, 
+                    0.1, 
+                    1000
+                );
+                this.camera.position.set(0, 2, 0);
+                
+                // Configuración del renderizador
+                this.renderer = new THREE.WebGLRenderer({ antialias: true });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                document.body.appendChild(this.renderer.domElement);
+                
+                // Variables de control
+                this.controls = null;
+                this.blocks = [];
+                this.moveState = { 
+                    forward: false, 
+                    backward: false, 
+                    left: false, 
+                    right: false, 
+                    jump: false 
+                };
+                
+                // Propiedades de física
+                this.velocity = new THREE.Vector3();
+                this.onGround = false;
+                this.gravity = -20;
+                this.jumpForce = 8;
+                this.playerHeight = 1.8;
+                this.playerRadius = 0.3;
+                
+                // Raycaster para detección de bloques
+                this.raycaster = new THREE.Raycaster();
+                this.raycaster.far = 10; // Distancia máxima de interacción
+                
+                // Clock para delta time
+                this.clock = new THREE.Clock();
+                
+                // Referencias a elementos UI
+                this.blockCountEl = document.getElementById('blockCount');
+                this.positionEl = document.getElementById('position');
+                
+                // Inicialización
+                this.setupLights();
+                this.createWorld();
+                this.setupControls();
+                this.setupEventListeners();
+                
+                this.animate();
+            }
+            
+            /**
+             * Configura las luces de la escena
+             */
+            setupLights() {
+                // Luz ambiental
+                const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+                this.scene.add(ambientLight);
+                
+                // Luz direccional (sol)
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+                directionalLight.position.set(50, 50, 50);
+                directionalLight.castShadow = true;
+                
+                // Configuración de sombras
+                directionalLight.shadow.mapSize.width = 2048;
+                directionalLight.shadow.mapSize.height = 2048;
+                directionalLight.shadow.camera.near = 0.5;
+                directionalLight.shadow.camera.far = 500;
+                directionalLight.shadow.camera.left = -50;
+                directionalLight.shadow.camera.right = 50;
+                directionalLight.shadow.camera.top = 50;
+                directionalLight.shadow.camera.bottom = -50;
+                
+                this.scene.add(directionalLight);
+            }
+            
+            /**
+             * Crea el mundo con bloques
+             */
+            createWorld() {
+                const gridSize = 12;
+                
+                // Crear suelo
+                console.log('Creando mundo...');
+                for (let x = -gridSize/2; x < gridSize/2; x++) {
+                    for (let z = -gridSize/2; z < gridSize/2; z++) {
+                        let type = 'grass';
+                        if (Math.random() > 0.8) type = 'dirt';
+                        if (Math.random() > 0.95) type = 'stone';
+                        
+                        const block = new Block(x, -0.5, z, type);
+                        block.addToScene(this.scene);
+                        this.blocks.push(block);
+                    }
+                }
+                
+                // Crear estructuras para probar el raycasting
+                // Torre 1
+                for (let y = 1; y <= 4; y++) {
+                    const block = new Block(-4, y - 0.5, -4, 'stone');
+                    block.addToScene(this.scene);
+                    this.blocks.push(block);
+                }
+                
+                // Torre 2
+                for (let y = 1; y <= 3; y++) {
+                    const block = new Block(4, y - 0.5, 4, 'dirt');
+                    block.addToScene(this.scene);
+                    this.blocks.push(block);
+                }
+                
+                // Pared
+                for (let x = -2; x <= 2; x++) {
+                    const block1 = new Block(x, 0.5, 0, 'stone');
+                    block1.addToScene(this.scene);
+                    this.blocks.push(block1);
+                    
+                    if (Math.abs(x) !== 0) { // Dejar hueco en el centro
+                        const block2 = new Block(x, 1.5, 0, 'stone');
+                        block2.addToScene(this.scene);
+                        this.blocks.push(block2);
+                    }
+                }
+                
+                // Bloques aleatorios elevados
+                const randomBlocks = [
+                    { x: 2, y: 0.5, z: -3, type: 'grass' },
+                    { x: -3, y: 0.5, z: 2, type: 'dirt' },
+                    { x: 3, y: 0.5, z: -2, type: 'stone' },
+                    { x: -2, y: 0.5, z: 3, type: 'grass' },
+                    { x: 0, y: 0.5, z: -4, type: 'dirt' }
+                ];
+                
+                randomBlocks.forEach(pos => {
+                    const block = new Block(pos.x, pos.y, pos.z, pos.type);
+                    block.addToScene(this.scene);
+                    this.blocks.push(block);
+                });
+                
+                this.updateBlockCount();
+                console.log(`Mundo creado con ${this.blocks.length} bloques`);
+            }
+            
+            /**
+             * Configura los controles de primera persona (PointerLockControls)
+             */
+            setupControls() {
+                this.controls = new THREE.PointerLockControls(this.camera, document.body);
+                
+                const instructions = document.getElementById('instructions');
+                
+                // Iniciar el juego al hacer clic
+                const startGame = () => {
+                    this.controls.lock();
+                };
+                
+                instructions.addEventListener('click', startGame);
+                
+                // Eventos de PointerLock
+                this.controls.addEventListener('lock', () => {
+                    instructions.style.display = 'none';
+                });
+                
+                this.controls.addEventListener('unlock', () => {
+                    instructions.style.display = 'block';
+                });
+            }
+            
+            /**
+             * Configura los event listeners del teclado y ratón
+             */
+            setupEventListeners() {
+                // Teclas presionadas
+                document.addEventListener('keydown', (event) => {
+                    switch (event.code) {
+                        case 'KeyW':
+                            this.moveState.forward = true;
+                            break;
+                        case 'KeyS':
+                            this.moveState.backward = true;
+                            break;
+                        case 'KeyA':
+                            this.moveState.left = true;
+                            break;
+                        case 'KeyD':
+                            this.moveState.right = true;
+                            break;
+                        case 'Space':
+                            if (this.onGround) {
+                                this.moveState.jump = true;
+                            }
+                            event.preventDefault();
+                            break;
+                    }
+                });
+                
+                // Teclas soltadas
+                document.addEventListener('keyup', (event) => {
+                    switch (event.code) {
+                        case 'KeyW':
+                            this.moveState.forward = false;
+                            break;
+                        case 'KeyS':
+                            this.moveState.backward = false;
+                            break;
+                        case 'KeyA':
+                            this.moveState.left = false;
+                            break;
+                        case 'KeyD':
+                            this.moveState.right = false;
+                            break;
+                        case 'Space':
+                            this.moveState.jump = false;
+                            break;
+                    }
+                });
+
+                // Click del ratón para eliminar bloques
+                document.addEventListener('mousedown', (event) => {
+                    if (event.button === 0 && this.controls.isLocked) { 
+                        // Click izquierdo y controles activos
+                        this.removeBlockAtPointer();
+                    }
+                });
+                
+                // Redimensionamiento de ventana
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            }
+
+            /**
+             * Elimina el bloque apuntado por el raycaster
+             * Esta es la función principal de raycasting
+             */
+            removeBlockAtPointer() {
+                // Configurar el raycaster desde el centro de la cámara
+                // Vector2(0, 0) representa el centro de la pantalla
+                this.raycaster.setFromCamera(new THREE.Vector2(0, 0), this.camera);
+                
+                // Obtener todos los meshes de los bloques
+                const blockMeshes = this.blocks.map(block => block.mesh);
+                
+                // Detectar intersecciones
+                const intersects = this.raycaster.intersectObjects(blockMeshes);
+                
+                if (intersects.length > 0) {
+                    // Tomar el primer objeto intersectado (el más cercano)
+                    const intersection = intersects[0];
+                    const blockMesh = intersection.object;
+                    
+                    // Encontrar el bloque correspondiente
+                    const blockIndex = this.blocks.findIndex(block => block.mesh === blockMesh);
+                    
+                    if (blockIndex !== -1) {
+                        const block = this.blocks[blockIndex];
+                        
+                        // No permitir eliminar el suelo base
+                        if (block.y >= 0) {
+                            // Remover de la escena
+                            block.removeFromScene(this.scene);
+                            
+                            // Remover del array
+                            this.blocks.splice(blockIndex, 1);
+                            
+                            this.updateBlockCount();
+                            console.log(`Bloque eliminado en (${block.x}, ${block.y}, ${block.z})`);
+                        } else {
+                            console.log('No puedes eliminar el suelo base');
+                        }
+                    }
+                }
+            }
+            
+            /**
+             * Verifica colisiones del jugador con los bloques
+             */
+            checkCollision(newPosition) {
+                const playerBox = new THREE.Box3(
+                    new THREE.Vector3(
+                        newPosition.x - this.playerRadius,
+                        newPosition.y - this.playerHeight,
+                        newPosition.z - this.playerRadius
+                    ),
+                    new THREE.Vector3(
+                        newPosition.x + this.playerRadius,
+                        newPosition.y,
+                        newPosition.z + this.playerRadius
+                    )
+                );
+                
+                for (const block of this.blocks) {
+                    const blockBox = block.getBoundingBox();
+                    if (playerBox.intersectsBox(blockBox)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            /**
+             * Actualiza el movimiento del jugador
+             */
+            updateMovement(delta) {
+                if (!this.controls.isLocked) return;
+                
+                const speed = 5.0;
+                
+                // Obtener vectores de dirección de la cámara
+                const cameraDirection = new THREE.Vector3();
+                this.camera.getWorldDirection(cameraDirection);
+                cameraDirection.y = 0; // Mantener movimiento horizontal
+                cameraDirection.normalize();
+                
+                // Vector derecho
+                const cameraRight = new THREE.Vector3();
+                cameraRight.crossVectors(this.camera.up, cameraDirection).normalize();
+                
+                // Resetear velocidad horizontal
+                this.velocity.x = 0;
+                this.velocity.z = 0;
+                
+                // Aplicar movimiento según la orientación de la cámara
+                if (this.moveState.forward) {
+                    this.velocity.add(cameraDirection.clone().multiplyScalar(speed * delta));
+                }
+                if (this.moveState.backward) {
+                    this.velocity.add(cameraDirection.clone().multiplyScalar(-speed * delta));
+                }
+                if (this.moveState.left) {
+                    this.velocity.add(cameraRight.clone().multiplyScalar(speed * delta));
+                }
+                if (this.moveState.right) {
+                    this.velocity.add(cameraRight.clone().multiplyScalar(-speed * delta));
+                }
+                
+                // Aplicar gravedad
+                this.velocity.y += this.gravity * delta;
+                
+                // Aplicar salto
+                if (this.moveState.jump && this.onGround) {
+                    this.velocity.y = this.jumpForce;
+                    this.onGround = false;
+                    this.moveState.jump = false;
+                }
+                
+                // Nueva posición
+                const newPosition = this.controls.getObject().position.clone();
+                newPosition.add(this.velocity.clone().multiplyScalar(delta));
+                
+                // Verificar colisión
+                if (!this.checkCollision(newPosition)) {
+                    this.controls.getObject().position.copy(newPosition);
+                }
+                
+                // Verificar si está en el suelo
+                const groundCheckPosition = this.controls.getObject().position.clone();
+                groundCheckPosition.y -= 0.1;
+                
+                if (this.checkCollision(groundCheckPosition)) {
+                    this.onGround = true;
+                    this.velocity.y = 0;
+                } else {
+                    this.onGround = false;
+                }
+                
+                // Límite inferior (caer al vacío)
+                if (this.controls.getObject().position.y < -10) {
+                    this.controls.getObject().position.set(0, 2, 0);
+                    this.velocity.set(0, 0, 0);
+                }
+            }
+            
+            /**
+             * Actualiza el contador de bloques en la UI
+             */
+            updateBlockCount() {
+                this.blockCountEl.textContent = this.blocks.length;
+            }
+            
+            /**
+             * Actualiza la posición del jugador en la UI
+             */
+            updatePosition() {
+                const pos = this.controls.getObject().position;
+                this.positionEl.textContent = `${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}, ${pos.z.toFixed(1)}`;
+            }
+            
+            /**
+             * Loop principal de animación
+             */
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                
+                const delta = this.clock.getDelta();
+                
+                // Actualizar movimiento
+                this.updateMovement(delta);
+                
+                // Actualizar UI
+                if (this.controls.isLocked) {
+                    this.updatePosition();
+                }
+                
+                // Renderizar escena
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        // ==========================================
+        // INICIAR EL JUEGO
+        // ==========================================
+        console.log('Iniciando Minecraft Clone con Raycasting...');
+        const game = new MinecraftGame();
+        
+    </script>
+</body>
+</html>

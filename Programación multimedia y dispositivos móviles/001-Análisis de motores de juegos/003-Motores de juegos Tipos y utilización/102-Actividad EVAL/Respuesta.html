@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      #lienzo{
+        border: 2px solid #932324;
+      }
+    </style>
+  </head>
+  <body>
+    <input type="range" id="angulo" min="0" max="6.283185307" step="0.01" value="0">
+    <label>Ángulo</label>
+    <br>
+    <input type="range" id="velocidad" min="0" max="10" step="0.1" value="2">
+    <label>Velocidad</label>
+    <br>
+    <input type="range" id="amplitud" min="0" max="2" step="0.01" value="1">
+    <label>Amplitud</label>
+    <br>
+    <canvas id="lienzo" width="512" height="512"></canvas>
+    <script>
+      class Particula{
+        constructor(x,y,v,a){
+          this.x = x;
+          this.y = y;
+          this.v = v;
+          this.a = a;
+        } 
+        dibuja(){
+          contexto.fillStyle = "#ae2e33"
+          contexto.fillRect(this.x,this.y,1,1)
+        }
+        mueve(){
+          this.x += Math.cos(this.a)*this.v
+          this.y += Math.sin(this.a)*this.v
+        }
+      }
+      
+      // Variables globales
+      var lienzo = document.querySelector("canvas")
+      var contexto = lienzo.getContext("2d")
+      var temporizador;
+      var numeroparticulas = 50
+      var particulas = []
+      var blancotransparente = "rgba(255,255,255,0.4)";
+      var angulo = document.querySelector("#angulo")
+      var velocidad = document.querySelector("#velocidad")
+      var amplitud = document.querySelector("#amplitud")
+      
+      inicio();
+      
+      function inicio(){
+        lienzo.onclick = function(event){
+          for(let i = 0;i<numeroparticulas;i++){
+            particulas.push(
+              new Particula(
+                event.offsetX,
+                event.offsetY,
+                parseFloat(velocidad.value),
+                parseFloat(angulo.value)+(Math.random()-0.5)*parseFloat(amplitud.value)
+              )
+            )
+          }
+        }
+        temporizador = setTimeout("bucle()",1000)
+      }
+      
+      function bucle(){
+        contexto.fillStyle = blancotransparente
+        contexto.fillRect(0,0,512,512)
+        particulas.forEach(function(particula){
+          particula.mueve()
+          particula.dibuja()
+        })
+        // Eliminamos particulas
+        for(let i = 0;i<particulas.length;i++){
+          if(
+            particulas[i].x < 0 || 
+            particulas[i].x > 512 ||
+            particulas[i].y < 0 || 
+            particulas[i].y > 512 
+            ){
+              particulas.splice(i,1)
+            }
+        }
+        clearTimeout(temporizador)
+        temporizador = setTimeout("bucle()",10)
+      }
+    </script>
+  </body>
+</html>

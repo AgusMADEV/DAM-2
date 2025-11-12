@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>jocarsa|ux – namespaced, JS‑built UI (v0.1 - Fixed)</title>
+  <style>
+    body,html{padding:0px;margin:0px;height:100%;}
+    body{display:flex;}
+    nav{flex:1;background:crimson;}
+    main{flex:8;}
+  </style>
+</head>
+<body>
+  <nav>
+  </nav>
+  <main>
+  </main>
+  <script>
+    let contenedor = document.querySelector("nav")
+     fetch("api2.php/tablas?action=tablas")
+      .then(function(respuesta){return respuesta.json()})
+      .then(function(datos){
+        datos.forEach(function(tabla){
+          let boton = document.createElement("button")
+          boton.textContent = tabla
+          contenedor.appendChild(boton)
+        })
+      })
+  </script>
+</body>
+</html>
+
+
+
+
+

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ejercicio 1: Escenario Básico - Clon Minecraft</title>
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            font-family: Arial, sans-serif;
+        }
+        canvas { 
+            display: block; 
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        #info h3 {
+            margin: 0 0 10px 0;
+        }
+        #info p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Panel de información -->
+    <div id="info">
+        <h3>Ejercicio 1: Escenario Básico</h3>
+        <p><strong>Objetivo:</strong> Construir un escenario simple con bloques</p>
+        <p>🟢 Bloques de césped (Grass)</p>
+        <p>🟤 Bloques de tierra (Dirt)</p>
+        <p>⚪ Bloques de piedra (Stone)</p>
+    </div>
+
+    <!-- Incluir Three.js desde CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <script>
+        // ==========================================
+        // CLASE BLOCK - Representa un bloque del mundo
+        // ==========================================
+        class Block {
+            constructor(x, y, z, type = 'grass') {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.type = type;
+                this.mesh = null;
+                
+                this.createMesh();
+            }
+            
+            /**
+             * Crea el mesh 3D del bloque con su color según el tipo
+             */
+            createMesh() {
+                // Geometría del cubo (1x1x1 unidades)
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                
+                // Colores para diferentes tipos de bloques
+                const colors = {
+                    'grass': 0x4CAF50,  // Verde para césped
+                    'dirt': 0x795548,   // Marrón para tierra
+                    'stone': 0x9E9E9E   // Gris para piedra
+                };
+                
+                // Material con iluminación Phong
+                const material = new THREE.MeshPhongMaterial({ 
+                    color: colors[this.type] || 0x4CAF50,
+                    flatShading: true  // Estilo blocky de Minecraft
+                });
+                
+                // Crear el mesh y posicionarlo
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.position.set(this.x, this.y, this.z);
+                
+                // Habilitar sombras
+                this.mesh.castShadow = true;
+                this.mesh.receiveShadow = true;
+            }
+            
+            /**
+             * Añade el bloque a la escena
+             */
+            addToScene(scene) {
+                if (this.mesh) {
+                    scene.add(this.mesh);
+                }
+            }
+        }
+
+        // ==========================================
+        // CONFIGURACIÓN DE LA ESCENA
+        // ==========================================
+        
+        // Crear la escena
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87CEEB); // Color cielo azul
+        
+        // Crear la cámara
+        const camera = new THREE.PerspectiveCamera(
+            75,                                    // Campo de visión
+            window.innerWidth / window.innerHeight, // Aspecto
+            0.1,                                   // Plano cercano
+            1000                                   // Plano lejano
+        );
+        camera.position.set(8, 8, 8);  // Posición de la cámara
+        camera.lookAt(0, 0, 0);         // Mirar al centro
+        
+        // Crear el renderizador
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
+        
+        // ==========================================
+        // ILUMINACIÓN
+        // ==========================================
+        
+        // Luz ambiental (iluminación suave general)
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+        scene.add(ambientLight);
+        
+        // Luz direccional (simula el sol)
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(20, 30, 20);
+        directionalLight.castShadow = true;
+        
+        // Configurar sombras de la luz direccional
+        directionalLight.shadow.mapSize.width = 2048;
+        directionalLight.shadow.mapSize.height = 2048;
+        directionalLight.shadow.camera.near = 0.5;
+        directionalLight.shadow.camera.far = 100;
+        directionalLight.shadow.camera.left = -20;
+        directionalLight.shadow.camera.right = 20;
+        directionalLight.shadow.camera.top = 20;
+        directionalLight.shadow.camera.bottom = -20;
+        
+        scene.add(directionalLight);
+        
+        // ==========================================
+        // CREAR BLOQUES DEL ESCENARIO
+        // ==========================================
+        
+        const blocks = [];
+        
+        // Crear un suelo de bloques (10x10)
+        console.log('Creando suelo...');
+        for (let x = -5; x < 5; x++) {
+            for (let z = -5; z < 5; z++) {
+                // Alternar tipos de bloques para variedad
+                let type = 'grass';
+                
+                // Algunos bloques de tierra aleatorios
+                if (Math.random() > 0.8) {
+                    type = 'dirt';
+                }
+                
+                // Algunos bloques de piedra aleatorios (menos frecuentes)
+                if (Math.random() > 0.95) {
+                    type = 'stone';
+                }
+                
+                const block = new Block(x, 0, z, type);
+                block.addToScene(scene);
+                blocks.push(block);
+            }
+        }
+        
+        // Crear algunas estructuras simples
+        console.log('Creando estructuras...');
+        
+        // Torre de bloques en una esquina
+        for (let y = 1; y <= 3; y++) {
+            const block = new Block(-3, y, -3, 'stone');
+            block.addToScene(scene);
+            blocks.push(block);
+        }
+        
+        // Pequeña pared
+        for (let x = 0; x <= 3; x++) {
+            const block1 = new Block(x, 1, 2, 'dirt');
+            block1.addToScene(scene);
+            blocks.push(block1);
+            
+            if (x % 2 === 0) {
+                const block2 = new Block(x, 2, 2, 'dirt');
+                block2.addToScene(scene);
+                blocks.push(block2);
+            }
+        }
+        
+        // Bloques decorativos aleatorios
+        const decorativePositions = [
+            { x: 3, y: 1, z: -2, type: 'grass' },
+            { x: 2, y: 1, z: -2, type: 'grass' },
+            { x: -2, y: 1, z: 3, type: 'stone' },
+            { x: 4, y: 1, z: 4, type: 'dirt' },
+            { x: 4, y: 2, z: 4, type: 'dirt' },
+            { x: 4, y: 3, z: 4, type: 'grass' },
+            { x: -4, y: 1, z: 0, type: 'stone' },
+            { x: -4, y: 2, z: 0, type: 'stone' }
+        ];
+        
+        decorativePositions.forEach(pos => {
+            const block = new Block(pos.x, pos.y, pos.z, pos.type);
+            block.addToScene(scene);
+            blocks.push(block);
+        });
+        
+        console.log(`Total de bloques creados: ${blocks.length}`);
+        
+        // ==========================================
+        // ANIMACIÓN Y RENDERIZADO
+        // ==========================================
+        
+        let time = 0;
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            time += 0.01;
+            
+            // Rotar la cámara lentamente alrededor del escenario
+            const radius = 12;
+            camera.position.x = Math.cos(time * 0.3) * radius;
+            camera.position.z = Math.sin(time * 0.3) * radius;
+            camera.position.y = 8;
+            
+            // La cámara siempre mira al centro
+            camera.lookAt(0, 1, 0);
+            
+            // Renderizar la escena
+            renderer.render(scene, camera);
+        }
+        
+        // ==========================================
+        // MANEJO DE REDIMENSIONAMIENTO
+        // ==========================================
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // ==========================================
+        // INICIAR ANIMACIÓN
+        // ==========================================
+        
+        console.log('Iniciando animación...');
+        animate();
+        
+    </script>
+</body>
+</html>

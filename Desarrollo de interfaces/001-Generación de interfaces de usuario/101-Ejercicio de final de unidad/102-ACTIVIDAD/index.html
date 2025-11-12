@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>jEnterpriseUI - Demo librería</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/jenterpriseui.css">
+</head>
+<body>
+  <div class="je-layout">
+    <aside class="je-sidebar">
+      <h1>jEnterpriseUI</h1>
+      <nav>
+        <a href="#formulario">Formulario de alta</a>
+        <a href="#listado">Listado de pedidos</a>
+        <a href="#componentes-extra">Componentes adicionales</a>
+      </nav>
+    </aside>
+
+    <main class="je-main">
+      <header class="je-header">
+        <div>
+          <div class="je-header-title">Librería de componentes UI empresariales</div>
+          <div class="je-header-subtitle">
+            Ejercicio final U1 · Controles avanzados + datos externos + reutilización
+          </div>
+        </div>
+      </header>
+
+      <section id="formulario" class="je-card">
+        <h2>Formulario de alta de pedido</h2>
+        <p style="font-size:0.85rem; color:#6b7280;">
+          Ejemplo de uso de <code>.je-select-remote</code> enlazado a datos JSON.
+        </p>
+        <!-- Nombre del pedido -->
+        <div class="je-textfield"
+            data-label="Nombre del pedido"
+            data-required="true"
+            data-minlength="3"
+            data-maxlength="50"
+            data-helper="Introduce un nombre descriptivo."
+            data-counter="true">
+        </div>
+        <!-- Selector de cliente desde JSON -->
+        <div class="je-select-remote"
+             data-label="Cliente"
+             data-src="data/clientes.json"
+             data-value-field="id"
+             data-label-field="nombre"
+             data-required="true">
+        </div>
+
+        <!-- Etiquetas internas -->
+        <div class="je-tag-input"
+            data-label="Etiquetas internas"
+            data-placeholder="Añade etiquetas y pulsa Enter"
+            data-name="tags"
+            data-max="5">
+        </div>
+      </section>
+
+      <section id="listado" class="je-card">
+        <h2>Listado de pedidos</h2>
+        <p style="font-size:0.85rem; color:#6b7280;">
+          Ejemplo de <code>.je-table</code> generada desde <code>pedidos.json</code>, con ordenación.
+        </p>
+
+        <div class="je-table"
+             data-src="data/pedidos.json"
+             data-caption="Pedidos recientes"
+             data-sortable="true">
+        </div>
+      </section>
+
+      <!-- NUEVOS COMPONENTES -->
+      <section id="componentes-extra" class="je-card">
+        <h2>Componentes adicionales</h2>
+        <p style="font-size:0.85rem; color:#6b7280;">
+          Nuevos componentes: DatePicker, CheckboxGroup, ProgressBar y Modal.
+        </p>
+
+        <!-- DatePicker -->
+        <div class="je-datepicker"
+             data-label="Fecha de entrega"
+             data-format="dd/mm/yyyy"
+             data-min="2025-01-01"
+             data-max="2025-12-31"
+             data-required="true">
+        </div>
+
+        <!-- CheckboxGroup -->
+        <div class="je-checkbox-group"
+             data-label="Opciones de envío"
+             data-options='[{"value":"express","label":"Envío Express"},{"value":"normal","label":"Envío Normal"},{"value":"recogida","label":"Recogida en tienda"}]'
+             data-name="envio"
+             data-layout="vertical"
+             data-min-checked="1">
+        </div>
+
+        <!-- ProgressBar -->
+        <div class="je-progress-bar"
+             data-value="65"
+             data-max="100"
+             data-label="Progreso del pedido"
+             data-show-percentage="true"
+             data-color="primary"
+             data-striped="true"
+             data-animated="true">
+        </div>
+
+        <!-- Botón para abrir modal -->
+        <button onclick="document.querySelector('.je-modal').__jeInstance.open()" 
+                class="je-btn je-btn-primary">
+          🔔 Abrir Modal de confirmación
+        </button>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL (fuera del layout principal) -->
+  <div class="je-modal" 
+       data-title="Confirmar pedido"
+       data-size="medium"
+       data-close-on-backdrop="true">
+    <p>¿Estás seguro de que deseas confirmar este pedido?</p>
+    <p style="color:#6b7280; font-size:0.85rem;">Esta acción no se puede deshacer.</p>
+    <div style="display:flex; gap:0.75rem; justify-content:flex-end; margin-top:1.5rem;">
+      <button onclick="document.querySelector('.je-modal').__jeInstance.close()" 
+              class="je-btn je-btn-secondary">
+        Cancelar
+      </button>
+      <button onclick="alert('Pedido confirmado'); document.querySelector('.je-modal').__jeInstance.close()" 
+              class="je-btn je-btn-success">
+        ✓ Confirmar
+      </button>
+    </div>
+  </div>
+
+    <script src="js/jenterpriseui.js"></script>
+    <script src="js/je-textfield.js"></script>
+    <script src="js/je-select-remote.js"></script>
+    <script src="js/je-tag-input.js"></script>
+    <script src="js/je-table.js"></script>
+    <script src="js/je-modal.js"></script>
+    <script src="js/je-datepicker.js"></script>
+    <script src="js/je-checkbox-group.js"></script>
+    <script src="js/je-progress-bar.js"></script>
+</body>
+</html>

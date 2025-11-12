@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JSON → Table (minimal, reusable)</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#0f172a;   /* slate-900 */
+      --muted:#475569;  /* slate-600 */
+      --line:#e2e8f0;   /* slate-200 */
+      --head:#0ea5e9;   /* sky-500 */
+      --chip:#f1f5f9;   /* slate-100 */
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; font:14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial; background:var(--bg); color:var(--text)}
+    .wrap{max-width:960px;margin:32px auto;padding:0 16px}
+    h1{margin:0 0 8px;font-size:clamp(18px,3.5vw,26px)}
+    p{margin:0 0 18px;color:var(--muted)}
+
+    .card{border:1px solid var(--line); border-radius:12px; overflow:hidden}
+    .pad{padding:14px}
+
+    table{width:100%; border-collapse:separate; border-spacing:0; font-size:14px}
+    thead th{position:sticky; top:0; background:linear-gradient(0deg,#f8fafc,#ffffff); border-bottom:1px solid var(--line); text-align:left; font-weight:700; padding:10px 12px}
+    tbody td{border-bottom:1px solid var(--line); padding:10px 12px; vertical-align:top}
+    tbody tr:nth-child(odd){background:#fafafa}
+    .table-scroll{max-height:70vh; overflow:auto; border-top:1px solid var(--line)}
+
+    code.inline{background:var(--chip); padding:2px 6px; border-radius:6px}
+    .badge{display:inline-block; background:var(--chip); padding:2px 8px; border:1px solid var(--line); border-radius:999px; font-size:12px; color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>JSON → Table</h1>
+    <p>Minimal example with a hardcoded sample. The renderer is packaged as <code class="inline">window.renderJSONTable(el, data, options)</code> for reuse.</p>
+
+    <div class="card">
+      <div class="pad">
+        <span class="badge">Sample data rendered below</span>
+      </div>
+      <div class="table-scroll">
+        <table id="table"></table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // --- Reusable renderer ------------------------------------------------------
+  // window.renderJSONTable(target, data, options)
+  //  - target: CSS selector or Element for the <table>
+  //  - data: Array of objects OR a single object OR { items: [...] }
+  //  - options: { flatten: true, joinArraysWith: ', ' }
+  (function(){
+    const isPlain = v => Object.prototype.toString.call(v) === '[object Object]';
+
+    function flatten(value, prefix=''){
+      const out = {}; const stack = [{v:value, p:prefix}];
+      while (stack.length){
+        const {v, p} = stack.pop();
+        if (Array.isArray(v)){
+          const primitives = v.every(x => !isPlain(x) && !Array.isArray(x));
+          if (primitives){ out[p || 'value'] = v.join(', '); }
+          else v.forEach((x,i)=>{
+            const np = p ? `${p}[${i}]` : `[${i}]`;
+            if (isPlain(x) || Array.isArray(x)) stack.push({v:x, p:np});
+            else out[np] = String(x);
+          });
+        } else if (isPlain(v)){
+          const ks = Object.keys(v);
+          if (ks.length === 0){ out[p || 'value'] = '{}'; continue; }
+          ks.forEach(k => {
+            const nv = v[k]; const np = p ? `${p}.${k}` : k;
+            if (isPlain(nv) || Array.isArray(nv)) stack.push({v:nv, p:np});
+            else out[np] = nv == null ? '' : String(nv);
+          });
+        } else {
+          out[p || 'value'] = v == null ? '' : String(v);
+        }
+      }
+      return out;
+    }
+
+    function normalizeTop(json){
+      if (Array.isArray(json)) return json;
+      if (isPlain(json)){
+        const key = Object.keys(json).find(k=>Array.isArray(json[k]));
+        return key ? json[key] : [json];
+      }
+      return [json];
+    }
+
+    function collectColumns(rows){
+      const set = new Set();
+      rows.forEach(r => Object.keys(r).forEach(k => set.add(k)));
+      return Array.from(set);
+    }
+
+    function renderJSONTable(target, data, options={}){
+      const table = (typeof target === 'string') ? document.querySelector(target) : target;
+      if (!table) throw new Error('Target table not found');
+      const opts = { flatten:true, joinArraysWith:', ', ...options };
+
+      const arr = normalizeTop(data);
+      const flat = opts.flatten ? arr.map(x=>flatten(x)) : arr;
+      const cols = collectColumns(flat);
+
+      const thead = document.createElement('thead');
+      const hr = document.createElement('tr');
+      cols.forEach(c=>{ const th=document.createElement('th'); th.textContent=c; hr.appendChild(th); });
+      thead.appendChild(hr);
+
+      const tbody = document.createElement('tbody');
+      const frag = document.createDocumentFragment();
+      flat.forEach(row => {
+        const tr = document.createElement('tr');
+        cols.forEach(c => { const td=document.createElement('td'); td.textContent = row[c] ?? ''; tr.appendChild(td); });
+        frag.appendChild(tr);
+      });
+      tbody.appendChild(frag);
+
+      table.innerHTML = '';
+      table.appendChild(thead);
+      table.appendChild(tbody);
+
+      return { columns: cols, rows: flat };
+    }
+
+    // Expose for reuse
+    window.renderJSONTable = renderJSONTable;
+  })();
+
+  // --- Hardcoded sample -------------------------------------------------------
+  const sample = [
+    {
+      id: 1,
+      name: "Ada Lovelace",
+      email: "ada@example.com",
+      tags: ["math","programming"],
+      profile: { role: "Analyst", location: { city: "London", country: "UK" } },
+      score: 9.5
+    },
+    {
+      id: 2,
+      name: "Linus Torvalds",
+      email: "linus@example.com",
+      tags: ["linux","git"],
+      profile: { role: "Engineer" },
+      score: 10
+    }
+  ];
+
+  // Render on load
+  window.addEventListener('DOMContentLoaded', ()=>{
+    window.renderJSONTable('#table', sample);
+  });
+  </script>
+</body>
+</html>
+

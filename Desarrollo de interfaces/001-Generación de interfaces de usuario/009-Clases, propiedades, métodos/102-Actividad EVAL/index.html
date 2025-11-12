@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad JocarsaUX - Gestión Deportiva</title>
+    <style>
+        body, html {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial, sans-serif;
+        }
+        body {
+            display: flex;
+            background: #f8fafc;
+        }
+        nav {
+            flex: 1;
+            min-width: 280px;
+            max-width: 320px;
+            overflow-y: auto;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+        }
+        main {
+            flex: 3;
+            overflow: auto;
+            background: #ffffff;
+        }
+        .welcome-message {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+        .feature-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 32px;
+            text-align: left;
+            margin-top: 24px;
+        }
+        .feature-list {
+            color: #475569;
+            line-height: 1.8;
+            margin: 0;
+        }
+        .feature-list li {
+            margin-bottom: 8px;
+        }
+        .feature-list strong {
+            color: #0f172a;
+        }
+        h1 {
+            font-size: clamp(24px, 5vw, 42px);
+            margin-bottom: 16px;
+            color: #0f172a;
+        }
+        .subtitle {
+            font-size: 18px;
+            color: #64748b;
+            margin-bottom: 32px;
+        }
+        .instruction {
+            margin-top: 24px;
+            color: #64748b;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <nav id="menu-container">
+    </nav>
+    <main id="main-container">
+        <div class="welcome-message">
+            <h1>🏆 Actividad Práctica JocarsaUX</h1>
+            <p class="subtitle">Sistema de Gestión Deportiva, Gaming y Turismo</p>
+            <div class="feature-card">
+                <h2 style="font-size:20px;margin-bottom:16px;color:#0f172a;">📋 Descripción de la Actividad</h2>
+                <p style="color:#475569;margin-bottom:20px;">
+                    Esta actividad demuestra el uso práctico de los diferentes renderizadores de JocarsaUX aplicados a tres áreas de interés:
+                    deportes, videojuegos y turismo.
+                </p>
+                <ul class="feature-list">
+                    <li><strong>🏅 Gestión Deportiva:</strong> Tabla interactiva con estadísticas de torneos, filtros y ordenamiento</li>
+                    <li><strong>🎮 Puntuaciones Gaming:</strong> Formulario inteligente para registro de puntuaciones por niveles</li>
+                    <li><strong>✈️ Estadísticas Turísticas:</strong> Gráficos automáticos de datos de visitantes por país</li>
+                    <li><strong>🎯 Vista en Tarjetas:</strong> Visualización alternativa de datos en formato cards responsivas</li>
+                </ul>
+                <p class="instruction">👈 Selecciona una opción del menú para comenzar a explorar las funcionalidades</p>
+            </div>
+        </div>
+    </main>
+    
+    <script src="jocarsaux4.js"></script>
+    <script src="datos-deportivos.js"></script>
+    <script src="datos-gaming.js"></script>
+    <script src="datos-turismo.js"></script>
+    <script>
+        const ux = new JocarsaUX();
+        const menuContainer = document.getElementById('menu-container');
+        const mainContainer = document.getElementById('main-container');
+        
+        // Configurar el menú principal
+        ux.menuRenderer({
+            target: menuContainer,
+            title: 'Gestión Integral',
+            color: '#dc143c',
+            sections: [
+                {
+                    header: 'Gestión Deportiva',
+                    items: [
+                        { label: 'Tabla de Torneo', value: 'deportes-tabla' },
+                        { label: 'Vista Cards Equipos', value: 'deportes-cards' }
+                    ]
+                },
+                {
+                    header: 'Gaming & Puntuaciones',
+                    items: [
+                        { label: 'Formulario Puntuaciones', value: 'gaming-form' },
+                        { label: 'Tabla de Scores', value: 'gaming-tabla' }
+                    ]
+                },
+                {
+                    header: 'Datos Turísticos',
+                    items: [
+                        { label: 'Gráficos de Visitantes', value: 'turismo-charts' },
+                        { label: 'Formulario de Destinos', value: 'turismo-form' }
+                    ]
+                },
+                {
+                    header: 'Ejemplos Avanzados',
+                    items: [
+                        { label: 'Dashboard Completo', value: 'dashboard' },
+                        { label: 'Volver al Inicio', value: 'inicio' }
+                    ]
+                }
+            ],
+            onItemClick: (value, item) => {
+                manejarSeleccionMenu(value);
+            }
+        });
+
+        function manejarSeleccionMenu(opcion) {
+            mainContainer.innerHTML = '';
+            
+            switch(opcion) {
+                case 'deportes-tabla':
+                    mostrarTablaDeportiva();
+                    break;
+                case 'deportes-cards':
+                    mostrarCardsEquipos();
+                    break;
+                case 'gaming-form':
+                    mostrarFormularioGaming();
+                    break;
+                case 'gaming-tabla':
+                    mostrarTablaGaming();
+                    break;
+                case 'turismo-charts':
+                    mostrarGraficosTurismo();
+                    break;
+                case 'turismo-form':
+                    mostrarFormularioTurismo();
+                    break;
+                case 'dashboard':
+                    mostrarDashboard();
+                    break;
+                case 'inicio':
+                    location.reload();
+                    break;
+                default:
+                    console.log('Opción no reconocida:', opcion);
+            }
+        }
+
+        function mostrarTablaDeportiva() {
+            const uxTabla = new JocarsaUX();
+            uxTabla.tableRenderer({
+                target: mainContainer,
+                data: datosDeportivos,
+                title: '🏆 Estadísticas del Torneo de Fútbol',
+                subtitle: 'Tabla interactiva con filtros y ordenamiento - Temporada 2024',
+                rowsPerPage: 8
+            });
+        }
+
+        function mostrarCardsEquipos() {
+            const uxCards = new JocarsaUX();
+            uxCards.gridRenderer({
+                target: mainContainer,
+                data: datosDeportivos,
+                title: '⚽ Equipos del Torneo',
+                subtitle: 'Vista en tarjetas con información detallada de cada equipo',
+                cardsPerPage: 6,
+                titleField: 'equipo',
+                onCardClick: (equipo, index) => {
+                    alert(`Información del ${equipo.equipo}:\\n\\n` +
+                          `Puntos: ${equipo.puntos}\\n` +
+                          `Partidos jugados: ${equipo.partidos_jugados}\\n` +
+                          `Goles a favor: ${equipo.goles_favor}\\n` +
+                          `Goles en contra: ${equipo.goles_contra}\\n` +
+                          `Entrenador: ${equipo.entrenador}`);
+                }
+            });
+        }
+
+        function mostrarFormularioGaming() {
+            const uxForm = new JocarsaUX();
+            uxForm.formRenderer({
+                target: mainContainer,
+                data: [datosGaming[0]], // Usar primer registro como modelo
+                title: '🎮 Registro de Puntuaciones Gaming',
+                subtitle: 'Formulario inteligente con validación automática de tipos de datos',
+                columns: 2,
+                onSubmit: (datos) => {
+                    alert('Puntuación registrada exitosamente:\\n\\n' + 
+                          Object.entries(datos)
+                            .map(([key, value]) => `${key}: ${value}`)
+                            .join('\\n'));
+                },
+                onReset: () => {
+                    console.log('Formulario limpiado');
+                }
+            });
+        }
+
+        function mostrarTablaGaming() {
+            const uxGamingTabla = new JocarsaUX();
+            uxGamingTabla.tableRenderer({
+                target: mainContainer,
+                data: datosGaming,
+                title: '🏮 Ranking de Puntuaciones',
+                subtitle: 'Mejores puntuaciones registradas en diferentes videojuegos',
+                rowsPerPage: 10
+            });
+        }
+
+        function mostrarGraficosTurismo() {
+            const uxCharts = new JocarsaUX();
+            uxCharts.chartRenderer({
+                target: mainContainer,
+                data: datosTurismo,
+                title: '✈️ Estadísticas Turísticas Globales',
+                subtitle: 'Gráficos automáticos basados en datos de visitantes por regiones'
+            });
+        }
+
+        function mostrarFormularioTurismo() {
+            const uxTurismoForm = new JocarsaUX();
+            uxTurismoForm.formRenderer({
+                target: mainContainer,
+                data: [datosTurismo[0]], // Usar primer registro como modelo
+                title: '🗺️ Registro de Nuevo Destino Turístico',
+                subtitle: 'Añadir información de destinos turísticos al sistema',
+                columns: 2,
+                onSubmit: (datos) => {
+                    alert('Destino turístico agregado:\\n\\n' + 
+                          Object.entries(datos)
+                            .map(([key, value]) => `${key}: ${value}`)
+                            .join('\\n'));
+                }
+            });
+        }
+
+        function mostrarDashboard() {
+            mainContainer.innerHTML = `
+                <div style="padding: 20px; max-width: 1200px; margin: 0 auto;">
+                    <h1 style="color: #0f172a; margin-bottom: 24px;">📊 Dashboard Integral JocarsaUX</h1>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                        <div id="mini-deportes" style="border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;"></div>
+                        <div id="mini-gaming" style="border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;"></div>
+                    </div>
+                    
+                    <div style="border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+                        <div id="mini-turismo"></div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: #f8fafc; border-radius: 12px; text-align: center;">
+                        <h3 style="color: #0f172a; margin-bottom: 16px;">🎯 Funcionalidades Demostradas</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; text-align: left;">
+                            <div style="background: white; padding: 16px; border-radius: 8px;">
+                                <strong>🔍 Filtros Dinámicos:</strong> Búsqueda en tiempo real en tablas
+                            </div>
+                            <div style="background: white; padding: 16px; border-radius: 8px;">
+                                <strong>📈 Ordenamiento:</strong> Columnas clickeables para ordenar datos
+                            </div>
+                            <div style="background: white; padding: 16px; border-radius: 8px;">
+                                <strong>📄 Paginación:</strong> Navegación eficiente en grandes conjuntos de datos
+                            </div>
+                            <div style="background: white; padding: 16px; border-radius: 8px;">
+                                <strong>📱 Responsivo:</strong> Adaptable a diferentes tamaños de pantalla
+                            </div>
+                            <div style="background: white; padding: 16px; border-radius: 8px;">
+                                <strong>🎨 Vista Cards:</strong> Presentación visual alternativa de datos
+                            </div>
+                            <div style="background: white; padding: 16px; border-radius: 8px;">
+                                <strong>📊 Gráficos Auto:</strong> Detección automática de datos graficables
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Mini tabla deportiva
+            const uxMiniDeportes = new JocarsaUX();
+            uxMiniDeportes.tableRenderer({
+                target: '#mini-deportes',
+                data: datosDeportivos.slice(0, 5),
+                title: '🏆 Top 5 Equipos',
+                subtitle: 'Mejores equipos del torneo',
+                rowsPerPage: 5
+            });
+
+            // Mini cards gaming
+            const uxMiniGaming = new JocarsaUX();
+            uxMiniGaming.gridRenderer({
+                target: '#mini-gaming',
+                data: datosGaming.slice(0, 4),
+                title: '🎮 Top Gaming',
+                subtitle: 'Mejores puntuaciones',
+                cardsPerPage: 4,
+                titleField: 'jugador'
+            });
+
+            // Mini gráfico turismo
+            const uxMiniTurismo = new JocarsaUX();
+            uxMiniTurismo.chartRenderer({
+                target: '#mini-turismo',
+                data: datosTurismo.slice(0, 8),
+                title: '✈️ Resumen Turístico',
+                subtitle: 'Datos principales de destinos'
+            });
+        }
+    </script>
+</body>
+</html>

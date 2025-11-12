@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procesador de Imágenes Multinúcleo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🎨 Procesador de Imágenes Multinúcleo</h1>
+            <p class="subtitle">Sistema de procesamiento paralelo en tiempo real</p>
+            <div class="status-bar">
+                <span id="conexion-estado" class="estado desconectado">● Desconectado</span>
+                <span id="nucleos-info">🖥️ Núcleos: --</span>
+                <span id="clientes-info">👥 Clientes: --</span>
+            </div>
+        </header>
+
+        <!-- Panel de control -->
+        <div class="panel-control">
+            <div class="seccion">
+                <h2>📁 Imágenes Disponibles</h2>
+                <div class="imagenes-container">
+                    <button id="btn-actualizar-imagenes" class="btn btn-secondary">🔄 Actualizar Lista</button>
+                    <div id="lista-imagenes" class="lista-imagenes">
+                        <p class="mensaje-placeholder">Conectando al servidor...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="seccion">
+                <h2>🎨 Filtros Disponibles</h2>
+                <div id="filtros-container" class="filtros-grid">
+                    <!-- Los filtros se cargarán dinámicamente -->
+                </div>
+                <button id="btn-seleccionar-todos" class="btn btn-secondary">✅ Seleccionar Todos</button>
+                <button id="btn-deseleccionar-todos" class="btn btn-secondary">❌ Deseleccionar Todos</button>
+            </div>
+
+            <div class="seccion">
+                <h2>⚙️ Configuración</h2>
+                <div class="config-opciones">
+                    <div class="opcion-grupo">
+                        <label for="modo-procesamiento">Modo de Procesamiento:</label>
+                        <select id="modo-procesamiento" class="select-modo">
+                            <option value="procesos">🚀 Procesos Paralelos (Recomendado)</option>
+                            <option value="threads">🧵 Threads</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="seccion-acciones">
+                <button id="btn-procesar" class="btn btn-primary" disabled>
+                    🚀 Iniciar Procesamiento
+                </button>
+                <button id="btn-cancelar" class="btn btn-danger" disabled>
+                    ⛔ Cancelar
+                </button>
+            </div>
+        </div>
+
+        <!-- Panel de progreso -->
+        <div class="panel-progreso">
+            <h2>📊 Progreso del Procesamiento</h2>
+            
+            <div id="progreso-general" class="progreso-general oculto">
+                <div class="progreso-info">
+                    <span id="progreso-texto">Preparando procesamiento...</span>
+                    <span id="progreso-porcentaje">0%</span>
+                </div>
+                <div class="barra-progreso">
+                    <div id="barra-progreso-fill" class="barra-progreso-fill" style="width: 0%"></div>
+                </div>
+                <div class="progreso-stats">
+                    <span>⏱️ Tiempo: <strong id="tiempo-transcurrido">0s</strong></span>
+                    <span>📁 Procesadas: <strong id="imagenes-procesadas">0</strong> / <strong id="imagenes-total">0</strong></span>
+                    <span>⚡ Velocidad: <strong id="velocidad">--</strong> img/s</span>
+                </div>
+            </div>
+
+            <div id="log-container" class="log-container">
+                <div class="log-header">
+                    <h3>📋 Log de Actividad</h3>
+                    <button id="btn-limpiar-log" class="btn btn-small">🗑️ Limpiar</button>
+                </div>
+                <div id="log-content" class="log-content">
+                    <p class="log-item info">Sistema iniciado. Esperando conexión...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de resultados -->
+        <div id="panel-resultados" class="panel-resultados oculto">
+            <h2>✅ Resultados del Procesamiento</h2>
+            <div id="resultados-content" class="resultados-content">
+                <!-- Los resultados se mostrarán aquí -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Desarrollado para la asignatura de Programación de Servicios y Procesos</p>
+        <p>Actividad Final - Unidad 1: Programación Multiproceso</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>

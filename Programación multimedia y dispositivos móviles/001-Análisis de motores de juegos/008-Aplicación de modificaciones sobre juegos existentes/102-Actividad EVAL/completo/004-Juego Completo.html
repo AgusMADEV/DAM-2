@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ejercicio Final: Minecraft Clone Completo</title>
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            font-family: Arial, sans-serif;
+        }
+        canvas { 
+            display: block; 
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            max-width: 280px;
+            line-height: 1.5;
+        }
+        #info h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: #4CAF50;
+        }
+        #info p {
+            margin: 4px 0;
+        }
+        #info .key {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 10px;
+        }
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 24px;
+            height: 24px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1000;
+        }
+        #crosshair::before, #crosshair::after {
+            content: '';
+            position: absolute;
+            background: white;
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+        }
+        #crosshair::before {
+            width: 2px;
+            height: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #crosshair::after {
+            width: 24px;
+            height: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        #instructions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            font-family: Arial;
+            max-width: 500px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.7);
+        }
+        #instructions h2 {
+            margin: 0 0 20px 0;
+            color: #4CAF50;
+            font-size: 28px;
+        }
+        #instructions p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        #instructions .highlight {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        #stats {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 11px;
+            min-width: 160px;
+        }
+        #stats div {
+            margin: 4px 0;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        #stats .label {
+            color: #aaa;
+        }
+        #stats .value {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        #block-selector {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .block-option {
+            width: 40px;
+            height: 40px;
+            border: 3px solid transparent;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .block-option:hover {
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        .block-option.selected {
+            border-color: #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+        #action-feedback {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            display: none;
+            animation: fadeInOut 1s;
+        }
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+        #action-feedback.show {
+            display: block;
+        }
+        #action-feedback.remove {
+            background: rgba(244, 67, 54, 0.9);
+        }
+    </style>
+</head>
+<body>
+    <!-- Crosshair -->
+    <div id="crosshair"></div>
+    
+    <!-- Panel de información -->
+    <div id="info">
+        <h3>🎮 Minecraft Clone</h3>
+        <p><span class="key">W A S D</span> Mover</p>
+        <p><span class="key">Mouse</span> Mirar</p>
+        <p><span class="key">Space</span> Saltar</p>
+        <p><span class="key">Shift</span> Correr</p>
+        <p><span class="key">Click Izq.</span> Eliminar</p>
+        <p><span class="key">Click Der.</span> Colocar</p>
+        <p><span class="key">1 2 3</span> Tipo de bloque</p>
+        <p style="margin-top: 8px; font-size: 11px; opacity: 0.7;">
+            💡 Construye y destruye libremente
+        </p>
+    </div>
+
+    <!-- Estadísticas -->
+    <div id="stats">
+        <div>
+            <span class="label">Posición:</span>
+            <span class="value" id="position">0, 0, 0</span>
+        </div>
+        <div>
+            <span class="label">Bloques:</span>
+            <span class="value" id="blockCount">0</span>
+        </div>
+        <div>
+            <span class="label">En suelo:</span>
+            <span class="value" id="onGround">No</span>
+        </div>
+        <div>
+            <span class="label">Colocados:</span>
+            <span class="value" id="placedCount">0</span>
+        </div>
+        <div>
+            <span class="label">Eliminados:</span>
+            <span class="value" id="removedCount">0</span>
+        </div>
+    </div>
+
+    <!-- Selector de bloques -->
+    <div id="block-selector">
+        <div class="block-option selected" data-type="grass" style="background: #4CAF50;">🟢</div>
+        <div class="block-option" data-type="dirt" style="background: #795548;">🟤</div>
+        <div class="block-option" data-type="stone" style="background: #9E9E9E;">⚪</div>
+    </div>
+
+    <!-- Feedback de acciones -->
+    <div id="action-feedback"></div>
+    
+    <!-- Instrucciones iniciales -->
+    <div id="instructions">
+        <h2>⛏️ MINECRAFT CLONE</h2>
+        <p><strong>¡Haz clic para comenzar!</strong></p>
+        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 20px 0;">
+        <p><span class="highlight">WASD</span> - Moverte por el mundo</p>
+        <p><span class="highlight">Mouse</span> - Mirar alrededor</p>
+        <p><span class="highlight">Espacio</span> - Saltar</p>
+        <p><span class="highlight">Shift</span> - Correr</p>
+        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 20px 0;">
+        <p><span class="highlight">Click Izquierdo</span> - Eliminar bloque</p>
+        <p><span class="highlight">Click Derecho</span> - Colocar bloque</p>
+        <p><span class="highlight">1, 2, 3</span> - Cambiar tipo de bloque</p>
+        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 20px 0;">
+        <p style="font-size: 13px; opacity: 0.8;">
+            ⚡ Construye estructuras increíbles<br>
+            ⚡ Explora el mundo generado
+        </p>
+        <p style="margin-top: 20px; font-size: 12px; opacity: 0.6;">
+            Presiona <strong>ESC</strong> para salir
+        </p>
+    </div>
+
+    <!-- Three.js y PointerLockControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.min.js"></script>
+    
+    <script>
+        // ==========================================
+        // CLASE BLOCK
+        // ==========================================
+        class Block {
+            constructor(x, y, z, type = 'grass') {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.type = type;
+                this.mesh = null;
+                
+                this.createMesh();
+            }
+            
+            createMesh() {
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                
+                const colors = {
+                    'grass': 0x4CAF50,
+                    'dirt': 0x795548,
+                    'stone': 0x9E9E9E
+                };
+                
+                const material = new THREE.MeshPhongMaterial({ 
+                    color: colors[this.type] || 0x4CAF50,
+                    flatShading: true
+                });
+                
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.position.set(this.x, this.y, this.z);
+                this.mesh.castShadow = true;
+                this.mesh.receiveShadow = true;
+            }
+            
+            addToScene(scene) {
+                if (this.mesh) {
+                    scene.add(this.mesh);
+                }
+            }
+            
+            removeFromScene(scene) {
+                if (this.mesh) {
+                    scene.remove(this.mesh);
+                }
+            }
+            
+            getBoundingBox() {
+                return new THREE.Box3().setFromObject(this.mesh);
+            }
+        }
+
+        // ==========================================
+        // CLASE MINECRAFTGAME COMPLETO
+        // ==========================================
+        class MinecraftGame {
+            constructor() {
+                // Configuración de la escena
+                this.scene = new THREE.Scene();
+                this.scene.background = new THREE.Color(0x87CEEB);
+                
+                // Cámara
+                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                this.camera.position.set(0, 2, 0);
+                
+                // Renderizador
+                this.renderer = new THREE.WebGLRenderer({ antialias: true });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                document.body.appendChild(this.renderer.domElement);
+                
+                // Variables de control
+                this.controls = null;
+                this.blocks = [];
+                this.moveState = { 
+                    forward: false, backward: false, left: false, right: false, 
+                    jump: false, sprint: false 
+                };
+                
+                // Física
+                this.velocity = new THREE.Vector3();
+                this.onGround = false;
+                this.gravity = -25;
+                this.jumpForce = 9;
+                this.playerHeight = 1.8;
+                this.playerRadius = 0.4;
+                
+                // Raycaster para interacción
+                this.raycaster = new THREE.Raycaster();
+                this.raycaster.far = 10;
+                
+                // Tipo de bloque seleccionado
+                this.selectedBlockType = 'grass';
+                
+                // Estadísticas
+                this.placedCount = 0;
+                this.removedCount = 0;
+                
+                // Clock
+                this.clock = new THREE.Clock();
+                
+                // Referencias UI
+                this.positionEl = document.getElementById('position');
+                this.blockCountEl = document.getElementById('blockCount');
+                this.onGroundEl = document.getElementById('onGround');
+                this.placedCountEl = document.getElementById('placedCount');
+                this.removedCountEl = document.getElementById('removedCount');
+                this.actionFeedback = document.getElementById('action-feedback');
+                
+                // Inicialización
+                this.setupLights();
+                this.createWorld();
+                this.setupControls();
+                this.setupEventListeners();
+                this.setupBlockSelector();
+                
+                this.animate();
+            }
+            
+            setupLights() {
+                const ambientLight = new THREE.AmbientLight(0x606060, 0.7);
+                this.scene.add(ambientLight);
+                
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+                directionalLight.position.set(50, 50, 50);
+                directionalLight.castShadow = true;
+                directionalLight.shadow.mapSize.width = 2048;
+                directionalLight.shadow.mapSize.height = 2048;
+                directionalLight.shadow.camera.near = 0.5;
+                directionalLight.shadow.camera.far = 500;
+                directionalLight.shadow.camera.left = -50;
+                directionalLight.shadow.camera.right = 50;
+                directionalLight.shadow.camera.top = 50;
+                directionalLight.shadow.camera.bottom = -50;
+                this.scene.add(directionalLight);
+            }
+            
+            createWorld() {
+                const gridSize = 20;
+                
+                console.log('🌍 Generando mundo...');
+                
+                // Suelo con variedad
+                for (let x = -gridSize/2; x < gridSize/2; x++) {
+                    for (let z = -gridSize/2; z < gridSize/2; z++) {
+                        let type = 'grass';
+                        const rand = Math.random();
+                        if (rand > 0.85) type = 'dirt';
+                        if (rand > 0.95) type = 'stone';
+                        
+                        const block = new Block(x, -0.5, z, type);
+                        block.addToScene(this.scene);
+                        this.blocks.push(block);
+                    }
+                }
+                
+                // Estructura inicial - casa pequeña
+                const house = [
+                    // Paredes
+                    { x: 5, y: 0.5, z: 5, type: 'stone' },
+                    { x: 6, y: 0.5, z: 5, type: 'stone' },
+                    { x: 7, y: 0.5, z: 5, type: 'stone' },
+                    { x: 5, y: 0.5, z: 7, type: 'stone' },
+                    { x: 6, y: 0.5, z: 7, type: 'stone' },
+                    { x: 7, y: 0.5, z: 7, type: 'stone' },
+                    { x: 5, y: 0.5, z: 6, type: 'stone' },
+                    { x: 7, y: 0.5, z: 6, type: 'stone' },
+                    // Segunda capa
+                    { x: 5, y: 1.5, z: 5, type: 'stone' },
+                    { x: 7, y: 1.5, z: 5, type: 'stone' },
+                    { x: 5, y: 1.5, z: 7, type: 'stone' },
+                    { x: 7, y: 1.5, z: 7, type: 'stone' },
+                    // Techo
+                    { x: 5, y: 2.5, z: 5, type: 'dirt' },
+                    { x: 6, y: 2.5, z: 5, type: 'dirt' },
+                    { x: 7, y: 2.5, z: 5, type: 'dirt' },
+                    { x: 5, y: 2.5, z: 6, type: 'dirt' },
+                    { x: 6, y: 2.5, z: 6, type: 'dirt' },
+                    { x: 7, y: 2.5, z: 6, type: 'dirt' },
+                    { x: 5, y: 2.5, z: 7, type: 'dirt' },
+                    { x: 6, y: 2.5, z: 7, type: 'dirt' },
+                    { x: 7, y: 2.5, z: 7, type: 'dirt' },
+                ];
+                
+                house.forEach(pos => {
+                    const block = new Block(pos.x, pos.y, pos.z, pos.type);
+                    block.addToScene(this.scene);
+                    this.blocks.push(block);
+                });
+                
+                // Torres decorativas
+                for (let y = 0; y < 3; y++) {
+                    const tower1 = new Block(-5, 0.5 + y, -5, 'stone');
+                    tower1.addToScene(this.scene);
+                    this.blocks.push(tower1);
+                    
+                    const tower2 = new Block(-5, 0.5 + y, 5, 'stone');
+                    tower2.addToScene(this.scene);
+                    this.blocks.push(tower2);
+                }
+                
+                this.updateBlockCount();
+                console.log(`✅ Mundo creado con ${this.blocks.length} bloques`);
+            }
+            
+            setupControls() {
+                this.controls = new THREE.PointerLockControls(this.camera, document.body);
+                const instructions = document.getElementById('instructions');
+                
+                const startGame = () => {
+                    this.controls.lock();
+                };
+                
+                instructions.addEventListener('click', startGame);
+                
+                this.controls.addEventListener('lock', () => {
+                    instructions.style.display = 'none';
+                });
+                
+                this.controls.addEventListener('unlock', () => {
+                    instructions.style.display = 'block';
+                });
+            }
+            
+            setupEventListeners() {
+                // Teclado
+                document.addEventListener('keydown', (event) => {
+                    switch (event.code) {
+                        case 'KeyW': this.moveState.forward = true; break;
+                        case 'KeyS': this.moveState.backward = true; break;
+                        case 'KeyA': this.moveState.left = true; break;
+                        case 'KeyD': this.moveState.right = true; break;
+                        case 'Space':
+                            if (this.onGround) this.moveState.jump = true;
+                            event.preventDefault();
+                            break;
+                        case 'ShiftLeft':
+                        case 'ShiftRight':
+                            this.moveState.sprint = true;
+                            break;
+                        // Selección de bloques
+                        case 'Digit1':
+                            this.selectBlockType('grass');
+                            break;
+                        case 'Digit2':
+                            this.selectBlockType('dirt');
+                            break;
+                        case 'Digit3':
+                            this.selectBlockType('stone');
+                            break;
+                    }
+                });
+                
+                document.addEventListener('keyup', (event) => {
+                    switch (event.code) {
+                        case 'KeyW': this.moveState.forward = false; break;
+                        case 'KeyS': this.moveState.backward = false; break;
+                        case 'KeyA': this.moveState.left = false; break;
+                        case 'KeyD': this.moveState.right = false; break;
+                        case 'Space': this.moveState.jump = false; break;
+                        case 'ShiftLeft':
+                        case 'ShiftRight':
+                            this.moveState.sprint = false;
+                            break;
+                    }
+                });
+                
+                // Mouse
+                document.addEventListener('mousedown', (event) => {
+                    if (!this.controls.isLocked) return;
+                    
+                    if (event.button === 0) { // Click izquierdo - Eliminar
+                        this.removeBlockAtPointer();
+                    } else if (event.button === 2) { // Click derecho - Colocar
+                        this.placeBlockAtPointer();
+                    }
+                });
+                
+                // Prevenir menú contextual
+                document.addEventListener('contextmenu', (event) => {
+                    event.preventDefault();
+                });
+                
+                // Resize
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            }
+            
+            setupBlockSelector() {
+                const options = document.querySelectorAll('.block-option');
+                options.forEach(option => {
+                    option.addEventListener('click', () => {
+                        const type = option.getAttribute('data-type');
+                        this.selectBlockType(type);
+                    });
+                });
+            }
+            
+            selectBlockType(type) {
+                this.selectedBlockType = type;
+                
+                // Actualizar UI
+                const options = document.querySelectorAll('.block-option');
+                options.forEach(option => {
+                    if (option.getAttribute('data-type') === type) {
+                        option.classList.add('selected');
+                    } else {
+                        option.classList.remove('selected');
+                    }
+                });
+                
+                this.showFeedback(`Bloque: ${type.toUpperCase()}`, false);
+            }
+            
+            removeBlockAtPointer() {
+                this.raycaster.setFromCamera(new THREE.Vector2(0, 0), this.camera);
+                const blockMeshes = this.blocks.map(block => block.mesh);
+                const intersects = this.raycaster.intersectObjects(blockMeshes);
+                
+                if (intersects.length > 0) {
+                    const blockMesh = intersects[0].object;
+                    const blockIndex = this.blocks.findIndex(block => block.mesh === blockMesh);
+                    
+                    if (blockIndex !== -1) {
+                        const block = this.blocks[blockIndex];
+                        
+                        // No eliminar suelo base
+                        if (block.y >= 0) {
+                            block.removeFromScene(this.scene);
+                            this.blocks.splice(blockIndex, 1);
+                            this.removedCount++;
+                            this.removedCountEl.textContent = this.removedCount;
+                            this.updateBlockCount();
+                            this.showFeedback('❌ Bloque eliminado', true);
+                        }
+                    }
+                }
+            }
+            
+            placeBlockAtPointer() {
+                this.raycaster.setFromCamera(new THREE.Vector2(0, 0), this.camera);
+                const blockMeshes = this.blocks.map(block => block.mesh);
+                const intersects = this.raycaster.intersectObjects(blockMeshes);
+                
+                if (intersects.length > 0) {
+                    const intersection = intersects[0];
+                    const normal = intersection.face.normal;
+                    
+                    // Obtener el bloque clickeado
+                    const clickedBlock = this.blocks.find(b => b.mesh === intersection.object);
+                    
+                    // Calcular posición del nuevo bloque sumando la normal
+                    const blockPos = intersection.object.position.clone();
+                    blockPos.add(normal);
+                    
+                    // Ajustar las coordenadas para alinearse con la cuadrícula de 0.5
+                    let newX = clickedBlock.x + Math.round(normal.x);
+                    let newY = clickedBlock.y + Math.round(normal.y);
+                    let newZ = clickedBlock.z + Math.round(normal.z);
+                    
+                    // Verificar que no haya otro bloque en esa posición
+                    const existingBlock = this.blocks.find(b => 
+                        Math.abs(b.x - newX) < 0.1 &&
+                        Math.abs(b.y - newY) < 0.1 &&
+                        Math.abs(b.z - newZ) < 0.1
+                    );
+                    
+                    if (!existingBlock) {
+                        // Verificar que no colisione con el jugador
+                        const playerPos = this.controls.getObject().position;
+                        const newBlockPos = new THREE.Vector3(newX, newY, newZ);
+                        const distance = newBlockPos.distanceTo(playerPos);
+                        
+                        if (distance > 1.5) {
+                            const newBlock = new Block(newX, newY, newZ, this.selectedBlockType);
+                            newBlock.addToScene(this.scene);
+                            this.blocks.push(newBlock);
+                            this.placedCount++;
+                            this.placedCountEl.textContent = this.placedCount;
+                            this.updateBlockCount();
+                            this.showFeedback('✅ Bloque colocado', false);
+                        }
+                    }
+                }
+            }
+            
+            showFeedback(message, isRemove) {
+                this.actionFeedback.textContent = message;
+                this.actionFeedback.className = 'show' + (isRemove ? ' remove' : '');
+                
+                setTimeout(() => {
+                    this.actionFeedback.className = '';
+                }, 1000);
+            }
+            
+            checkCollision(newPosition) {
+                const playerBox = new THREE.Box3(
+                    new THREE.Vector3(
+                        newPosition.x - this.playerRadius,
+                        newPosition.y - this.playerHeight,
+                        newPosition.z - this.playerRadius
+                    ),
+                    new THREE.Vector3(
+                        newPosition.x + this.playerRadius,
+                        newPosition.y + 0.2,
+                        newPosition.z + this.playerRadius
+                    )
+                );
+                
+                for (const block of this.blocks) {
+                    if (playerBox.intersectsBox(block.getBoundingBox())) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            updateMovement(delta) {
+                if (!this.controls.isLocked) return;
+                
+                const baseSpeed = 250.0;
+                const speed = this.moveState.sprint ? baseSpeed * 1.5 : baseSpeed;
+                
+                const cameraDirection = new THREE.Vector3();
+                this.camera.getWorldDirection(cameraDirection);
+                cameraDirection.y = 0;
+                cameraDirection.normalize();
+                
+                const cameraRight = new THREE.Vector3();
+                cameraRight.crossVectors(this.camera.up, cameraDirection).normalize();
+                
+                this.velocity.x = 0;
+                this.velocity.z = 0;
+                
+                if (this.moveState.forward) {
+                    this.velocity.add(cameraDirection.clone().multiplyScalar(speed * delta));
+                }
+                if (this.moveState.backward) {
+                    this.velocity.add(cameraDirection.clone().multiplyScalar(-speed * delta));
+                }
+                if (this.moveState.left) {
+                    this.velocity.add(cameraRight.clone().multiplyScalar(speed * delta));
+                }
+                if (this.moveState.right) {
+                    this.velocity.add(cameraRight.clone().multiplyScalar(-speed * delta));
+                }
+                
+                this.velocity.y += this.gravity * delta;
+                
+                if (this.moveState.jump && this.onGround) {
+                    this.velocity.y = this.jumpForce;
+                    this.onGround = false;
+                    this.moveState.jump = false;
+                }
+                
+                const currentPosition = this.controls.getObject().position.clone();
+                
+                // Movimiento en X
+                const testPositionX = currentPosition.clone();
+                testPositionX.x += this.velocity.x * delta;
+                if (!this.checkCollision(testPositionX)) {
+                    this.controls.getObject().position.x = testPositionX.x;
+                }
+                
+                // Movimiento en Z
+                const testPositionZ = this.controls.getObject().position.clone();
+                testPositionZ.z += this.velocity.z * delta;
+                if (!this.checkCollision(testPositionZ)) {
+                    this.controls.getObject().position.z = testPositionZ.z;
+                }
+                
+                // Movimiento en Y
+                const testPositionY = this.controls.getObject().position.clone();
+                testPositionY.y += this.velocity.y * delta;
+                if (!this.checkCollision(testPositionY)) {
+                    this.controls.getObject().position.y = testPositionY.y;
+                } else {
+                    if (this.velocity.y < 0) {
+                        this.onGround = true;
+                    }
+                    this.velocity.y = 0;
+                }
+                
+                // Check suelo
+                const groundCheck = this.controls.getObject().position.clone();
+                groundCheck.y -= 0.1;
+                if (this.checkCollision(groundCheck)) {
+                    this.onGround = true;
+                    if (this.velocity.y < 0) this.velocity.y = 0;
+                } else {
+                    this.onGround = false;
+                }
+                
+                // Respawn
+                if (this.controls.getObject().position.y < -10) {
+                    this.controls.getObject().position.set(0, 2, 0);
+                    this.velocity.set(0, 0, 0);
+                }
+            }
+            
+            updateBlockCount() {
+                this.blockCountEl.textContent = this.blocks.length;
+            }
+            
+            updateUI() {
+                const pos = this.controls.getObject().position;
+                this.positionEl.textContent = `${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}, ${pos.z.toFixed(1)}`;
+                this.onGroundEl.textContent = this.onGround ? 'Sí ✓' : 'No ✗';
+                this.onGroundEl.style.color = this.onGround ? '#4CAF50' : '#FF5722';
+            }
+            
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                
+                const delta = this.clock.getDelta();
+                this.updateMovement(delta);
+                
+                if (this.controls.isLocked) {
+                    this.updateUI();
+                }
+                
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        // ==========================================
+        // INICIAR JUEGO
+        // ==========================================
+        console.log('🎮 Iniciando Minecraft Clone Completo...');
+        const game = new MinecraftGame();
+        
+    </script>
+</body>
+</html>

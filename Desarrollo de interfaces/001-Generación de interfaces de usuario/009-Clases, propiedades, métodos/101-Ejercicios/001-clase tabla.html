@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JSON → HTML Table</title>
+  <style>
+    :root{
+      --bg:#0f172a; /* slate-900 */
+      --panel:#111827ee; /* gray-900 */
+      --muted:#94a3b8; /* slate-400 */
+      --text:#e5e7eb; /* gray-200 */
+      --accent:#38bdf8; /* sky-400 */
+      --accent-2:#22d3ee; /* cyan-400 */
+      --ring:#1f2937; /* gray-800 */
+      --ok:#34d399;
+      --warn:#f59e0b;
+      --err:#ef4444;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font:14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 1200px at 10% 0%, #0b122c 0%, var(--bg) 40%, #0b122c 100%);
+      color:var(--text);
+    }
+    .wrap{max-width:1200px;margin:32px auto;padding:0 16px}
+    h1{font-weight:800;letter-spacing:.4px;margin:0 0 12px;font-size:clamp(20px,3vw,28px)}
+    p.subtitle{margin:0 0 18px;color:var(--muted)}
+
+    .controls{display:grid;gap:12px;grid-template-columns:1fr;}
+    @media (min-width: 900px){.controls{grid-template-columns: 1fr 320px;}}
+
+    .card{background:linear-gradient(180deg, #0b122c, var(--panel)); border:1px solid var(--ring); border-radius:16px; box-shadow: 0 10px 30px #00000044;}
+    .pad{padding:14px}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .toolbar .spacer{flex:1}
+
+    textarea{
+      width:100%; min-height:200px; border:1px solid var(--ring); border-radius:12px; background:#0b122c; color:var(--text); padding:12px; resize:vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", Consolas, monospace;
+    }
+    label{display:block;font-weight:600; margin:8px 0 6px; color:#cbd5e1}
+    .hint{color:var(--muted);font-size:12px}
+
+    button, .btn{
+      appearance:none; border:1px solid var(--ring); background:#0b122c; color:var(--text); padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600; transition:transform .04s ease, border-color .2s ease, background .2s ease; text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+    }
+    button:hover{border-color:#334155}
+    button:active{transform:translateY(1px)}
+    .btn-primary{background:linear-gradient(180deg, #0ea5e9, #06b6d4); color:#003244; border:none}
+    .btn-primary:hover{filter:brightness(1.05)}
+
+    input[type="file"]{display:none}
+    .file-label{border:1px dashed #334155; padding:8px 12px; border-radius:10px; cursor:pointer;}
+
+    .status{font-size:12px}
+    .status.ok{color:var(--ok)}
+    .status.warn{color:var(--warn)}
+    .status.err{color:var(--err)}
+
+    .table-wrap{margin-top:16px; background:linear-gradient(180deg, #0b122c, var(--panel)); border:1px solid var(--ring); border-radius:16px; overflow:hidden}
+    .table-scroll{overflow:auto; max-height:60vh}
+    table{border-collapse:separate; border-spacing:0; width:100%; min-width:600px}
+    thead th{position:sticky; top:0; background:#0b122c; z-index:1;}
+    th, td{padding:10px 12px; border-bottom:1px solid #1f2937; text-align:left; vertical-align:top;}
+    tbody tr:nth-child(odd){background:#0b122c33}
+    tbody tr:hover{background:#0b122c66}
+    th.sortable{cursor:pointer; user-select:none}
+    th.sortable .dir{opacity:.6; font-size:11px}
+    .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid #334155;color:#cbd5e1}
+
+    .footer{display:flex;gap:10px;align-items:center;justify-content:space-between;color:var(--muted);padding:10px}
+    .search{display:flex;gap:8px;align-items:center}
+    .search input{background:#0b122c;border:1px solid var(--ring);border-radius:10px;padding:8px 10px;color:var(--text);min-width:200px}
+    .count{font-size:12px}
+    .no-data{padding:24px;color:var(--muted)}
+    code.inline{background:#0b122c;padding:2px 6px;border:1px solid var(--ring);border-radius:6px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>JSON → HTML Table</h1>
+    <p class="subtitle">Paste JSON, upload a file, or use the sample. Nested objects are flattened with dot‑notation; arrays of primitives are joined with commas. Click headers to sort. Export to CSV.</p>
+
+    <div class="controls">
+      <div class="card pad">
+        <label for="jsonInput">Your JSON</label>
+        <textarea id="jsonInput" spellcheck="false" placeholder='Example: [{"id":1,"name":"Ada"},{"id":2,"name":"Linus"}]'></textarea>
+        <div class="toolbar" style="margin-top:10px">
+          <button id="renderBtn" class="btn-primary">Render ⏎</button>
+          <label class="file-label" title="Upload JSON file">
+            <input id="fileInput" type="file" accept=".json,application/json" />
+            Upload JSON…
+          </label>
+          <button id="sampleBtn">Load sample</button>
+          <div class="spacer"></div>
+          <span id="status" class="status">Idle</span>
+        </div>
+      </div>
+
+      <div class="card pad">
+        <label>Quick tips</label>
+        <ul style="margin:8px 0 12px 18px; padding:0; color:var(--muted)">
+          <li>Top level can be an <code class="inline">Array</code> or an <code class="inline">Object</code>.</li>
+          <li>Click a header to sort ascending/descending.</li>
+          <li>Use the search box to filter visible rows.</li>
+          <li>Download the current view as CSV.</li>
+        </ul>
+        <div class="pill">Arrays of objects are supported</div>
+      </div>
+    </div>
+
+    <div class="table-wrap card" id="tableWrap" hidden>
+      <div class="pad" style="padding-bottom:0">
+        <div class="footer">
+          <div class="search">
+            <span>Search</span>
+            <input id="searchInput" placeholder="type to filter…" />
+          </div>
+          <div>
+            <button id="downloadBtn" title="Download CSV of current rows">Download CSV</button>
+            <span class="count" id="count"></span>
+          </div>
+        </div>
+      </div>
+      <div class="table-scroll" id="tableScroll">
+        <table id="table"></table>
+        <div class="no-data" id="noData" hidden>No rows match your filter.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const $ = (sel, el=document)=>el.querySelector(sel);
+    const $$ = (sel, el=document)=>Array.from(el.querySelectorAll(sel));
+
+    const jsonInput = $('#jsonInput');
+    const statusEl = $('#status');
+    const tableWrap = $('#tableWrap');
+    const tableEl = $('#table');
+    const tableScroll = $('#tableScroll');
+    const searchInput = $('#searchInput');
+    const countEl = $('#count');
+    const noDataEl = $('#noData');
+
+    let rows = [];        // flattened data objects
+    let columns = [];     // array of keys
+    let viewRows = [];    // filtered/sorted slice
+    let sortState = { key:null, dir: 1 }; // 1 asc, -1 desc
+
+    // --- Flatten helpers ---
+    function isPlainObject(v){
+      return Object.prototype.toString.call(v) === '[object Object]';
+    }
+
+    function flatten(obj, prefix=''){
+      const out = {};
+      const stack = [{value: obj, path: prefix}];
+      while (stack.length){
+        const {value, path} = stack.pop();
+        if (Array.isArray(value)){
+          // If array of primitives → join
+          const allPrimitive = value.every(v => !isPlainObject(v) && !Array.isArray(v));
+          if (allPrimitive){
+            out[path || 'value'] = value.join(', ');
+          } else {
+            value.forEach((v,i)=>{
+              const p = path ? path + '['+i+']' : '['+i+']';
+              if (isPlainObject(v) || Array.isArray(v)) stack.push({value:v, path:p});
+              else out[p] = String(v);
+            });
+          }
+        } else if (isPlainObject(value)){
+          const keys = Object.keys(value);
+          if (keys.length === 0){ out[path || 'value'] = '{}'; continue; }
+          keys.forEach(k=>{
+            const v = value[k];
+            const p = path ? path + '.' + k : k;
+            if (isPlainObject(v) || Array.isArray(v)) stack.push({value:v, path:p});
+            else out[p] = v == null ? '' : String(v);
+          });
+        } else {
+          out[path || 'value'] = value == null ? '' : String(value);
+        }
+      }
+      return out;
+    }
+
+    function collectColumns(list){
+      const set = new Set();
+      list.forEach(r=>Object.keys(r).forEach(k=>set.add(k)));
+      return Array.from(set);
+    }
+
+    function renderTable(){
+      // Header
+      const thead = document.createElement('thead');
+      const headRow = document.createElement('tr');
+      columns.forEach(k=>{
+        const th = document.createElement('th');
+        th.textContent = k;
+        th.title = 'Sort by '+k;
+        th.className = 'sortable';
+        th.addEventListener('click', ()=>onSort(k));
+        const dirSpan = document.createElement('span');
+        dirSpan.className = 'dir'; dirSpan.style.marginLeft = '6px';
+        if (sortState.key === k) dirSpan.textContent = sortState.dir === 1 ? '▲' : '▼';
+        th.appendChild(dirSpan);
+        headRow.appendChild(th);
+      });
+      thead.appendChild(headRow);
+
+      // Body
+      const tbody = document.createElement('tbody');
+      if (viewRows.length === 0){
+        noDataEl.hidden = false;
+      } else {
+        noDataEl.hidden = true;
+        const frag = document.createDocumentFragment();
+        viewRows.forEach(r=>{
+          const tr = document.createElement('tr');
+          columns.forEach(k=>{
+            const td = document.createElement('td');
+            const v = r[k];
+            td.textContent = v == null ? '' : String(v);
+            tr.appendChild(td);
+          });
+          frag.appendChild(tr);
+        });
+        tbody.appendChild(frag);
+      }
+
+      tableEl.innerHTML = '';
+      tableEl.appendChild(thead);
+      tableEl.appendChild(tbody);
+
+      countEl.textContent = viewRows.length ? `${viewRows.length} row(s)` : '';
+      tableWrap.hidden = false;
+    }
+
+    function onSort(key){
+      if (sortState.key === key){ sortState.dir *= -1; }
+      else { sortState.key = key; sortState.dir = 1; }
+      const dir = sortState.dir;
+      viewRows.sort((a,b)=>{
+        const va = a[key] ?? '';
+        const vb = b[key] ?? '';
+        const na = Number(va), nb = Number(vb);
+        const bothNum = !isNaN(na) && !isNaN(nb);
+        if (bothNum){ return (na - nb) * dir; }
+        return String(va).localeCompare(String(vb), undefined, {numeric:true, sensitivity:'base'}) * dir;
+      });
+      renderTable();
+    }
+
+    function applyFilter(){
+      const q = searchInput.value.trim().toLowerCase();
+      if (!q){ viewRows = rows.slice(); return; }
+      viewRows = rows.filter(r=>{
+        for (const k of columns){
+          const v = r[k];
+          if (v && String(v).toLowerCase().includes(q)) return true;
+        }
+        return false;
+      });
+    }
+
+    function toCSV(cols, data){
+      const esc = (s)=>('"' + String(s ?? '').replaceAll('"','""') + '"');
+      const lines = [];
+      lines.push(cols.map(esc).join(','));
+      data.forEach(r=>{
+        lines.push(cols.map(c=>esc(r[c])).join(','));
+      });
+      return lines.join('\n');
+    }
+
+    function downloadCSV(){
+      const csv = toCSV(columns, viewRows);
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'table.csv';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function parseTop(json){
+      let top = json;
+      if (Array.isArray(top)) return top;
+      if (isPlainObject(top)){
+        // if object with an array property, prefer that
+        const firstArrayKey = Object.keys(top).find(k=>Array.isArray(top[k]));
+        if (firstArrayKey) return top[firstArrayKey];
+        return [top];
+      }
+      throw new Error('Top-level JSON must be an object or array');
+    }
+
+    function renderFromJSON(json){
+      const arr = parseTop(json);
+      const flat = arr.map(x=>flatten(x));
+      rows = flat;
+      columns = collectColumns(flat);
+      viewRows = rows.slice();
+      sortState = {key:null, dir:1};
+      applyFilter();
+      renderTable();
+    }
+
+    // --- Wiring ---
+    $('#renderBtn').addEventListener('click', ()=>{
+      try{
+        statusEl.textContent = 'Parsing…';
+        const text = jsonInput.value.trim();
+        if (!text) throw new Error('Please paste some JSON');
+        const json = JSON.parse(text);
+        renderFromJSON(json);
+        statusEl.textContent = 'Rendered ✅'; statusEl.className = 'status ok';
+      }catch(err){
+        console.error(err);
+        statusEl.textContent = 'Error: ' + err.message; statusEl.className = 'status err';
+      }
+    });
+
+    $('#fileInput').addEventListener('change', (e)=>{
+      const f = e.target.files?.[0]; if(!f) return;
+      const reader = new FileReader();
+      reader.onload = ()=>{ jsonInput.value = reader.result; };
+      reader.onerror = ()=>{ statusEl.textContent = 'Error reading file'; statusEl.className = 'status err'; };
+      reader.readAsText(f);
+    });
+
+    $('#sampleBtn').addEventListener('click', ()=>{
+      const sample = [
+        {
+          id: 1,
+          name: "Ada Lovelace",
+          tags: ["math","programming"],
+          contact: { email: "ada@example.com", phones: ["+44 123 456", "+44 987 654"] },
+          scores: [{q:"logic",v:9.5},{q:"writing",v:8.7}],
+          active: true
+        },
+        {
+          id: 2,
+          name: "Linus Torvalds",
+          tags: ["linux","git"],
+          contact: { email: "linus@example.com" },
+          scores: [{q:"kernels",v:10}],
+          active: false
+        }
+      ];
+      jsonInput.value = JSON.stringify(sample, null, 2);
+      statusEl.textContent = 'Sample loaded'; statusEl.className = 'status';
+    });
+
+    $('#downloadBtn').addEventListener('click', downloadCSV);
+    searchInput.addEventListener('input', ()=>{ applyFilter(); renderTable(); });
+
+    // small UX: Ctrl/Cmd+Enter to render
+    jsonInput.addEventListener('keydown', (e)=>{
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter'){ $('#renderBtn').click(); }
+    });
+
+    // initial state
+    tableWrap.hidden = true;
+  })();
+  </script>
+</body>
+</html>
+

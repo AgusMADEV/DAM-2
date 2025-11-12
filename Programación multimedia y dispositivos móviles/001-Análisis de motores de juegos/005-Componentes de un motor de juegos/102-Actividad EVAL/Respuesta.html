@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Interfaz 3D para Videojuego • Actividad de Evaluación</title>
+<style>
+  :root{
+    /* Colores corporativos */
+    --text: #1b1b1b;
+    --muted: #334155;
+    --morado: #ae2e33;
+    --accentColor: #932324;
+    --glass: #ffffffcc;
+    --ring: #0000000f;
+    --bg-soft: #e5e7eb;
+    --details: #00A398;
+    
+    /* Colores derivados para la interfaz */
+    --bg-dark: #f5f5f5;
+    --bg-accent: #ffffff;
+    --card-bg: var(--glass);
+    --text-primary: var(--text);
+    --text-secondary: var(--muted);
+    --accent-primary: var(--morado);
+    --accent-secondary: var(--accentColor);
+    --accent-details: var(--details);
+    
+    --gap: 20px;
+    --pad: 28px;
+    --radius: 16px;
+    --perspective: 1600px;
+
+    /* Variables controladas por JavaScript */
+    --rx: 0deg;      /* rotación X de la cámara */
+    --ry: 0deg;      /* rotación Y de la cámara */
+    --mx: 0;         /* posición normalizada del ratón X */
+    --my: 0;         /* posición normalizada del ratón Y */
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html, body { 
+    height: 100%; 
+    margin: 0;
+    padding: 0;
+  }
+
+  body{
+    overflow: hidden;
+    color: var(--text-primary);
+    background: 
+      radial-gradient(ellipse 1400px 900px at 70% 10%, rgba(174, 46, 51, 0.15) 0%, var(--bg-soft) 50%),
+      linear-gradient(135deg, #ffffff 0%, var(--bg-soft) 100%);
+    background-attachment: fixed;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+  }
+
+  /* Contenedor de la escena 3D - establece la perspectiva */
+  .scene{
+    height: 100vh;
+    padding: var(--pad);
+    perspective: var(--perspective);
+    perspective-origin: 50% 60%; /* cámara ligeramente desde arriba */
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: var(--gap);
+  }
+
+  /* Encabezado */
+  header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    z-index: 100;
+  }
+
+  h1{
+    margin: 0;
+    font-size: clamp(20px, 3vw, 36px);
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--morado), var(--accentColor));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.5px;
+  }
+
+  .subtitle{
+    color: var(--text-secondary);
+    font-size: clamp(11px, 1.2vw, 15px);
+    margin: 0;
+  }
+
+  /* Escenario - contiene todo lo que rota en 3D */
+  .stage{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transform:
+      translateZ(0)
+      rotateX(var(--rx))
+      rotateY(var(--ry))
+      scale(0.95);
+    transform-origin: 50% 70%;
+    will-change: transform;
+  }
+
+  /* Capas de profundidad (fondo con efecto parallax) */
+  .depth-layer{
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    pointer-events: none;
+    will-change: transform;
+    opacity: 0.6;
+    /* Cada capa usa sus propias variables --z, --px, --py */
+    transform:
+      translate3d(
+        calc(var(--mx) * var(--px)),
+        calc(var(--my) * var(--py)),
+        var(--z)
+      );
+  }
+
+  .depth-layer circle{
+    transition: all 0.3s ease;
+  }
+
+  /* Sombra del suelo para añadir realismo */
+  .floor-shadow{
+    position: absolute;
+    inset: -8% -12% -30% -12%;
+    background:
+      radial-gradient(100% 30% at 50% 100%,
+        rgba(147, 35, 36, 0.2) 0%,
+        rgba(147, 35, 36, 0.1) 40%,
+        rgba(0, 0, 0, 0) 75%);
+    transform: translateZ(-250px) rotateX(90deg);
+    pointer-events: none;
+  }
+
+  /* Grid de elementos del juego */
+  .game-grid{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: var(--gap);
+    transform-style: preserve-3d;
+  }
+
+  /* Tarjetas de elementos del juego */
+  .game-card{
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--card-bg);
+    border: 2px solid rgba(174, 46, 51, 0.3);
+    box-shadow:
+      0 2px 0 rgba(255,255,255,0.5) inset,
+      0 15px 40px rgba(147, 35, 36, 0.2),
+      0 0 20px rgba(174, 46, 51, 0.1);
+    transform-style: preserve-3d;
+    transition:
+      transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.3s ease,
+      border-color 0.3s ease;
+    will-change: transform, box-shadow;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    
+    /* Profundidad dinámica calculada por JS */
+    --dz: 0px;
+    transform: translateZ(var(--dz));
+  }
+
+  .game-card:hover{
+    transform:
+      translateZ(calc(var(--dz) + 80px))
+      rotateX(-3deg)
+      rotateY(3deg)
+      scale(1.02);
+    box-shadow:
+      0 2px 0 rgba(255,255,255,0.8) inset,
+      0 25px 70px rgba(147, 35, 36, 0.35),
+      0 0 40px rgba(174, 46, 51, 0.3);
+    border-color: rgba(174, 46, 51, 0.8);
+  }
+
+  .game-card:focus{
+    outline: 3px solid var(--morado);
+    outline-offset: 4px;
+  }
+
+  /* Contenido de las tarjetas */
+  .card-bg{
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(135deg, rgba(174, 46, 51, 0.15) 0%, rgba(0, 163, 152, 0.1) 100%),
+      repeating-linear-gradient(45deg, 
+        transparent 0px, 
+        transparent 2px, 
+        rgba(174, 46, 51, 0.03) 2px, 
+        rgba(174, 46, 51, 0.03) 4px);
+    transform: translateZ(2px);
+  }
+
+  .card-overlay{
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.3) 40%, rgba(255,255,255,0) 70%);
+    transform: translateZ(3px);
+    pointer-events: none;
+  }
+
+  .card-content{
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transform: translateZ(10px);
+  }
+
+  .card-icon{
+    width: 48px;
+    height: 48px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  }
+
+  .card-title{
+    font-weight: 700;
+    font-size: clamp(14px, 1.3vw, 20px);
+    text-shadow: 0 2px 4px rgba(255,255,255,0.5);
+    line-height: 1.3;
+    color: var(--text);
+  }
+
+  .card-description{
+    color: var(--text-secondary);
+    font-size: clamp(11px, 1vw, 14px);
+    text-shadow: 0 1px 2px rgba(255,255,255,0.3);
+    line-height: 1.4;
+  }
+
+  .card-tag{
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: clamp(10px, 0.9vw, 12px);
+    font-weight: 600;
+    background: rgba(174, 46, 51, 0.2);
+    border: 1px solid rgba(174, 46, 51, 0.4);
+    color: var(--accentColor);
+    backdrop-filter: blur(8px);
+    align-self: flex-start;
+  }
+
+  /* Colores específicos por tipo de tarjeta */
+  .game-card[data-type="player"] .card-tag{
+    background: rgba(0, 163, 152, 0.2);
+    border-color: rgba(0, 163, 152, 0.4);
+    color: var(--details);
+  }
+
+  .game-card[data-type="enemy"] .card-tag{
+    background: rgba(147, 35, 36, 0.2);
+    border-color: rgba(147, 35, 36, 0.4);
+    color: var(--accentColor);
+  }
+
+  .game-card[data-type="weapon"] .card-tag{
+    background: rgba(174, 46, 51, 0.2);
+    border-color: rgba(174, 46, 51, 0.4);
+    color: var(--morado);
+  }
+
+  /* Indicador de instrucciones */
+  .instructions{
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    padding: 12px 24px;
+    border-radius: 999px;
+    border: 2px solid rgba(174, 46, 51, 0.3);
+    color: var(--text);
+    font-size: 13px;
+    z-index: 100;
+    box-shadow: 0 10px 30px rgba(147, 35, 36, 0.2);
+  }
+
+  @media (max-width: 1024px){
+    :root{
+      --gap: 14px;
+      --pad: 20px;
+      --perspective: 1200px;
+    }
+    
+    .game-grid{
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 640px){
+    :root{
+      --gap: 12px;
+      --pad: 16px;
+    }
+    
+    .game-grid{
+      grid-template-columns: 1fr;
+      grid-template-rows: repeat(6, 1fr);
+    }
+
+    .instructions{
+      font-size: 11px;
+      padding: 10px 18px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="scene" id="scene">
+    <header>
+      <div>
+        <h1>🎮 Interfaz 3D para Videojuego</h1>
+      </div>
+    </header>
+
+    <div class="stage" id="stage">
+      <!-- Capas de profundidad (fondo parallax) -->
+      
+      <!-- Capa lejana -->
+      <svg class="depth-layer" style="--z:-280px; --px:20px; --py:26px" viewBox="0 0 1920 1080" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <mask id="mask-far">
+            <rect x="0" y="0" width="1920" height="1080" fill="white"/>
+            <circle cx="250" cy="200" r="90" fill="black"/>
+            <circle cx="600" cy="280" r="65" fill="black"/>
+            <circle cx="950" cy="180" r="80" fill="black"/>
+            <circle cx="1400" cy="250" r="95" fill="black"/>
+            <circle cx="1750" cy="180" r="70" fill="black"/>
+            <circle cx="350" cy="600" r="100" fill="black"/>
+            <circle cx="800" cy="700" r="70" fill="black"/>
+            <circle cx="1200" cy="620" r="85" fill="black"/>
+            <circle cx="1600" cy="650" r="100" fill="black"/>
+            <circle cx="450" cy="950" r="90" fill="black"/>
+            <circle cx="1050" cy="930" r="75" fill="black"/>
+            <circle cx="1600" cy="920" r="88" fill="black"/>
+          </mask>
+        </defs>
+        <rect x="0" y="0" width="1920" height="1080"
+              fill="rgba(174, 46, 51, 0.08)" mask="url(#mask-far)"/>
+      </svg>
+
+      <!-- Capa media -->
+      <svg class="depth-layer" style="--z:-190px; --px:35px; --py:42px" viewBox="0 0 1920 1080" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <mask id="mask-mid">
+            <rect x="0" y="0" width="1920" height="1080" fill="white"/>
+            <circle cx="180" cy="160" r="75" fill="black"/>
+            <circle cx="500" cy="240" r="50" fill="black"/>
+            <circle cx="850" cy="170" r="65" fill="black"/>
+            <circle cx="1250" cy="230" r="80" fill="black"/>
+            <circle cx="1720" cy="200" r="58" fill="black"/>
+            <circle cx="280" cy="550" r="82" fill="black"/>
+            <circle cx="680" cy="680" r="55" fill="black"/>
+            <circle cx="1080" cy="600" r="70" fill="black"/>
+            <circle cx="1480" cy="660" r="85" fill="black"/>
+            <circle cx="380" cy="920" r="78" fill="black"/>
+            <circle cx="980" cy="920" r="62" fill="black"/>
+            <circle cx="1520" cy="900" r="72" fill="black"/>
+          </mask>
+        </defs>
+        <rect x="0" y="0" width="1920" height="1080"
+              fill="rgba(147, 35, 36, 0.12)" mask="url(#mask-mid)"/>
+      </svg>
+
+      <!-- Capa cercana -->
+      <svg class="depth-layer" style="--z:-80px; --px:55px; --py:65px" viewBox="0 0 1920 1080" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <mask id="mask-near">
+            <rect x="0" y="0" width="1920" height="1080" fill="white"/>
+            <circle cx="140" cy="140" r="62" fill="black"/>
+            <circle cx="450" cy="250" r="42" fill="black"/>
+            <circle cx="780" cy="180" r="58" fill="black"/>
+            <circle cx="1180" cy="260" r="65" fill="black"/>
+            <circle cx="1780" cy="230" r="50" fill="black"/>
+            <circle cx="240" cy="560" r="68" fill="black"/>
+            <circle cx="640" cy="700" r="45" fill="black"/>
+            <circle cx="1020" cy="640" r="60" fill="black"/>
+            <circle cx="1380" cy="690" r="70" fill="black"/>
+            <circle cx="340" cy="940" r="65" fill="black"/>
+            <circle cx="920" cy="940" r="52" fill="black"/>
+            <circle cx="1440" cy="920" r="62" fill="black"/>
+          </mask>
+        </defs>
+        <rect x="0" y="0" width="1920" height="1080"
+              fill="rgba(0, 163, 152, 0.16)" mask="url(#mask-near)"/>
+      </svg>
+
+      <!-- Sombra del suelo -->
+      <div class="floor-shadow"></div>
+
+      <!-- Grid de elementos del juego -->
+      <section class="game-grid" id="gameGrid" aria-label="Elementos del videojuego">
+        
+        <!-- Tarjeta 1: Personaje Principal -->
+        <article class="game-card" data-type="player" tabindex="0">
+          <div class="card-bg"></div>
+          <div class="card-overlay"></div>
+          <div class="card-content">
+            <div class="card-icon">⚔️</div>
+            <h2 class="card-title">Personaje Principal</h2>
+            <p class="card-description">Héroe personalizable con habilidades únicas y sistema de progresión</p>
+            <span class="card-tag">Jugador</span>
+          </div>
+        </article>
+
+        <!-- Tarjeta 2: Enemigos -->
+        <article class="game-card" data-type="enemy" tabindex="0">
+          <div class="card-bg"></div>
+          <div class="card-overlay"></div>
+          <div class="card-content">
+            <div class="card-icon">👾</div>
+            <h2 class="card-title">Sistema de Enemigos</h2>
+            <p class="card-description">IA avanzada con diferentes tipos y niveles de dificultad</p>
+            <span class="card-tag">Enemigos</span>
+          </div>
+        </article>
+
+        <!-- Tarjeta 3: Armas -->
+        <article class="game-card" data-type="weapon" tabindex="0">
+          <div class="card-bg"></div>
+          <div class="card-overlay"></div>
+          <div class="card-content">
+            <div class="card-icon">🗡️</div>
+            <h2 class="card-title">Arsenal de Armas</h2>
+            <p class="card-description">Variedad de armas con estadísticas y efectos especiales</p>
+            <span class="card-tag">Armas</span>
+          </div>
+        </article>
+
+        <!-- Tarjeta 4: Mundo -->
+        <article class="game-card" data-type="world" tabindex="0">
+          <div class="card-bg"></div>
+          <div class="card-overlay"></div>
+          <div class="card-content">
+            <div class="card-icon">🌍</div>
+            <h2 class="card-title">Mundo Abierto</h2>
+            <p class="card-description">Mapa extenso con múltiples biomas y secretos por descubrir</p>
+            <span class="card-tag">Entorno</span>
+          </div>
+        </article>
+
+        <!-- Tarjeta 5: Misiones -->
+        <article class="game-card" data-type="quest" tabindex="0">
+          <div class="card-bg"></div>
+          <div class="card-overlay"></div>
+          <div class="card-content">
+            <div class="card-icon">📜</div>
+            <h2 class="card-title">Sistema de Misiones</h2>
+            <p class="card-description">Historias épicas con decisiones que afectan el resultado</p>
+            <span class="card-tag">Misiones</span>
+          </div>
+        </article>
+
+        <!-- Tarjeta 6: Multijugador -->
+        <article class="game-card" data-type="multiplayer" tabindex="0">
+          <div class="card-bg"></div>
+          <div class="card-overlay"></div>
+          <div class="card-content">
+            <div class="card-icon">👥</div>
+            <h2 class="card-title">Modo Multijugador</h2>
+            <p class="card-description">Cooperativo y competitivo para hasta 4 jugadores online</p>
+            <span class="card-tag">Multijugador</span>
+          </div>
+        </article>
+
+      </section>
+    </div>
+  </div>
+
+  <!-- Indicador de instrucciones -->
+  <div class="instructions" aria-live="polite">
+    💡 Mueve el ratón para rotar la cámara • Pasa sobre las tarjetas para aumentar su profundidad
+  </div>
+
+<script>
+(() => {
+  'use strict';
+
+  // Referencias al DOM
+  const scene = document.getElementById('scene');
+  const stage = document.getElementById('stage');
+  const cards = Array.from(document.querySelectorAll('.game-card'));
+
+  // Configuración de la cámara
+  const config = {
+    maxRotateX: 12,      // grados máximos de rotación vertical
+    maxRotateY: 16,      // grados máximos de rotación horizontal
+    ease: 0.10,          // suavizado de la cámara (0-1)
+    maxCardDepth: 35,    // píxeles de profundidad máxima para las tarjetas
+  };
+
+  // Estado de la cámara
+  let targetRX = 0, targetRY = 0;  // rotación objetivo
+  let currentRX = 0, currentRY = 0; // rotación actual (con suavizado)
+
+  /**
+   * Mide y cachea las posiciones de las tarjetas para cálculos de profundidad
+   */
+  const measureCards = () => cards.map(card => {
+    const rect = card.getBoundingClientRect();
+    return {
+      element: card,
+      centerX: rect.left + rect.width / 2,
+      centerY: rect.top + rect.height / 2,
+      width: rect.width,
+      height: rect.height
+    };
+  });
+
+  let cachedCards = measureCards();
+
+  // Recalcular posiciones cuando cambia el tamaño de la ventana
+  window.addEventListener('resize', () => {
+    cachedCards = measureCards();
+  });
+
+  /**
+   * Normaliza las coordenadas del puntero a un rango de -1 a 1
+   * @param {number} x - Coordenada X del puntero
+   * @param {number} y - Coordenada Y del puntero
+   * @returns {Object} Coordenadas normalizadas {nx, ny}
+   */
+  const normalizePointer = (x, y) => {
+    const rect = scene.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    return {
+      nx: Math.max(-1, Math.min(1, (x - centerX) / (rect.width / 2))),
+      ny: Math.max(-1, Math.min(1, (y - centerY) / (rect.height / 2)))
+    };
+  };
+
+  /**
+   * Maneja el movimiento del puntero/ratón
+   * Actualiza la rotación de la cámara y la profundidad de las tarjetas
+   */
+  function handlePointerMove(event) {
+    const pointer = event.touches ? event.touches[0] : event;
+    const { nx, ny } = normalizePointer(pointer.clientX, pointer.clientY);
+
+    // Actualizar variables CSS para las capas de parallax
+    stage.style.setProperty('--mx', nx.toFixed(4));
+    stage.style.setProperty('--my', ny.toFixed(4));
+
+    // Calcular rotación objetivo de la cámara
+    // El centro de la pantalla produce 0/0, los bordes producen máximos
+    targetRY = -nx * config.maxRotateY;  // invertido para que sea intuitivo
+    targetRX = ny * config.maxRotateX;
+
+    // Calcular profundidad individual de cada tarjeta según proximidad del puntero
+    cachedCards.forEach(({ element, centerX, centerY, width, height }) => {
+      // Distancia normalizada desde el puntero al centro de la tarjeta
+      const dx = (pointer.clientX - centerX) / (width * 0.5);
+      const dy = (pointer.clientY - centerY) / (height * 0.5);
+      const distance = Math.hypot(dx, dy);
+      
+      // Influencia: 1 en el centro de la tarjeta, 0 lejos de ella
+      const influence = Math.max(0, 1 - distance);
+      
+      // Aplicar profundidad proporcional a la influencia
+      const depth = influence * config.maxCardDepth;
+      element.style.setProperty('--dz', `${depth.toFixed(2)}px`);
+    });
+  }
+
+  /**
+   * Resetea la cámara y las profundidades a su estado neutral
+   */
+  function resetCamera() {
+    targetRX = 0;
+    targetRY = 0;
+    stage.style.setProperty('--mx', '0');
+    stage.style.setProperty('--my', '0');
+    cards.forEach(card => card.style.setProperty('--dz', '0px'));
+  }
+
+  // Event listeners para movimiento del puntero
+  window.addEventListener('pointermove', handlePointerMove, { passive: true });
+  window.addEventListener('touchmove', handlePointerMove, { passive: true });
+  window.addEventListener('pointerleave', resetCamera);
+  window.addEventListener('blur', resetCamera);
+
+  /**
+   * Bucle de animación principal
+   * Aplica suavizado (easing) a la rotación de la cámara
+   */
+  (function animationLoop() {
+    // Interpolar suavemente entre rotación actual y objetivo
+    currentRX += (targetRX - currentRX) * config.ease;
+    currentRY += (targetRY - currentRY) * config.ease;
+
+    // Aplicar las rotaciones suavizadas a las variables CSS
+    stage.style.setProperty('--rx', `${currentRX.toFixed(3)}deg`);
+    stage.style.setProperty('--ry', `${currentRY.toFixed(3)}deg`);
+
+    // Continuar el bucle
+    requestAnimationFrame(animationLoop);
+  })();
+
+  /**
+   * Accesibilidad: aumentar profundidad en foco de teclado
+   */
+  cards.forEach(card => {
+    card.addEventListener('focus', () => {
+      card.style.setProperty('--dz', '50px');
+    });
+    
+    card.addEventListener('blur', () => {
+      card.style.setProperty('--dz', '0px');
+    });
+  });
+
+  // Logging para depuración (puede eliminarse en producción)
+  console.log('🎮 Interfaz 3D inicializada');
+  console.log(`📊 Configuración:`, config);
+  console.log(`🃏 Tarjetas detectadas:`, cards.length);
+})();
+</script>
+</body>
+</html>

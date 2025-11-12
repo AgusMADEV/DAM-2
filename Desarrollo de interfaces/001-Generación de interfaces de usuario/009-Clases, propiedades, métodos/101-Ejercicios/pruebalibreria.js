@@ -1,0 +1,201 @@
+(function(global){
+    const NAMESPACE = 'jux';
+    const NS = (name) => `${NAMESPACE}-${name}`;
+
+    function ensureStyles(){
+      const id = `${NAMESPACE}-styles`; if (document.getElementById(id)) return;
+      const css = `
+:root { --jux-bg:#ffffff; --jux-text:#0f172a; --jux-muted:#475569; --jux-line:#e2e8f0; --jux-chip:#f8fafc; }
+.${NS('root')} { font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial; color:var(--jux-text); }
+.${NS('wrap')} { max-width:1000px; margin:32px auto; padding:0 16px; }
+.${NS('title')} { margin:0 0 6px; font-size:clamp(18px,3.5vw,26px); }
+.${NS('subtitle')} { margin:0 0 14px; color:var(--jux-muted); }
+.${NS('card')} { border:1px solid var(--jux-line); border-radius:12px; overflow:hidden; background:#fff }
+.${NS('pad')} { padding:14px }
+.${NS('toolbar')} { display:flex; gap:10px; align-items:center; justify-content:space-between }
+.${NS('badge')} { display:inline-block; background:var(--jux-chip); padding:2px 8px; border:1px solid var(--jux-line); border-radius:999px; font-size:12px; color:var(--jux-muted) }
+.${NS('search')} { display:flex; gap:8px; align-items:center }
+.${NS('search')} input { border:1px solid var(--jux-line); border-radius:10px; padding:8px 10px; min-width:220px }
+.${NS('count')} { font-size:12px; color:var(--jux-muted) }
+.${NS('scroll')} { max-height:70vh; overflow:auto; border-top:1px solid var(--jux-line) }
+.${NS('table')} { width:100%; border-collapse:separate; border-spacing:0; font-size:14px }
+.${NS('thead')} th { position:sticky; top:0; background:linear-gradient(0deg,#f8fafc,#ffffff); border-bottom:1px solid var(--jux-line); text-align:left; font-weight:700; padding:10px 12px; white-space:nowrap }
+.${NS('th-sortable')} { cursor:pointer; user-select:none }
+.${NS('th-sortable')} .${NS('dir')} { margin-left:6px; font-size:11px; color:var(--jux-muted) }
+.${NS('tbody')} td { border-bottom:1px solid var(--jux-line); padding:10px 12px; vertical-align:top }
+.${NS('row-odd')} { background:#fafafa }
+`;
+      const style = document.createElement('style');
+      style.id = id; style.textContent = css; document.head.appendChild(style);
+    }
+
+    const isPlain = v => Object.prototype.toString.call(v) === '[object Object]';
+    
+    // Fixed flatten function - only flattens a single object, not arrays of objects
+    function flatten(value, prefix=''){
+      const out = {}; const stack = [{v:value,p:prefix}];
+      while (stack.length){
+        const {v,p} = stack.pop();
+        if (Array.isArray(v)){
+          // Arrays are joined as comma-separated strings
+          const primitives = v.every(x => !isPlain(x) && !Array.isArray(x));
+          if (primitives){ out[p||'value'] = v.join(', '); }
+          else {
+            // If array contains objects, just stringify it
+            out[p||'value'] = v.map(x => isPlain(x) ? JSON.stringify(x) : String(x)).join(', ');
+          }
+        } else if (isPlain(v)){
+          const ks = Object.keys(v); 
+          if (!ks.length){ out[p||'value'] = '{}'; continue; }
+          ks.forEach(k=>{
+            const nv=v[k]; 
+            const np = p ? `${p}.${k}` : k;
+            if (isPlain(nv)) {
+              // Recursively flatten nested objects
+              stack.push({v:nv,p:np});
+            } else if (Array.isArray(nv)) {
+              // Handle arrays as comma-separated strings
+              const primitives = nv.every(x => !isPlain(x) && !Array.isArray(x));
+              out[np] = primitives ? nv.join(', ') : nv.map(x => isPlain(x) ? JSON.stringify(x) : String(x)).join(', ');
+            } else {
+              out[np] = nv==null ? '' : String(nv);
+            }
+          });
+        } else { 
+          out[p||'value'] = v==null ? '' : String(v); 
+        }
+      }
+      return out;
+    }
+    
+    function normalizeTop(json){ 
+      if (Array.isArray(json)) return json; 
+      if (isPlain(json)){ 
+        const key=Object.keys(json).find(k=>Array.isArray(json[k])); 
+        return key?json[key]:[json]; 
+      } 
+      return [json]; 
+    }
+    
+    const collectColumns = rows => Array.from(rows.reduce((s,r)=>{ Object.keys(r).forEach(k=>s.add(k)); return s; }, new Set()));
+
+    class JocarsaUX {
+      constructor(){ ensureStyles(); this.state={ columns:[], rows:[], view:[], sort:{key:null, dir:1}, query:'' }; this._els={ host:null, table:null, thead:null, tbody:null, search:null, count:null }; }
+
+      tableRenderer({ target, data, flattenObjects=true, title='jocarsa|ux', subtitle='Table renderer (search + sort)' }={}){
+        const host = (typeof target==='string') ? document.querySelector(target) : target; if (!host) throw new Error('Target not found');
+        this._els.host = host;
+        host.classList.add(NS('root'));
+        host.innerHTML = '';
+
+        const wrap = el('div', NS('wrap'));
+        const h1 = el('h1', NS('title'), title);
+        const p = el('p', NS('subtitle'), subtitle);
+        const card = el('div', NS('card'));
+        const pad = el('div', NS('pad'));
+        const toolbar = el('div', NS('toolbar'));
+        const badge = el('span', NS('badge'), 'Table demo');
+        const searchBox = el('div', NS('search'));
+        const label = el('label', null, 'Search'); label.htmlFor = NS('search-input');
+        const input = el('input'); input.id = NS('search-input');
+        const count = el('span', NS('count'));
+        searchBox.append(label, input, count);
+        toolbar.append(badge, searchBox);
+        pad.append(toolbar);
+
+        const scroll = el('div', NS('scroll'));
+        const table = el('table', NS('table'));
+        const thead = document.createElement('thead'); thead.className = NS('thead');
+        const tbody = document.createElement('tbody'); tbody.className = NS('tbody');
+        table.append(thead, tbody);
+        scroll.append(table);
+        card.append(pad, scroll);
+        wrap.append(h1, p, card);
+        host.append(wrap);
+
+        this._els = { host, table, thead, tbody, search: input, count };
+
+        // Fixed: normalize to array first, THEN flatten each object individually
+        const arr = normalizeTop(data);
+        const flat = flattenObjects ? arr.map(obj => flatten(obj)) : arr;
+        this.state.columns = collectColumns(flat);
+        this.state.rows = flat; 
+        this.state.view = flat.slice(); 
+        this.state.sort = {key:null, dir:1}; 
+        this.state.query='';
+
+        input.value = '';
+        input.oninput = () => this.setFilter(input.value);
+
+        this._renderHead();
+        this._renderBody();
+        return this;
+      }
+
+      setFilter(query=''){
+        this.state.query = String(query).toLowerCase();
+        const { rows, columns } = this.state;
+        if (!this.state.query) this.state.view = rows.slice();
+        else this.state.view = rows.filter(r=>columns.some(k=>{ const v=r[k]; return v && String(v).toLowerCase().includes(this.state.query); }));
+        this._renderBody();
+        return this;
+      }
+
+      sortBy(key, dir){
+        if (!key) return this;
+        const s = this.state;
+        if (dir == null){ if (s.sort.key === key) s.sort.dir *= -1; else { s.sort.key = key; s.sort.dir = 1; } }
+        else { s.sort.key = key; s.sort.dir = dir >= 0 ? 1 : -1; }
+        const d = s.sort.dir; const k = s.sort.key;
+        s.view.sort((a,b)=>{
+          const va=a[k] ?? '', vb=b[k] ?? '';
+          const na=Number(va), nb=Number(vb);
+          const bothNum = !isNaN(na) && !isNaN(nb);
+          if (bothNum) return (na-nb)*d;
+          return String(va).localeCompare(String(vb), undefined, {numeric:true, sensitivity:'base'})*d;
+        });
+        this._renderHead();
+        this._renderBody();
+        return this;
+      }
+
+      _renderHead(){
+        const { columns, sort } = this.state; const thead = this._els.thead;
+        thead.innerHTML = '';
+        const tr = document.createElement('tr');
+        columns.forEach(c=>{
+          const th = document.createElement('th');
+          th.className = `${NS('th-sortable')}`; th.title = `Sort by ${c}`; th.textContent = c;
+          const dir = el('span', NS('dir'), sort.key===c ? (sort.dir===1 ? '▲' : '▼') : '');
+          th.append(dir);
+          th.addEventListener('click', ()=>this.sortBy(c));
+          tr.append(th);
+        });
+        thead.append(tr);
+      }
+
+      _renderBody(){
+        const { columns, view } = this.state; const tbody = this._els.tbody;
+        tbody.innerHTML = '';
+        const frag = document.createDocumentFragment();
+        view.forEach((r, idx)=>{
+          const tr = document.createElement('tr');
+          if (idx % 2 === 0) tr.classList.add(NS('row-odd'));
+          columns.forEach(c=>{
+            const td = document.createElement('td');
+            td.textContent = r[c] ?? '';
+            tr.append(td);
+          });
+          frag.append(tr);
+        });
+        tbody.append(frag);
+        if (this._els.count) this._els.count.textContent = `${view.length} row(s)`;
+      }
+    }
+
+    function el(tag, className, text){ const x=document.createElement(tag); if (className) x.className=className; if (text!=null) x.textContent=text; return x; }
+
+    global.JocarsaUX = JocarsaUX;
+    global['jocarsa|ux'] = { UX: JocarsaUX };
+
+  })(window);

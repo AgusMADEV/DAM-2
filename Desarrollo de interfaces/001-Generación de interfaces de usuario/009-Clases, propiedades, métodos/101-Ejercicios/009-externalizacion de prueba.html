@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>jocarsa|ux – namespaced, JS‑built UI (v0.1 - Fixed)</title>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="pruebalibreria.js"></script>
+  <script>
+  
+
+  
+  fetch("api.php")
+  .then(function(respuesta){return respuesta.json()})
+  .then(function(datos){
+    const ux = new JocarsaUX();
+    ux.tableRenderer({ target: '#app', data: datos });
+  })
+  </script>
+</body>
+</html>
+
+
+
+
+
