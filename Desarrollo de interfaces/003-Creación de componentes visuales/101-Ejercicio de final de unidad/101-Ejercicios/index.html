@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UILib - Demostración de Componentes</title>
+  
+  <!-- Cargar librería UILib -->
+  <link rel="stylesheet" href="uilib.css">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .demo-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .demo-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 3rem;
+    }
+
+    .demo-header h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .demo-header p {
+      font-size: 1.25rem;
+      opacity: 0.9;
+    }
+
+    .demo-section {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .demo-section h2 {
+      color: #2563eb;
+      margin-bottom: 1.5rem;
+      font-size: 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .demo-section p {
+      color: #64748b;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #0f172a;
+    }
+
+    .code-block {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .demo-header h1 {
+        font-size: 2rem;
+      }
+
+      .demo-section {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-container">
+    
+    <!-- Header -->
+    <div class="demo-header">
+      <h1>🎨 UILib v1.0</h1>
+      <p>Librería de componentes UI reutilizables - Ejercicio Final de Unidad</p>
+    </div>
+
+    <!-- Sección: Stats Cards -->
+    <div class="demo-section">
+      <h2>📊 Componentes de Informes - StatsCard</h2>
+      <p>Tarjetas de estadísticas para mostrar métricas clave en dashboards.</p>
+      
+      <div class="uil-grid uil-grid-4">
+        <div id="stats1"></div>
+        <div id="stats2"></div>
+        <div id="stats3"></div>
+        <div id="stats4"></div>
+      </div>
+
+      <div class="code-block">
+new UILib.StatsCard('#stats1', {
+  label: 'Ventas Totales',
+  value: '€45,231',
+  change: '+12.5',
+  changeType: 'positive',
+  icon: '💰',
+  iconType: 'success'
+});
+      </div>
+    </div>
+
+    <!-- Sección: Data Table -->
+    <div class="demo-section">
+      <h2>📋 Componentes de Tabla - DataTable</h2>
+      <p>Tabla con búsqueda, ordenamiento y paginación.</p>
+      
+      <div id="dataTable"></div>
+
+      <div class="code-block">
+        new UILib.DataTable('#dataTable', {
+        title: 'Lista de Empleados',
+        columns: [
+            { field: 'id', label: 'ID' },
+            { field: 'nombre', label: 'Nombre' },
+            { field: 'departamento', label: 'Departamento' },
+            { field: 'salario', label: 'Salario' }
+        ],
+        data: empleados,
+        searchable: true,
+        sortable: true,
+        pagination: true,
+        rowsPerPage: 5
+        });
+      </div>
+    </div>
+
+    <!-- Sección: Gráficas -->
+    <div class="demo-section">
+      <h2>📈 Componentes de Gráficas - BarChart</h2>
+      <p>Gráficos de barras interactivos renderizados con Canvas.</p>
+      
+      <div id="barChart" style="max-width: 800px; margin: 0 auto;"></div>
+
+      <div class="code-block">
+new UILib.BarChart('#barChart', {
+  title: 'Ventas Mensuales 2024',
+  labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+  data: [2400, 1398, 9800, 3908, 4800, 3800],
+  color: '#2563eb',
+  width: 700,
+  height: 350
+});
+      </div>
+    </div>
+
+    <!-- Sección: Formularios -->
+    <div class="demo-section">
+      <h2>📝 Componentes de Formularios</h2>
+      <p>Inputs y selects mejorados con búsqueda integrada.</p>
+      
+      <div class="uil-grid uil-grid-2">
+        <div class="form-group">
+          <label for="nombre">Nombre Completo</label>
+          <input type="text" id="nombre" class="uil-input" placeholder="Introduce tu nombre">
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" class="uil-input" placeholder="tu@email.com">
+        </div>
+
+        <div class="form-group">
+          <label for="pais">País (SearchableSelect)</label>
+          <select id="pais" class="uil-select-native">
+            <option value="">-- Selecciona --</option>
+            <option value="es">España</option>
+            <option value="mx">México</option>
+            <option value="ar">Argentina</option>
+            <option value="co">Colombia</option>
+            <option value="pe">Perú</option>
+            <option value="cl">Chile</option>
+            <option value="ve">Venezuela</option>
+            <option value="ec">Ecuador</option>
+            <option value="gt">Guatemala</option>
+            <option value="cu">Cuba</option>
+            <option value="bo">Bolivia</option>
+            <option value="do">República Dominicana</option>
+            <option value="hn">Honduras</option>
+            <option value="py">Paraguay</option>
+            <option value="sv">El Salvador</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="ciudad">Ciudad (SearchableSelect)</label>
+          <select id="ciudad" class="uil-select-native">
+            <option value="">-- Selecciona --</option>
+            <option value="mad">Madrid</option>
+            <option value="bcn">Barcelona</option>
+            <option value="vlc">Valencia</option>
+            <option value="sev">Sevilla</option>
+            <option value="zar">Zaragoza</option>
+            <option value="mal">Málaga</option>
+            <option value="bil">Bilbao</option>
+            <option value="ali">Alicante</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="code-block">
+// Input normal con estilos de UILib
+&lt;input type="text" class="uil-input" placeholder="Nombre"&gt;
+
+// SearchableSelect (select con búsqueda)
+new UILib.SearchableSelect('#pais', {
+  placeholder: 'Buscar país...',
+  diacriticsInsensitive: true,
+  closeOnSelect: true
+});
+      </div>
+    </div>
+
+    <!-- Sección: Report Panel -->
+    <div class="demo-section">
+      <h2>📄 Componente de Informe - ReportPanel</h2>
+      <p>Panel estructurado para mostrar informes completos.</p>
+      
+      <div id="reportPanel"></div>
+
+      <div class="code-block">
+new UILib.ReportPanel('#reportPanel', {
+  title: 'Informe Trimestral Q4 2024',
+  subtitle: 'Análisis de rendimiento y métricas clave',
+  content: '&lt;p&gt;Contenido del informe...&lt;/p&gt;',
+  footer: 'Generado el 12 de noviembre de 2025'
+});
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Cargar JavaScript de la librería -->
+  <script src="uilib.js"></script>
+  
+  <script>
+    // ================================================
+    // INICIALIZACIÓN DE COMPONENTES
+    // ================================================
+
+    // 1. Stats Cards
+    new UILib.StatsCard('#stats1', {
+      label: 'Ventas Totales',
+      value: '€45,231',
+      change: '+12.5',
+      changeType: 'positive',
+      icon: '💰',
+      iconType: 'success'
+    });
+
+    new UILib.StatsCard('#stats2', {
+      label: 'Nuevos Clientes',
+      value: '1,245',
+      change: '+8.2',
+      changeType: 'positive',
+      icon: '👥',
+      iconType: 'primary'
+    });
+
+    new UILib.StatsCard('#stats3', {
+      label: 'Productos Vendidos',
+      value: '3,892',
+      change: '-2.4',
+      changeType: 'negative',
+      icon: '📦',
+      iconType: 'warning'
+    });
+
+    new UILib.StatsCard('#stats4', {
+      label: 'Satisfacción',
+      value: '98.5%',
+      change: '+5.1',
+      changeType: 'positive',
+      icon: '⭐',
+      iconType: 'info'
+    });
+
+    // 2. Data Table
+    const empleadosData = [
+      { id: 1, nombre: 'Ana García', departamento: 'Ventas', salario: 35000, email: 'ana@empresa.com' },
+      { id: 2, nombre: 'Carlos López', departamento: 'IT', salario: 45000, email: 'carlos@empresa.com' },
+      { id: 3, nombre: 'María Fernández', departamento: 'Marketing', salario: 38000, email: 'maria@empresa.com' },
+      { id: 4, nombre: 'Juan Martínez', departamento: 'IT', salario: 48000, email: 'juan@empresa.com' },
+      { id: 5, nombre: 'Laura Sánchez', departamento: 'RRHH', salario: 40000, email: 'laura@empresa.com' },
+      { id: 6, nombre: 'Pedro Rodríguez', departamento: 'Ventas', salario: 36000, email: 'pedro@empresa.com' },
+      { id: 7, nombre: 'Isabel Gómez', departamento: 'Finanzas', salario: 42000, email: 'isabel@empresa.com' },
+      { id: 8, nombre: 'Miguel Torres', departamento: 'IT', salario: 50000, email: 'miguel@empresa.com' },
+      { id: 9, nombre: 'Carmen Ruiz', departamento: 'Marketing', salario: 37000, email: 'carmen@empresa.com' },
+      { id: 10, nombre: 'Francisco Moreno', departamento: 'Ventas', salario: 39000, email: 'francisco@empresa.com' },
+      { id: 11, nombre: 'Elena Jiménez', departamento: 'RRHH', salario: 41000, email: 'elena@empresa.com' },
+      { id: 12, nombre: 'Antonio Álvarez', departamento: 'IT', salario: 47000, email: 'antonio@empresa.com' },
+      { id: 13, nombre: 'Rosa Romero', departamento: 'Finanzas', salario: 43000, email: 'rosa@empresa.com' },
+      { id: 14, nombre: 'José Navarro', departamento: 'Marketing', salario: 36500, email: 'jose@empresa.com' },
+      { id: 15, nombre: 'Lucía Serrano', departamento: 'Ventas', salario: 37500, email: 'lucia@empresa.com' }
+    ];
+
+    new UILib.DataTable('#dataTable', {
+      title: 'Lista de Empleados',
+      columns: [
+        { field: 'id', label: 'ID', sortable: true },
+        { field: 'nombre', label: 'Nombre', sortable: true },
+        { field: 'departamento', label: 'Departamento', sortable: true },
+        { 
+          field: 'salario', 
+          label: 'Salario', 
+          sortable: true,
+          render: (value) => `€${value.toLocaleString()}`
+        },
+        { field: 'email', label: 'Email' }
+      ],
+      data: empleadosData,
+      searchable: true,
+      sortable: true,
+      pagination: true,
+      rowsPerPage: 5
+    });
+
+    // 3. Bar Chart
+    new UILib.BarChart('#barChart', {
+      title: 'Ventas Mensuales 2024',
+      labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+      data: [2400, 1398, 9800, 3908, 4800, 3800, 4300, 5600, 7200, 6800, 8900, 9500],
+      color: '#2563eb',
+      width: 700,
+      height: 350,
+      showValues: true
+    });
+
+    // 4. Searchable Selects
+    new UILib.SearchableSelect(document.querySelector('#pais'), {
+      placeholder: 'Buscar país...',
+      diacriticsInsensitive: true,
+      closeOnSelect: true
+    });
+
+    new UILib.SearchableSelect(document.querySelector('#ciudad'), {
+      placeholder: 'Buscar ciudad...',
+      diacriticsInsensitive: true,
+      closeOnSelect: true
+    });
+
+    // 5. Report Panel
+    const reportContent = `
+      <div class="uil-grid uil-grid-2" style="margin-bottom: 1.5rem;">
+        <div>
+          <h4 style="color: #2563eb; margin-bottom: 0.5rem;">Resumen Ejecutivo</h4>
+          <p style="color: #64748b; line-height: 1.6;">
+            El cuarto trimestre de 2024 ha mostrado un crecimiento sostenido del 12.5% 
+            comparado con el trimestre anterior. Las ventas totales alcanzaron los €45,231.
+          </p>
+        </div>
+        <div>
+          <h4 style="color: #2563eb; margin-bottom: 0.5rem;">Objetivos Cumplidos</h4>
+          <ul style="color: #64748b; line-height: 1.8;">
+            <li>✓ Incremento de ventas: 12.5%</li>
+            <li>✓ Nuevos clientes: +1,245</li>
+            <li>✓ Satisfacción del cliente: 98.5%</li>
+          </ul>
+        </div>
+      </div>
+      
+      <h4 style="color: #2563eb; margin-bottom: 0.5rem;">Análisis Detallado</h4>
+      <p style="color: #64748b; line-height: 1.6; margin-bottom: 1rem;">
+        Los departamentos de ventas e IT han liderado el crecimiento este trimestre, 
+        con contribuciones significativas al resultado global de la empresa.
+      </p>
+      
+      <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #2563eb;">
+        <strong style="color: #0f172a;">Nota:</strong>
+        <span style="color: #64748b;"> 
+          Se recomienda mantener la estrategia actual y reforzar las áreas de marketing 
+          digital para el próximo trimestre.
+        </span>
+      </div>
+    `;
+
+    new UILib.ReportPanel('#reportPanel', {
+      title: 'Informe Trimestral Q4 2024',
+      subtitle: 'Análisis de rendimiento y métricas clave del último trimestre',
+      content: reportContent,
+      footer: 'Generado el 12 de noviembre de 2025 | Departamento de Análisis'
+    });
+
+    // ================================================
+    // EVENTOS ADICIONALES (Demostración de inputs)
+    // ================================================
+    
+    const nombreInput = document.querySelector('#nombre');
+    const emailInput = document.querySelector('#email');
+
+    nombreInput.addEventListener('input', (e) => {
+      console.log('Nombre ingresado:', e.target.value);
+    });
+
+    emailInput.addEventListener('blur', (e) => {
+      // Validación simple de email
+      const email = e.target.value;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+      if (email && !emailRegex.test(email)) {
+        e.target.classList.add('error');
+        console.log('Email inválido');
+      } else {
+        e.target.classList.remove('error');
+      }
+    });
+
+    // Eventos de los selects
+    document.querySelector('#pais').addEventListener('change', (e) => {
+      console.log('País seleccionado:', e.target.value);
+    });
+
+    document.querySelector('#ciudad').addEventListener('change', (e) => {
+      console.log('Ciudad seleccionada:', e.target.value);
+    });
+
+    console.log('✨ UILib v1.0 - Todos los componentes cargados correctamente');
+  </script>
+</body>
+</html>

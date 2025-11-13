@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Gestión Empresarial - Proyecto Real con UILib</title>
+  
+  <!-- CARGA DE LA LIBRERÍA UILIB -->
+  <link rel="stylesheet" href="uilib.css">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+    }
+
+    /* Layout principal */
+    .layout {
+      display: grid;
+      grid-template-areas:
+        "header header"
+        "sidebar main";
+      grid-template-columns: 250px 1fr;
+      grid-template-rows: auto 1fr;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      grid-area: header;
+      background: white;
+      padding: 1rem 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      grid-area: sidebar;
+      background: white;
+      padding: 1.5rem;
+      border-right: 1px solid #e2e8f0;
+      height: calc(100vh - 72px);
+      position: sticky;
+      top: 72px;
+    }
+
+    .nav-item {
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 150ms;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: #64748b;
+      text-decoration: none;
+    }
+
+    .nav-item:hover {
+      background: #f1f5f9;
+      color: #2563eb;
+    }
+
+    .nav-item.active {
+      background: #2563eb;
+      color: white;
+    }
+
+    .nav-icon {
+      font-size: 1.25rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    /* Main content */
+    .main {
+      grid-area: main;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .section {
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-subtitle {
+      color: #64748b;
+      margin-bottom: 1rem;
+    }
+
+    /* Formulario */
+    .form-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-field label {
+      font-weight: 500;
+      color: #0f172a;
+      font-size: 0.875rem;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .tab {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-weight: 500;
+      color: #64748b;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 150ms;
+    }
+
+    .tab:hover {
+      color: #2563eb;
+    }
+
+    .tab.active {
+      color: #2563eb;
+      border-bottom-color: #2563eb;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .layout {
+        grid-template-areas:
+          "header"
+          "main";
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .main {
+        padding: 1rem;
+      }
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .badge-success {
+      background: rgba(22, 163, 74, 0.1);
+      color: #16a34a;
+    }
+
+    .badge-warning {
+      background: rgba(217, 119, 6, 0.1);
+      color: #d97706;
+    }
+
+    .badge-danger {
+      background: rgba(220, 38, 38, 0.1);
+      color: #dc2626;
+    }
+
+    /* Alert */
+    .alert {
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .alert-info {
+      background: rgba(8, 145, 178, 0.1);
+      color: #0891b2;
+      border-left: 4px solid #0891b2;
+    }
+
+    .alert-success {
+      background: rgba(22, 163, 74, 0.1);
+      color: #16a34a;
+      border-left: 4px solid #16a34a;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    
+    <!-- Header -->
+    <header class="header">
+      <div class="header-title">
+        🏢 Sistema de Gestión Empresarial
+      </div>
+      <div class="header-user">
+        <span style="color: #64748b;">Admin</span>
+        <div class="user-avatar">AG</div>
+      </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <nav>
+        <a href="#" class="nav-item active" data-tab="dashboard">
+          <span class="nav-icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="empleados">
+          <span class="nav-icon">👥</span>
+          <span>Empleados</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="ventas">
+          <span class="nav-icon">💰</span>
+          <span>Ventas</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="productos">
+          <span class="nav-icon">📦</span>
+          <span>Productos</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="informes">
+          <span class="nav-icon">📄</span>
+          <span>Informes</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+
+      <!-- TAB: Dashboard -->
+      <div id="tab-dashboard" class="tab-content active">
+        <div class="section">
+          <h2 class="section-title">📊 Panel de Control</h2>
+          <p class="section-subtitle">Visión general del rendimiento empresarial</p>
+
+          <!-- Stats Cards usando UILib -->
+          <div class="uil-grid uil-grid-4">
+            <div id="stat-ventas"></div>
+            <div id="stat-clientes"></div>
+            <div id="stat-empleados"></div>
+            <div id="stat-productos"></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="uil-grid uil-grid-2">
+            <!-- Gráfico de ventas -->
+            <div id="chart-ventas"></div>
+            
+            <!-- Gráfico de productos -->
+            <div id="chart-productos"></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div id="table-recent"></div>
+        </div>
+      </div>
+
+      <!-- TAB: Empleados -->
+      <div id="tab-empleados" class="tab-content">
+        <div class="section">
+          <h2 class="section-title">👥 Gestión de Empleados</h2>
+          
+          <div class="alert alert-info">
+            <span>ℹ️</span>
+            <span>Usa el buscador y los filtros para encontrar empleados rápidamente</span>
+          </div>
+
+          <!-- Formulario de nuevo empleado -->
+          <div class="form-card">
+            <h3 style="margin-bottom: 1.5rem; color: #2563eb;">➕ Añadir Nuevo Empleado</h3>
+            
+            <form id="form-empleado">
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="emp-nombre">Nombre Completo *</label>
+                  <input type="text" id="emp-nombre" class="uil-input" placeholder="Juan Pérez" required>
+                </div>
+
+                <div class="form-field">
+                  <label for="emp-email">Email *</label>
+                  <input type="email" id="emp-email" class="uil-input" placeholder="juan@empresa.com" required>
+                </div>
+
+                <div class="form-field">
+                  <label for="emp-departamento">Departamento *</label>
+                  <select id="emp-departamento" required>
+                    <option value="">-- Selecciona --</option>
+                    <option value="IT">Tecnología (IT)</option>
+                    <option value="Ventas">Ventas</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="RRHH">Recursos Humanos</option>
+                    <option value="Finanzas">Finanzas</option>
+                    <option value="Operaciones">Operaciones</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="emp-puesto">Puesto *</label>
+                  <select id="emp-puesto" required>
+                    <option value="">-- Selecciona --</option>
+                    <option value="Junior">Junior</option>
+                    <option value="Semi-Senior">Semi-Senior</option>
+                    <option value="Senior">Senior</option>
+                    <option value="Lead">Lead</option>
+                    <option value="Manager">Manager</option>
+                    <option value="Director">Director</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="emp-salario">Salario Anual (€) *</label>
+                  <input type="number" id="emp-salario" class="uil-input" placeholder="35000" required min="0">
+                </div>
+
+                <div class="form-field">
+                  <label for="emp-fecha">Fecha de Ingreso *</label>
+                  <input type="date" id="emp-fecha" class="uil-input" required>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="reset" class="uil-button secondary">Limpiar</button>
+                <button type="submit" class="uil-button">Añadir Empleado</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Tabla de empleados -->
+          <div id="table-empleados"></div>
+        </div>
+      </div>
+
+      <!-- TAB: Ventas -->
+      <div id="tab-ventas" class="tab-content">
+        <div class="section">
+          <h2 class="section-title">💰 Gestión de Ventas</h2>
+          
+          <div class="uil-grid uil-grid-3">
+            <div id="stat-ventas-hoy"></div>
+            <div id="stat-ventas-mes"></div>
+            <div id="stat-ventas-anual"></div>
+          </div>
+
+          <div style="margin-top: 2rem;">
+            <div id="chart-ventas-detalle"></div>
+          </div>
+
+          <div style="margin-top: 2rem;">
+            <div id="table-ventas"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: Productos -->
+      <div id="tab-productos" class="tab-content">
+        <div class="section">
+          <h2 class="section-title">📦 Gestión de Productos</h2>
+          
+          <div class="form-card">
+            <h3 style="margin-bottom: 1.5rem; color: #2563eb;">➕ Añadir Nuevo Producto</h3>
+            
+            <form id="form-producto">
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="prod-nombre">Nombre del Producto *</label>
+                  <input type="text" id="prod-nombre" class="uil-input" placeholder="Laptop Dell XPS 15" required>
+                </div>
+
+                <div class="form-field">
+                  <label for="prod-categoria">Categoría *</label>
+                  <select id="prod-categoria" required>
+                    <option value="">-- Selecciona --</option>
+                    <option value="Electrónica">Electrónica</option>
+                    <option value="Software">Software</option>
+                    <option value="Servicios">Servicios</option>
+                    <option value="Oficina">Material de Oficina</option>
+                    <option value="Hardware">Hardware</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="prod-precio">Precio (€) *</label>
+                  <input type="number" id="prod-precio" class="uil-input" placeholder="1299.99" required min="0" step="0.01">
+                </div>
+
+                <div class="form-field">
+                  <label for="prod-stock">Stock Disponible *</label>
+                  <input type="number" id="prod-stock" class="uil-input" placeholder="50" required min="0">
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="reset" class="uil-button secondary">Limpiar</button>
+                <button type="submit" class="uil-button">Añadir Producto</button>
+              </div>
+            </form>
+          </div>
+
+          <div id="table-productos"></div>
+        </div>
+      </div>
+
+      <!-- TAB: Informes -->
+      <div id="tab-informes" class="tab-content">
+        <div class="section">
+          <h2 class="section-title">📄 Informes y Reportes</h2>
+          
+          <div class="alert alert-success">
+            <span>✓</span>
+            <span>Todos los informes están actualizados al día de hoy</span>
+          </div>
+
+          <div id="informe-trimestral"></div>
+
+          <div style="margin-top: 2rem;">
+            <div id="informe-anual"></div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- CARGAR LIBRERÍA UILIB -->
+  <script src="uilib.js"></script>
+  
+  <script>
+    // =====================================================
+    // DATOS DE LA APLICACIÓN (Simulando backend/API)
+    // =====================================================
+    
+    let empleadosData = [
+      { id: 1, nombre: 'Ana García López', email: 'ana.garcia@empresa.com', departamento: 'IT', puesto: 'Senior', salario: 48000, fecha: '2020-03-15', estado: 'Activo' },
+      { id: 2, nombre: 'Carlos Martínez Ruiz', email: 'carlos.martinez@empresa.com', departamento: 'Ventas', puesto: 'Manager', salario: 52000, fecha: '2019-06-01', estado: 'Activo' },
+      { id: 3, nombre: 'María Fernández Silva', email: 'maria.fernandez@empresa.com', departamento: 'Marketing', puesto: 'Lead', salario: 45000, fecha: '2021-01-20', estado: 'Activo' },
+      { id: 4, nombre: 'Juan López Torres', email: 'juan.lopez@empresa.com', departamento: 'IT', puesto: 'Senior', salario: 47000, fecha: '2020-08-10', estado: 'Activo' },
+      { id: 5, nombre: 'Laura Sánchez Pérez', email: 'laura.sanchez@empresa.com', departamento: 'RRHH', puesto: 'Manager', salario: 50000, fecha: '2018-11-05', estado: 'Activo' },
+      { id: 6, nombre: 'Pedro Rodríguez Díaz', email: 'pedro.rodriguez@empresa.com', departamento: 'Ventas', puesto: 'Senior', salario: 42000, fecha: '2021-04-12', estado: 'Activo' },
+      { id: 7, nombre: 'Isabel Gómez Moreno', email: 'isabel.gomez@empresa.com', departamento: 'Finanzas', puesto: 'Director', salario: 65000, fecha: '2017-02-28', estado: 'Activo' },
+      { id: 8, nombre: 'Miguel Torres Jiménez', email: 'miguel.torres@empresa.com', departamento: 'IT', puesto: 'Lead', salario: 55000, fecha: '2019-09-15', estado: 'Activo' },
+      { id: 9, nombre: 'Carmen Ruiz Herrera', email: 'carmen.ruiz@empresa.com', departamento: 'Marketing', puesto: 'Senior', salario: 44000, fecha: '2020-12-01', estado: 'Activo' },
+      { id: 10, nombre: 'Francisco Moreno Castro', email: 'francisco.moreno@empresa.com', departamento: 'Ventas', puesto: 'Semi-Senior', salario: 38000, fecha: '2022-03-10', estado: 'Activo' }
+    ];
+
+    let productosData = [
+      { id: 1, nombre: 'Laptop Dell XPS 15', categoria: 'Electrónica', precio: 1299.99, stock: 15, vendidos: 45 },
+      { id: 2, nombre: 'Microsoft Office 365', categoria: 'Software', precio: 89.99, stock: 100, vendidos: 230 },
+      { id: 3, nombre: 'Monitor LG 27" 4K', categoria: 'Hardware', precio: 349.99, stock: 28, vendidos: 67 },
+      { id: 4, nombre: 'Silla Ergonómica Pro', categoria: 'Oficina', precio: 299.00, stock: 12, vendidos: 89 },
+      { id: 5, nombre: 'Teclado Mecánico RGB', categoria: 'Hardware', precio: 129.99, stock: 35, vendidos: 112 },
+      { id: 6, nombre: 'Webcam Logitech 4K', categoria: 'Electrónica', precio: 159.99, stock: 20, vendidos: 78 },
+      { id: 7, nombre: 'Adobe Creative Cloud', categoria: 'Software', precio: 52.99, stock: 200, vendidos: 156 },
+      { id: 8, nombre: 'Impresora HP LaserJet', categoria: 'Hardware', precio: 449.00, stock: 8, vendidos: 34 }
+    ];
+
+    let ventasData = [
+      { id: 1, fecha: '2024-11-12', cliente: 'Tech Corp SA', producto: 'Laptop Dell XPS 15', cantidad: 3, total: 3899.97, vendedor: 'Carlos Martínez' },
+      { id: 2, fecha: '2024-11-11', cliente: 'Innovate Ltd', producto: 'Microsoft Office 365', cantidad: 50, total: 4499.50, vendedor: 'Pedro Rodríguez' },
+      { id: 3, fecha: '2024-11-11', cliente: 'Design Studio', producto: 'Monitor LG 27" 4K', cantidad: 5, total: 1749.95, vendedor: 'Carlos Martínez' },
+      { id: 4, fecha: '2024-11-10', cliente: 'StartUp XYZ', producto: 'Silla Ergonómica Pro', cantidad: 15, total: 4485.00, vendedor: 'Francisco Moreno' },
+      { id: 5, fecha: '2024-11-10', cliente: 'Media Group', producto: 'Adobe Creative Cloud', cantidad: 20, total: 1059.80, vendedor: 'Pedro Rodríguez' },
+      { id: 6, fecha: '2024-11-09', cliente: 'Finance Plus', producto: 'Webcam Logitech 4K', cantidad: 8, total: 1279.92, vendedor: 'Carlos Martínez' },
+      { id: 7, fecha: '2024-11-09', cliente: 'Legal Services', producto: 'Impresora HP LaserJet', cantidad: 2, total: 898.00, vendedor: 'Francisco Moreno' }
+    ];
+
+    // =====================================================
+    // INICIALIZACIÓN DE COMPONENTES UILIB
+    // =====================================================
+
+    // --- DASHBOARD ---
+    
+    // Stats Cards
+    new UILib.StatsCard('#stat-ventas', {
+      label: 'Ventas Totales',
+      value: '€156,234',
+      change: '+18.2',
+      changeType: 'positive',
+      icon: '💰',
+      iconType: 'success'
+    });
+
+    new UILib.StatsCard('#stat-clientes', {
+      label: 'Clientes Activos',
+      value: '847',
+      change: '+12.5',
+      changeType: 'positive',
+      icon: '👥',
+      iconType: 'primary'
+    });
+
+    new UILib.StatsCard('#stat-empleados', {
+      label: 'Empleados',
+      value: empleadosData.length.toString(),
+      change: null,
+      icon: '👔',
+      iconType: 'info'
+    });
+
+    new UILib.StatsCard('#stat-productos', {
+      label: 'Productos en Stock',
+      value: productosData.reduce((sum, p) => sum + p.stock, 0).toString(),
+      change: '-3.8',
+      changeType: 'negative',
+      icon: '📦',
+      iconType: 'warning'
+    });
+
+    // Gráficos
+    new UILib.BarChart('#chart-ventas', {
+      title: 'Ventas Mensuales 2024',
+      labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+      data: [8400, 9200, 11800, 10500, 12400, 13800, 14200, 15600, 16200, 17800, 18900, 20100],
+      color: '#2563eb',
+      width: 600,
+      height: 300
+    });
+
+    new UILib.BarChart('#chart-productos', {
+      title: 'Productos Más Vendidos',
+      labels: productosData.slice(0, 6).map(p => p.nombre.split(' ')[0]),
+      data: productosData.slice(0, 6).map(p => p.vendidos),
+      color: '#16a34a',
+      width: 600,
+      height: 300
+    });
+
+    // Tabla reciente
+    new UILib.DataTable('#table-recent', {
+      title: 'Ventas Recientes',
+      columns: [
+        { field: 'fecha', label: 'Fecha', sortable: true },
+        { field: 'cliente', label: 'Cliente' },
+        { field: 'producto', label: 'Producto' },
+        { field: 'cantidad', label: 'Cant.', sortable: true },
+        { 
+          field: 'total', 
+          label: 'Total', 
+          sortable: true,
+          render: (val) => `€${val.toFixed(2)}`
+        }
+      ],
+      data: ventasData,
+      searchable: true,
+      sortable: true,
+      pagination: true,
+      rowsPerPage: 5
+    });
+
+    // --- EMPLEADOS ---
+
+    // Inicializar SearchableSelect para departamentos y puestos
+    new UILib.SearchableSelect('#emp-departamento', {
+      placeholder: 'Buscar departamento...',
+      closeOnSelect: true
+    });
+
+    new UILib.SearchableSelect('#emp-puesto', {
+      placeholder: 'Buscar puesto...',
+      closeOnSelect: true
+    });
+
+    // Tabla de empleados
+    const tablaEmpleados = new UILib.DataTable('#table-empleados', {
+      title: 'Todos los Empleados',
+      columns: [
+        { field: 'id', label: 'ID', sortable: true },
+        { field: 'nombre', label: 'Nombre', sortable: true },
+        { field: 'email', label: 'Email' },
+        { field: 'departamento', label: 'Departamento', sortable: true },
+        { field: 'puesto', label: 'Puesto', sortable: true },
+        { 
+          field: 'salario', 
+          label: 'Salario', 
+          sortable: true,
+          render: (val) => `€${val.toLocaleString()}`
+        },
+        {
+          field: 'estado',
+          label: 'Estado',
+          render: (val) => `<span class="badge badge-success">${val}</span>`
+        }
+      ],
+      data: empleadosData,
+      searchable: true,
+      sortable: true,
+      pagination: true,
+      rowsPerPage: 8
+    });
+
+    // Formulario de empleados
+    document.getElementById('form-empleado').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const nuevoEmpleado = {
+        id: empleadosData.length + 1,
+        nombre: document.getElementById('emp-nombre').value,
+        email: document.getElementById('emp-email').value,
+        departamento: document.getElementById('emp-departamento').value,
+        puesto: document.getElementById('emp-puesto').value,
+        salario: parseInt(document.getElementById('emp-salario').value),
+        fecha: document.getElementById('emp-fecha').value,
+        estado: 'Activo'
+      };
+
+      empleadosData.push(nuevoEmpleado);
+      tablaEmpleados.updateData(empleadosData);
+      
+      e.target.reset();
+      
+      // Mostrar mensaje de éxito
+      alert('✓ Empleado añadido correctamente');
+    });
+
+    // --- VENTAS ---
+
+    new UILib.StatsCard('#stat-ventas-hoy', {
+      label: 'Ventas Hoy',
+      value: '€8,452',
+      change: '+25.3',
+      changeType: 'positive',
+      icon: '📅',
+      iconType: 'success'
+    });
+
+    new UILib.StatsCard('#stat-ventas-mes', {
+      label: 'Ventas Este Mes',
+      value: '€89,234',
+      change: '+18.2',
+      changeType: 'positive',
+      icon: '📊',
+      iconType: 'primary'
+    });
+
+    new UILib.StatsCard('#stat-ventas-anual', {
+      label: 'Ventas Anuales',
+      value: '€1.2M',
+      change: '+32.5',
+      changeType: 'positive',
+      icon: '🎯',
+      iconType: 'info'
+    });
+
+    new UILib.BarChart('#chart-ventas-detalle', {
+      title: 'Evolución de Ventas Semanal',
+      labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+      data: [3200, 3800, 4200, 3900, 4500, 2800, 2100],
+      color: '#d97706',
+      width: 900,
+      height: 350
+    });
+
+    new UILib.DataTable('#table-ventas', {
+      title: 'Historial de Ventas',
+      columns: [
+        { field: 'id', label: 'ID', sortable: true },
+        { field: 'fecha', label: 'Fecha', sortable: true },
+        { field: 'cliente', label: 'Cliente' },
+        { field: 'producto', label: 'Producto' },
+        { field: 'cantidad', label: 'Cantidad', sortable: true },
+        { 
+          field: 'total', 
+          label: 'Total', 
+          sortable: true,
+          render: (val) => `<strong>€${val.toFixed(2)}</strong>`
+        },
+        { field: 'vendedor', label: 'Vendedor' }
+      ],
+      data: ventasData,
+      searchable: true,
+      sortable: true,
+      pagination: true,
+      rowsPerPage: 10
+    });
+
+    // --- PRODUCTOS ---
+
+    new UILib.SearchableSelect('#prod-categoria', {
+      placeholder: 'Buscar categoría...',
+      closeOnSelect: true
+    });
+
+    const tablaProductos = new UILib.DataTable('#table-productos', {
+      title: 'Catálogo de Productos',
+      columns: [
+        { field: 'id', label: 'ID', sortable: true },
+        { field: 'nombre', label: 'Producto', sortable: true },
+        { field: 'categoria', label: 'Categoría', sortable: true },
+        { 
+          field: 'precio', 
+          label: 'Precio', 
+          sortable: true,
+          render: (val) => `€${val.toFixed(2)}`
+        },
+        { 
+          field: 'stock', 
+          label: 'Stock', 
+          sortable: true,
+          render: (val) => {
+            if (val < 15) return `<span class="badge badge-warning">${val}</span>`;
+            return `<span class="badge badge-success">${val}</span>`;
+          }
+        },
+        { field: 'vendidos', label: 'Vendidos', sortable: true }
+      ],
+      data: productosData,
+      searchable: true,
+      sortable: true,
+      pagination: true,
+      rowsPerPage: 8
+    });
+
+    document.getElementById('form-producto').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const nuevoProducto = {
+        id: productosData.length + 1,
+        nombre: document.getElementById('prod-nombre').value,
+        categoria: document.getElementById('prod-categoria').value,
+        precio: parseFloat(document.getElementById('prod-precio').value),
+        stock: parseInt(document.getElementById('prod-stock').value),
+        vendidos: 0
+      };
+
+      productosData.push(nuevoProducto);
+      tablaProductos.updateData(productosData);
+      
+      e.target.reset();
+      
+      alert('✓ Producto añadido correctamente');
+    });
+
+    // --- INFORMES ---
+
+    const contenidoInformeTrimestral = `
+      <div style="margin-bottom: 1.5rem;">
+        <h4 style="color: #2563eb; margin-bottom: 0.75rem;">📊 Resumen Ejecutivo Q4 2024</h4>
+        <p style="color: #64748b; line-height: 1.8;">
+          El cuarto trimestre de 2024 ha sido el más exitoso del año, con un crecimiento del 
+          <strong style="color: #16a34a;">+32.5%</strong> en ventas comparado con el mismo período del año anterior.
+          La estrategia de expansión en nuevos mercados y la incorporación de ${empleadosData.length} profesionales 
+          altamente cualificados han sido factores clave en este éxito.
+        </p>
+      </div>
+
+      <div class="uil-grid uil-grid-3" style="margin-bottom: 1.5rem;">
+        <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem;">
+          <div style="color: #64748b; font-size: 0.875rem; margin-bottom: 0.25rem;">Ingresos Totales</div>
+          <div style="font-size: 1.5rem; font-weight: 700; color: #0f172a;">€${ventasData.reduce((sum, v) => sum + v.total, 0).toFixed(2)}</div>
+        </div>
+        <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem;">
+          <div style="color: #64748b; font-size: 0.875rem; margin-bottom: 0.25rem;">Ventas Realizadas</div>
+          <div style="font-size: 1.5rem; font-weight: 700; color: #0f172a;">${ventasData.length}</div>
+        </div>
+        <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem;">
+          <div style="color: #64748b; font-size: 0.875rem; margin-bottom: 0.25rem;">Ticket Medio</div>
+          <div style="font-size: 1.5rem; font-weight: 700; color: #0f172a;">€${(ventasData.reduce((sum, v) => sum + v.total, 0) / ventasData.length).toFixed(2)}</div>
+        </div>
+      </div>
+
+      <h4 style="color: #2563eb; margin-bottom: 0.75rem; margin-top: 1.5rem;">🎯 Objetivos Cumplidos</h4>
+      <ul style="color: #64748b; line-height: 2;">
+        <li>✓ Incremento de ventas: <strong>+32.5%</strong></li>
+        <li>✓ Nuevos clientes captados: <strong>+847</strong></li>
+        <li>✓ Satisfacción del cliente: <strong>98.5%</strong></li>
+        <li>✓ Reducción de costes operativos: <strong>-8.2%</strong></li>
+        <li>✓ Productos más vendidos: <strong>${productosData[0].nombre}</strong> (${productosData[0].vendidos} unidades)</li>
+      </ul>
+
+      <div style="background: #ecfdf5; padding: 1.25rem; border-radius: 0.5rem; border-left: 4px solid #16a34a; margin-top: 1.5rem;">
+        <strong style="color: #0f172a;">💡 Recomendación:</strong>
+        <p style="color: #064e3b; margin-top: 0.5rem; line-height: 1.6;">
+          Se recomienda mantener la estrategia actual de inversión en tecnología y formación del equipo. 
+          El departamento de IT ha demostrado ser un motor clave de innovación, generando mejoras que han 
+          impactado positivamente en la satisfacción del cliente y la eficiencia operativa.
+        </p>
+      </div>
+    `;
+
+    new UILib.ReportPanel('#informe-trimestral', {
+      title: 'Informe Trimestral Q4 2024',
+      subtitle: 'Análisis de rendimiento del cuarto trimestre',
+      content: contenidoInformeTrimestral,
+      footer: 'Generado el 12 de noviembre de 2025 | Departamento de Análisis y Finanzas'
+    });
+
+    const contenidoInformeAnual = `
+      <h4 style="color: #2563eb; margin-bottom: 0.75rem;">📈 Crecimiento Anual</h4>
+      <p style="color: #64748b; line-height: 1.8; margin-bottom: 1.5rem;">
+        El año 2024 ha sido excepcional para la compañía, cerrando con un crecimiento sostenido 
+        en todos los indicadores clave. La facturación ha alcanzado los <strong>€1.2M</strong>, 
+        superando las proyecciones iniciales en un 15%.
+      </p>
+
+      <div style="background: #f1f5f9; padding: 1.5rem; border-radius: 0.5rem;">
+        <h5 style="color: #0f172a; margin-bottom: 1rem;">Departamentos Destacados:</h5>
+        <div style="display: grid; gap: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #64748b;">🏆 Ventas</span>
+            <span style="color: #16a34a; font-weight: 600;">+45% rendimiento</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #64748b;">💻 IT</span>
+            <span style="color: #16a34a; font-weight: 600;">+38% eficiencia</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #64748b;">📢 Marketing</span>
+            <span style="color: #16a34a; font-weight: 600;">+52% conversión</span>
+          </div>
+        </div>
+      </div>
+    `;
+
+    new UILib.ReportPanel('#informe-anual', {
+      title: 'Informe Anual 2024',
+      subtitle: 'Resumen completo del año fiscal',
+      content: contenidoInformeAnual,
+      footer: 'Confidencial - Solo para uso interno'
+    });
+
+    // =====================================================
+    // NAVEGACIÓN POR TABS
+    // =====================================================
+
+    const navItems = document.querySelectorAll('.nav-item');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    navItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Remover clase active de todos
+        navItems.forEach(nav => nav.classList.remove('active'));
+        tabContents.forEach(tab => tab.classList.remove('active'));
+        
+        // Activar el seleccionado
+        item.classList.add('active');
+        const tabId = item.dataset.tab;
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+      });
+    });
+
+    console.log('✨ Sistema de Gestión Empresarial cargado correctamente');
+    console.log('📦 UILib v1.0 - Todos los componentes funcionando');
+  </script>
+</body>
+</html>

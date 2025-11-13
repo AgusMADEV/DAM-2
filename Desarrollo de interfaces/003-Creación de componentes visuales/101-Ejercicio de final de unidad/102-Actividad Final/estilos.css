@@ -1,0 +1,372 @@
+/* Estilos Mejorados para Componentes */
+
+/* Reset básico */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ============================================
+   COMPONENTE 1: TABLA
+   ============================================ */
+.tabla-contenedor {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+  margin-bottom: 1.5rem;
+  transition: box-shadow 0.3s ease;
+}
+
+.tabla-contenedor:hover {
+  box-shadow: 0 8px 12px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.08);
+}
+
+.tabla-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.tabla-header h3 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.tabla-buscar {
+  padding: 0.625rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  width: 300px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.tabla-buscar:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.tabla-buscar::placeholder {
+  color: #9ca3af;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.tabla th {
+  background: linear-gradient(to bottom, #f9fafb, #f3f4f6);
+  padding: 1rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.tabla td {
+  padding: 1rem 0.75rem;
+  border-bottom: 1px solid #f3f4f6;
+  color: #1f2937;
+}
+
+.tabla tbody tr {
+  transition: all 0.2s ease;
+}
+
+.tabla tbody tr:hover {
+  background: #f9fafb;
+  transform: scale(1.001);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.tabla tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ============================================
+   COMPONENTE 2: SELECT BUSCABLE
+   ============================================ */
+.select-buscable {
+  position: relative;
+  width: 100%;
+}
+
+.select-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  outline: none;
+  background: white;
+}
+
+.select-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.select-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  max-height: 250px;
+  overflow-y: auto;
+  display: none;
+  z-index: 1000;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.select-opcion {
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: #374151;
+}
+
+.select-opcion:hover {
+  background: #eff6ff;
+  color: #2563eb;
+  padding-left: 1.25rem;
+}
+
+.select-opcion:active {
+  background: #dbeafe;
+}
+
+/* ============================================
+   COMPONENTE 3: GRÁFICO
+   ============================================ */
+canvas {
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  background: white;
+  display: block;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+  transition: box-shadow 0.3s ease;
+}
+
+canvas:hover {
+  box-shadow: 0 8px 12px rgba(0,0,0,0.1);
+}
+
+/* ============================================
+   COMPONENTE 4: TARJETA DE ESTADÍSTICA
+   ============================================ */
+.tarjeta-stat {
+  background: white;
+  padding: 1.75rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tarjeta-stat::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: currentColor;
+}
+
+.tarjeta-stat:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.12), 0 6px 12px rgba(0,0,0,0.08);
+}
+
+.tarjeta-icono {
+  font-size: 3rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.tarjeta-info {
+  flex: 1;
+}
+
+.tarjeta-titulo {
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tarjeta-valor {
+  color: #1f2937;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+/* ============================================
+   COMPONENTE 5: PANEL DE INFORME
+   ============================================ */
+.informe-panel {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.informe-panel:hover {
+  box-shadow: 0 8px 12px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.08);
+}
+
+.informe-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1.75rem;
+  border-bottom: none;
+}
+
+.informe-header h3 {
+  margin: 0;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.informe-body {
+  padding: 2rem;
+  color: #4b5563;
+  line-height: 1.8;
+}
+
+.informe-body p {
+  margin-bottom: 1rem;
+}
+
+.informe-body strong {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+/* ============================================
+   UTILIDADES
+   ============================================ */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+/* Animaciones suaves */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tabla-contenedor,
+.tarjeta-stat,
+.informe-panel,
+canvas {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Scrollbar personalizada */
+.select-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.select-panel::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+.select-panel::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+.select-panel::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-2, .grid-3, .grid-4 {
+    grid-template-columns: 1fr;
+  }
+  
+  .tabla-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .tabla-buscar {
+    width: 100%;
+  }
+  
+  canvas {
+    width: 100% !important;
+    height: auto !important;
+  }
+  
+  .tarjeta-stat {
+    padding: 1.25rem;
+  }
+  
+  .tarjeta-icono {
+    font-size: 2.5rem;
+  }
+  
+  .tarjeta-valor {
+    font-size: 1.75rem;
+  }
+}

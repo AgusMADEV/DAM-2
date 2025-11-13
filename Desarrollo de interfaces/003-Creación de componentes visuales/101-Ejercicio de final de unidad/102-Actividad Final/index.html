@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Librería de Componentes - Ejemplo Simple</title>
+  <link rel="stylesheet" href="estilos.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      padding: 2rem;
+    }
+    .contenedor {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #1f2937;
+      margin-bottom: 2rem;
+    }
+    .seccion {
+      margin-bottom: 3rem;
+    }
+    .seccion h2 {
+      color: #374151;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <h1>📦 Librería de Componentes UI</h1>
+
+    <!-- TARJETAS DE ESTADÍSTICAS -->
+    <div class="seccion">
+      <h2>1. Tarjetas de Estadísticas</h2>
+      <div class="grid-4">
+        <div id="tarjeta1"></div>
+        <div id="tarjeta2"></div>
+        <div id="tarjeta3"></div>
+        <div id="tarjeta4"></div>
+      </div>
+    </div>
+
+    <!-- GRÁFICO -->
+    <div class="seccion">
+      <h2>2. Gráfico de Barras</h2>
+      <canvas id="grafico" width="800" height="400"></canvas>
+    </div>
+    <div class="seccion">
+      <h2>2. Gráfico de Barras</h2>
+      <canvas id="grafico2" width="800" height="400"></canvas>
+    </div>
+    <!-- TABLA CON BÚSQUEDA -->
+    <div class="seccion">
+      <h2>3. Tabla con Búsqueda</h2>
+      <div id="tabla"></div>
+    </div>
+
+    <!-- SELECT BUSCABLE -->
+    <div class="seccion">
+      <h2>4. Select con Búsqueda</h2>
+      <div style="max-width: 400px;">
+        <label>Selecciona un país:</label><br><br>
+        <select id="paises">
+          <option value="">-- Selecciona --</option>
+          <option value="es">España</option>
+          <option value="mx">México</option>
+          <option value="ar">Argentina</option>
+          <option value="co">Colombia</option>
+          <option value="pe">Perú</option>
+          <option value="cl">Chile</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- INFORME -->
+    <div class="seccion">
+      <h2>5. Panel de Informe</h2>
+      <div id="informe"></div>
+    </div>
+
+  </div>
+
+  <script src="componentes.js"></script>
+  <script>
+    // DATOS DE EJEMPLO
+    const empleados = [
+      { id: 1, nombre: 'Ana García', puesto: 'Desarrolladora', salario: '45000€' },
+      { id: 2, nombre: 'Carlos López', puesto: 'Diseñador', salario: '38000€' },
+      { id: 3, nombre: 'María Fernández', puesto: 'Gerente', salario: '55000€' },
+      { id: 4, nombre: 'Juan Martínez', puesto: 'Analista', salario: '42000€' },
+      { id: 5, nombre: 'Laura Sánchez', puesto: 'Desarrolladora', salario: '47000€' }
+    ];
+
+    // 1. CREAR TARJETAS
+    crearTarjeta('tarjeta1', {
+      titulo: 'Empleados',
+      valor: '125',
+      icono: '👥',
+      color: '#3b82f6'
+    });
+
+    crearTarjeta('tarjeta2', {
+      titulo: 'Proyectos',
+      valor: '42',
+      icono: '📊',
+      color: '#10b981'
+    });
+
+    crearTarjeta('tarjeta3', {
+      titulo: 'Ventas',
+      valor: '€89,450',
+      icono: '💰',
+      color: '#f59e0b'
+    });
+
+    crearTarjeta('tarjeta4', {
+      titulo: 'Clientes',
+      valor: '234',
+      icono: '⭐',
+      color: '#8b5cf6'
+    });
+
+    // 2. CREAR GRÁFICO
+    crearGrafico('grafico', {
+      titulo: 'Ventas Mensuales',
+      etiquetas: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+      valores: [65, 78, 90, 81, 95, 102]
+    });
+    crearGrafico('grafico2', {
+      titulo: 'Pérdidas Mensuales',
+      etiquetas: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+      valores: [12, 60, 5, 20, 17, 40]
+    });
+
+    // 3. CREAR TABLA
+    crearTabla('tabla', {
+      titulo: 'Lista de Empleados',
+      columnas: [
+        { campo: 'id', label: 'ID' },
+        { campo: 'nombre', label: 'Nombre' },
+        { campo: 'puesto', label: 'Puesto' },
+        { campo: 'salario', label: 'Salario' }
+      ],
+      datos: empleados
+    });
+
+    // 4. CREAR SELECT BUSCABLE
+    crearSelectBuscable('paises');
+
+    // 5. CREAR INFORME
+    crearInforme('informe', {
+      titulo: 'Resumen del Mes',
+      contenido: `
+        <p><strong>Total de ventas:</strong> €89,450</p>
+        <p><strong>Nuevos clientes:</strong> 23</p>
+        <p><strong>Proyectos completados:</strong> 8</p>
+        <p>El mes ha sido muy productivo con un incremento del 15% en ventas.</p>
+      `
+    });
+
+    console.log('✅ Todos los componentes cargados correctamente');
+  </script>
+</body>
+</html>

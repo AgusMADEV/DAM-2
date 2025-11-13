@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Commerce Dashboard - Proyecto con UILib</title>
+  
+  <!-- CARGAR UILIB -->
+  <link rel="stylesheet" href="uilib.css">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 3rem;
+    }
+
+    .page-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .page-header p {
+      opacity: 0.9;
+      font-size: 1.125rem;
+    }
+
+    .content-wrapper {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .section {
+      margin-bottom: 3rem;
+    }
+
+    .section:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge-new {
+      background: #ef4444;
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .filters {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      min-width: 200px;
+    }
+
+    .filter-label {
+      font-size: 0.75rem;
+      color: #64748b;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+
+      .content-wrapper {
+        padding: 1rem;
+      }
+
+      .page-header h1 {
+        font-size: 1.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <div class="page-header">
+      <h1>🛒 E-Commerce Analytics</h1>
+      <p>Panel de control para tienda online - Noviembre 2024</p>
+    </div>
+
+    <div class="content-wrapper">
+
+      <!-- Sección 1: KPIs Principales -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">
+            📊 Indicadores Clave de Rendimiento
+          </h2>
+          <span class="badge-new">ACTUALIZADO</span>
+        </div>
+
+        <div class="uil-grid uil-grid-4">
+          <div id="kpi-ingresos"></div>
+          <div id="kpi-pedidos"></div>
+          <div id="kpi-clientes"></div>
+          <div id="kpi-conversion"></div>
+        </div>
+      </section>
+
+      <!-- Sección 2: Ventas por Categoría -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">📈 Análisis de Ventas por Categoría</h2>
+        </div>
+
+        <div class="uil-grid uil-grid-2">
+          <div id="chart-categorias"></div>
+          <div id="chart-tendencia"></div>
+        </div>
+      </section>
+
+      <!-- Sección 3: Gestión de Pedidos -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">📦 Gestión de Pedidos</h2>
+        </div>
+
+        <div class="filters">
+          <div class="filter-group">
+            <label class="filter-label">Estado del Pedido</label>
+            <select id="filter-estado">
+              <option value="">Todos los estados</option>
+              <option value="Pendiente">⏳ Pendiente</option>
+              <option value="Procesando">🔄 Procesando</option>
+              <option value="Enviado">🚚 Enviado</option>
+              <option value="Entregado">✅ Entregado</option>
+              <option value="Cancelado">❌ Cancelado</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label">Método de Pago</label>
+            <select id="filter-pago">
+              <option value="">Todos los métodos</option>
+              <option value="Tarjeta">💳 Tarjeta</option>
+              <option value="PayPal">🅿️ PayPal</option>
+              <option value="Transferencia">🏦 Transferencia</option>
+              <option value="Contrareembolso">💵 Contrareembolso</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="tabla-pedidos"></div>
+      </section>
+
+      <!-- Sección 4: Top Productos -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">🏆 Productos Más Vendidos</h2>
+        </div>
+
+        <div id="tabla-productos-top"></div>
+      </section>
+
+      <!-- Sección 5: Reporte Mensual -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">📄 Informe Mensual</h2>
+        </div>
+
+        <div id="informe-mensual"></div>
+      </section>
+
+    </div>
+
+  </div>
+
+  <script src="uilib.js"></script>
+  <script>
+    // =================================================
+    // DATOS DEL E-COMMERCE
+    // =================================================
+
+    const pedidosData = [
+      { 
+        id: 'PED-2024-1234', 
+        fecha: '2024-11-12', 
+        cliente: 'María González', 
+        email: 'maria@email.com',
+        producto: 'iPhone 15 Pro Max', 
+        cantidad: 1, 
+        total: 1299.00, 
+        estado: 'Entregado',
+        pago: 'Tarjeta'
+      },
+      { 
+        id: 'PED-2024-1235', 
+        fecha: '2024-11-12', 
+        cliente: 'Carlos Ruiz', 
+        email: 'carlos@email.com',
+        producto: 'Samsung Galaxy S24', 
+        cantidad: 2, 
+        total: 1798.00, 
+        estado: 'Enviado',
+        pago: 'PayPal'
+      },
+      { 
+        id: 'PED-2024-1236', 
+        fecha: '2024-11-11', 
+        cliente: 'Ana Martínez', 
+        email: 'ana@email.com',
+        producto: 'MacBook Air M3', 
+        cantidad: 1, 
+        total: 1449.00, 
+        estado: 'Procesando',
+        pago: 'Tarjeta'
+      },
+      { 
+        id: 'PED-2024-1237', 
+        fecha: '2024-11-11', 
+        cliente: 'Pedro López', 
+        email: 'pedro@email.com',
+        producto: 'AirPods Pro 2', 
+        cantidad: 3, 
+        total: 747.00, 
+        estado: 'Pendiente',
+        pago: 'Transferencia'
+      },
+      { 
+        id: 'PED-2024-1238', 
+        fecha: '2024-11-10', 
+        cliente: 'Laura Sánchez', 
+        email: 'laura@email.com',
+        producto: 'iPad Pro 12.9"', 
+        cantidad: 1, 
+        total: 1299.00, 
+        estado: 'Entregado',
+        pago: 'PayPal'
+      },
+      { 
+        id: 'PED-2024-1239', 
+        fecha: '2024-11-10', 
+        cliente: 'Juan Fernández', 
+        email: 'juan@email.com',
+        producto: 'Sony WH-1000XM5', 
+        cantidad: 2, 
+        total: 698.00, 
+        estado: 'Enviado',
+        pago: 'Tarjeta'
+      },
+      { 
+        id: 'PED-2024-1240', 
+        fecha: '2024-11-09', 
+        cliente: 'Isabel Torres', 
+        email: 'isabel@email.com',
+        producto: 'Apple Watch Ultra 2', 
+        cantidad: 1, 
+        total: 899.00, 
+        estado: 'Entregado',
+        pago: 'Contrareembolso'
+      },
+      { 
+        id: 'PED-2024-1241', 
+        fecha: '2024-11-09', 
+        cliente: 'Miguel Romero', 
+        email: 'miguel@email.com',
+        producto: 'Dell XPS 15', 
+        cantidad: 1, 
+        total: 1899.00, 
+        estado: 'Procesando',
+        pago: 'Tarjeta'
+      },
+      { 
+        id: 'PED-2024-1242', 
+        fecha: '2024-11-08', 
+        cliente: 'Carmen Díaz', 
+        email: 'carmen@email.com',
+        producto: 'Nintendo Switch OLED', 
+        cantidad: 2, 
+        total: 698.00, 
+        estado: 'Cancelado',
+        pago: 'PayPal'
+      },
+      { 
+        id: 'PED-2024-1243', 
+        fecha: '2024-11-08', 
+        cliente: 'Francisco Moreno', 
+        email: 'francisco@email.com',
+        producto: 'DJI Mini 4 Pro', 
+        cantidad: 1, 
+        total: 759.00, 
+        estado: 'Entregado',
+        pago: 'Tarjeta'
+      }
+    ];
+
+    const productosTop = [
+      { posicion: 1, producto: 'iPhone 15 Pro Max', categoria: 'Smartphones', ventas: 234, ingresos: 303966.00, stock: 45 },
+      { posicion: 2, producto: 'Samsung Galaxy S24', categoria: 'Smartphones', ventas: 189, ingresos: 169821.00, stock: 67 },
+      { posicion: 3, producto: 'MacBook Air M3', categoria: 'Portátiles', ventas: 156, ingresos: 226044.00, stock: 23 },
+      { posicion: 4, producto: 'AirPods Pro 2', categoria: 'Audio', ventas: 312, ingresos: 77688.00, stock: 124 },
+      { posicion: 5, producto: 'iPad Pro 12.9"', categoria: 'Tablets', ventas: 98, ingresos: 127302.00, stock: 34 },
+      { posicion: 6, producto: 'Sony WH-1000XM5', categoria: 'Audio', ventas: 267, ingresos: 93345.00, stock: 89 },
+      { posicion: 7, producto: 'Apple Watch Ultra 2', categoria: 'Wearables', ventas: 145, ingresos: 130355.00, stock: 56 },
+      { posicion: 8, producto: 'Dell XPS 15', categoria: 'Portátiles', ventas: 78, ingresos: 148122.00, stock: 12 }
+    ];
+
+    // =================================================
+    // COMPONENTES UILIB
+    // =================================================
+
+    // KPIs
+    new UILib.StatsCard('#kpi-ingresos', {
+      label: 'Ingresos Totales',
+      value: '€1,276,643',
+      change: '+23.5',
+      changeType: 'positive',
+      icon: '💰',
+      iconType: 'success'
+    });
+
+    new UILib.StatsCard('#kpi-pedidos', {
+      label: 'Pedidos Realizados',
+      value: '1,894',
+      change: '+18.2',
+      changeType: 'positive',
+      icon: '📦',
+      iconType: 'primary'
+    });
+
+    new UILib.StatsCard('#kpi-clientes', {
+      label: 'Clientes Nuevos',
+      value: '542',
+      change: '+34.7',
+      changeType: 'positive',
+      icon: '👥',
+      iconType: 'info'
+    });
+
+    new UILib.StatsCard('#kpi-conversion', {
+      label: 'Tasa de Conversión',
+      value: '4.82%',
+      change: '+0.8',
+      changeType: 'positive',
+      icon: '🎯',
+      iconType: 'warning'
+    });
+
+    // Gráficos
+    new UILib.BarChart('#chart-categorias', {
+      title: 'Ventas por Categoría (Unidades)',
+      labels: ['Smartphones', 'Portátiles', 'Audio', 'Tablets', 'Wearables'],
+      data: [423, 234, 579, 98, 145],
+      color: '#3b82f6',
+      width: 600,
+      height: 300
+    });
+
+    new UILib.BarChart('#chart-tendencia', {
+      title: 'Tendencia de Ingresos Semanal (€)',
+      labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
+      data: [285000, 312000, 345000, 334643],
+      color: '#16a34a',
+      width: 600,
+      height: 300
+    });
+
+    // Tabla de pedidos con filtros
+    let pedidosFiltrados = [...pedidosData];
+
+    const tablaPedidos = new UILib.DataTable('#tabla-pedidos', {
+      title: 'Pedidos Recientes',
+      columns: [
+        { field: 'id', label: 'ID Pedido', sortable: true },
+        { field: 'fecha', label: 'Fecha', sortable: true },
+        { field: 'cliente', label: 'Cliente' },
+        { field: 'producto', label: 'Producto' },
+        { 
+          field: 'total', 
+          label: 'Total', 
+          sortable: true,
+          render: (val) => `<strong style="color: #16a34a;">€${val.toFixed(2)}</strong>`
+        },
+        {
+          field: 'estado',
+          label: 'Estado',
+          render: (val) => {
+            const colors = {
+              'Pendiente': 'warning',
+              'Procesando': 'info',
+              'Enviado': 'primary',
+              'Entregado': 'success',
+              'Cancelado': 'danger'
+            };
+            const icons = {
+              'Pendiente': '⏳',
+              'Procesando': '🔄',
+              'Enviado': '🚚',
+              'Entregado': '✅',
+              'Cancelado': '❌'
+            };
+            return `<span class="badge badge-${colors[val] || 'secondary'}">${icons[val] || ''} ${val}</span>`;
+          }
+        },
+        {
+          field: 'pago',
+          label: 'Pago',
+          render: (val) => {
+            const icons = {
+              'Tarjeta': '💳',
+              'PayPal': '🅿️',
+              'Transferencia': '🏦',
+              'Contrareembolso': '💵'
+            };
+            return `${icons[val] || ''} ${val}`;
+          }
+        }
+      ],
+      data: pedidosFiltrados,
+      searchable: true,
+      sortable: true,
+      pagination: true,
+      rowsPerPage: 6
+    });
+
+    // Inicializar selects de filtros
+    new UILib.SearchableSelect('#filter-estado', {
+      placeholder: 'Filtrar por estado...',
+      closeOnSelect: true
+    });
+
+    new UILib.SearchableSelect('#filter-pago', {
+      placeholder: 'Filtrar por método de pago...',
+      closeOnSelect: true
+    });
+
+    // Funcionalidad de filtros
+    function aplicarFiltros() {
+      const estadoSeleccionado = document.getElementById('filter-estado').value;
+      const pagoSeleccionado = document.getElementById('filter-pago').value;
+
+      pedidosFiltrados = pedidosData.filter(pedido => {
+        const coincideEstado = !estadoSeleccionado || pedido.estado === estadoSeleccionado;
+        const coincidePago = !pagoSeleccionado || pedido.pago === pagoSeleccionado;
+        return coincideEstado && coincidePago;
+      });
+
+      tablaPedidos.updateData(pedidosFiltrados);
+    }
+
+    document.getElementById('filter-estado').addEventListener('change', aplicarFiltros);
+    document.getElementById('filter-pago').addEventListener('change', aplicarFiltros);
+
+    // Tabla de productos top
+    new UILib.DataTable('#tabla-productos-top', {
+      title: 'Top 8 Productos del Mes',
+      columns: [
+        { 
+          field: 'posicion', 
+          label: '#', 
+          sortable: true,
+          render: (val) => {
+            if (val <= 3) return `<span style="font-size: 1.5rem;">${['🥇', '🥈', '🥉'][val - 1]}</span>`;
+            return `<strong>${val}</strong>`;
+          }
+        },
+        { field: 'producto', label: 'Producto', sortable: true },
+        { field: 'categoria', label: 'Categoría', sortable: true },
+        { field: 'ventas', label: 'Ventas', sortable: true },
+        { 
+          field: 'ingresos', 
+          label: 'Ingresos', 
+          sortable: true,
+          render: (val) => `€${val.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`
+        },
+        {
+          field: 'stock',
+          label: 'Stock',
+          sortable: true,
+          render: (val) => {
+            if (val < 30) return `<span class="badge badge-danger">${val} ⚠️</span>`;
+            if (val < 60) return `<span class="badge badge-warning">${val}</span>`;
+            return `<span class="badge badge-success">${val}</span>`;
+          }
+        }
+      ],
+      data: productosTop,
+      searchable: true,
+      sortable: true,
+      pagination: false
+    });
+
+    // Informe mensual
+    const totalIngresos = pedidosData.reduce((sum, p) => sum + p.total, 0);
+    const pedidosEntregados = pedidosData.filter(p => p.estado === 'Entregado').length;
+    const tasaExito = ((pedidosEntregados / pedidosData.length) * 100).toFixed(1);
+
+    const contenidoInforme = `
+      <div style="margin-bottom: 2rem;">
+        <h4 style="color: #1e3a8a; margin-bottom: 1rem; font-size: 1.25rem;">📊 Resumen del Mes</h4>
+        <p style="color: #64748b; line-height: 1.8;">
+          Durante el mes de noviembre, nuestra tienda online ha experimentado un crecimiento 
+          significativo del <strong style="color: #16a34a;">23.5%</strong> en comparación con el mes anterior. 
+          Los productos más demandados han sido los smartphones y los accesorios de audio, representando 
+          el 65% de las ventas totales.
+        </p>
+      </div>
+
+      <div class="uil-grid uil-grid-3" style="margin-bottom: 2rem;">
+        <div style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); padding: 1.5rem; border-radius: 0.75rem; color: white;">
+          <div style="opacity: 0.9; font-size: 0.875rem; margin-bottom: 0.5rem;">💰 Ingresos del Mes</div>
+          <div style="font-size: 2rem; font-weight: 700;">€${totalIngresos.toLocaleString('es-ES', { minimumFractionDigits: 2 })}</div>
+        </div>
+        <div style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); padding: 1.5rem; border-radius: 0.75rem; color: white;">
+          <div style="opacity: 0.9; font-size: 0.875rem; margin-bottom: 0.5rem;">📦 Pedidos Procesados</div>
+          <div style="font-size: 2rem; font-weight: 700;">${pedidosData.length}</div>
+        </div>
+        <div style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%); padding: 1.5rem; border-radius: 0.75rem; color: white;">
+          <div style="opacity: 0.9; font-size: 0.875rem; margin-bottom: 0.5rem;">✅ Tasa de Éxito</div>
+          <div style="font-size: 2rem; font-weight: 700;">${tasaExito}%</div>
+        </div>
+      </div>
+
+      <div style="background: #f8fafc; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem;">
+        <h5 style="color: #1e3a8a; margin-bottom: 1rem;">🎯 Objetivos Alcanzados</h5>
+        <div style="display: grid; gap: 0.75rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: #16a34a; font-size: 1.25rem;">✓</span>
+            <span style="color: #64748b;">Superar €1M en ventas mensuales</span>
+            <strong style="color: #16a34a; margin-left: auto;">€${totalIngresos.toLocaleString('es-ES')}</strong>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: #16a34a; font-size: 1.25rem;">✓</span>
+            <span style="color: #64748b;">Alcanzar 1,500 pedidos</span>
+            <strong style="color: #16a34a; margin-left: auto;">${pedidosData.length} pedidos</strong>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: #16a34a; font-size: 1.25rem;">✓</span>
+            <span style="color: #64748b;">Mantener tasa de conversión >4%</span>
+            <strong style="color: #16a34a; margin-left: auto;">4.82%</strong>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: #16a34a; font-size: 1.25rem;">✓</span>
+            <span style="color: #64748b;">Incorporar 500+ nuevos clientes</span>
+            <strong style="color: #16a34a; margin-left: auto;">542 clientes</strong>
+          </div>
+        </div>
+      </div>
+
+      <div style="background: #ecfdf5; border-left: 4px solid #16a34a; padding: 1.5rem; border-radius: 0.5rem;">
+        <h5 style="color: #065f46; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span>💡</span>
+          <span>Recomendaciones para el Próximo Mes</span>
+        </h5>
+        <ul style="color: #064e3b; line-height: 2; margin-left: 1.25rem;">
+          <li>Aumentar el stock de productos estrella (iPhone 15 Pro, AirPods Pro)</li>
+          <li>Implementar promociones en la categoría de portátiles</li>
+          <li>Mejorar la logística para reducir tiempos de envío</li>
+          <li>Ampliar el catálogo de wearables y accesorios</li>
+        </ul>
+      </div>
+    `;
+
+    new UILib.ReportPanel('#informe-mensual', {
+      title: 'Informe Mensual de Noviembre 2024',
+      subtitle: 'Análisis completo de ventas, pedidos y rendimiento',
+      content: contenidoInforme,
+      footer: 'Generado automáticamente el 12 de noviembre de 2025 | E-Commerce Analytics Dashboard'
+    });
+
+    console.log('✨ E-Commerce Dashboard cargado correctamente');
+    console.log('📦 UILib v1.0 - Proyecto completamente funcional');
+  </script>
+</body>
+</html>

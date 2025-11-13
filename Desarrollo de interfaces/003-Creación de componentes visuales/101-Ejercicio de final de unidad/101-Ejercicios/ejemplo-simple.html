@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Primera Página con UILib - 2 Minutos</title>
+  
+  <!-- PASO 1: Cargar UILib -->
+  <link rel="stylesheet" href="uilib.css">
+  
+  <style>
+    body {
+      padding: 2rem;
+      background: #f8fafc;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #2563eb;
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎉 Mi Primera Página con UILib</h1>
+    
+    <!-- PASO 2: Crear contenedores -->
+    <div class="uil-grid uil-grid-3" style="margin-bottom: 2rem;">
+      <div id="stat1"></div>
+      <div id="stat2"></div>
+      <div id="stat3"></div>
+    </div>
+
+    <div id="tabla" style="margin-bottom: 2rem;"></div>
+
+    <div id="grafico"></div>
+  </div>
+
+  <!-- PASO 3: Cargar JavaScript -->
+  <script src="uilib.js"></script>
+  
+  <!-- PASO 4: Inicializar componentes -->
+  <script>
+    // ¡Solo esto necesitas! 🚀
+
+    // Stats Cards
+    new UILib.StatsCard('#stat1', {
+      label: 'Usuarios',
+      value: '1,234',
+      icon: '👥',
+      iconType: 'primary'
+    });
+
+    new UILib.StatsCard('#stat2', {
+      label: 'Ventas',
+      value: '€45,678',
+      change: '+12.5',
+      changeType: 'positive',
+      icon: '💰',
+      iconType: 'success'
+    });
+
+    new UILib.StatsCard('#stat3', {
+      label: 'Productos',
+      value: '89',
+      icon: '📦',
+      iconType: 'warning'
+    });
+
+    // Tabla de datos
+    new UILib.DataTable('#tabla', {
+      title: 'Mi Primera Tabla',
+      columns: [
+        { field: 'id', label: 'ID', sortable: true },
+        { field: 'nombre', label: 'Nombre', sortable: true },
+        { field: 'ciudad', label: 'Ciudad' },
+        { field: 'edad', label: 'Edad', sortable: true }
+      ],
+      data: [
+        { id: 1, nombre: 'Ana García', ciudad: 'Madrid', edad: 28 },
+        { id: 2, nombre: 'Carlos López', ciudad: 'Barcelona', edad: 35 },
+        { id: 3, nombre: 'María Fernández', ciudad: 'Valencia', edad: 31 },
+        { id: 4, nombre: 'Juan Martínez', ciudad: 'Sevilla', edad: 42 },
+        { id: 5, nombre: 'Laura Sánchez', ciudad: 'Bilbao', edad: 26 }
+      ],
+      rowsPerPage: 3
+    });
+
+    // Gráfico
+    new UILib.BarChart('#grafico', {
+      title: 'Mi Primer Gráfico',
+      labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May'],
+      data: [65, 78, 90, 81, 95],
+      color: '#2563eb',
+      width: 800,
+      height: 300
+    });
+
+    console.log('✨ ¡Todo funcionando! Eso ha sido fácil, ¿verdad?');
+  </script>
+</body>
+</html>
