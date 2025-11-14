@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Edición</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Prueba de Funcionalidad de Edición</h1>
+    
+    <div class="test-section">
+        <h2>Prueba de API - Obtener Cliente por ID</h2>
+        <button onclick="testGetCliente(1)">Obtener Cliente ID 1</button>
+        <div id="cliente-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Prueba de API - Obtener Producto por ID</h2>
+        <button onclick="testGetProducto(1)">Obtener Producto ID 1</button>
+        <div id="producto-result"></div>
+    </div>
+    
+    <script>
+        async function testGetCliente(id) {
+            try {
+                const token = localStorage.getItem('erp_token');
+                if (!token) {
+                    document.getElementById('cliente-result').innerHTML = '<p class="error">No hay token. Debes hacer login primero.</p>';
+                    return;
+                }
+                
+                const response = await fetch(`../backend/api/clientes.php?id=${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('cliente-result').innerHTML = `
+                        <p class="success">✅ Cliente encontrado:</p>
+                        <pre>${JSON.stringify(data.cliente, null, 2)}</pre>
+                    `;
+                } else {
+                    document.getElementById('cliente-result').innerHTML = `
+                        <p class="error">❌ Error: ${data.message}</p>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('cliente-result').innerHTML = `
+                    <p class="error">❌ Error de conexión: ${error.message}</p>
+                `;
+            }
+        }
+        
+        async function testGetProducto(id) {
+            try {
+                const token = localStorage.getItem('erp_token');
+                if (!token) {
+                    document.getElementById('producto-result').innerHTML = '<p class="error">No hay token. Debes hacer login primero.</p>';
+                    return;
+                }
+                
+                const response = await fetch(`../backend/api/productos.php?id=${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('producto-result').innerHTML = `
+                        <p class="success">✅ Producto encontrado:</p>
+                        <pre>${JSON.stringify(data.producto, null, 2)}</pre>
+                    `;
+                } else {
+                    document.getElementById('producto-result').innerHTML = `
+                        <p class="error">❌ Error: ${data.message}</p>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('producto-result').innerHTML = `
+                    <p class="error">❌ Error de conexión: ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

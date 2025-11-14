@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema ERP - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>Sistema ERP</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#dashboard" class="menu-item active" data-section="dashboard">Dashboard</a></li>
+                <li><a href="#clientes" class="menu-item" data-section="clientes">Clientes</a></li>
+                <li><a href="#productos" class="menu-item" data-section="productos">Productos</a></li>
+                <li><a href="#ventas" class="menu-item" data-section="ventas">Ventas</a></li>
+                <li><a href="#inventario" class="menu-item" data-section="inventario">Inventario</a></li>
+                <li><a href="#reportes" class="menu-item" data-section="reportes">Reportes</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <button id="logout" class="btn-logout">Cerrar Sesión</button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <header class="topbar">
+                <h1 id="page-title">Dashboard</h1>
+                <div class="user-info">
+                    <span id="username-display">Administrador</span>
+                </div>
+            </header>
+
+            <main class="content">
+                <!-- Dashboard Section -->
+                <section id="dashboard-section" class="content-section active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Total Clientes</h3>
+                            <p class="stat-number" id="total-clientes">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Productos</h3>
+                            <p class="stat-number" id="total-productos">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Ventas del Mes</h3>
+                            <p class="stat-number" id="ventas-mes">€0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Stock Bajo</h3>
+                            <p class="stat-number" id="stock-bajo">0</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Clientes Section -->
+                <section id="clientes-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Gestión de Clientes</h2>
+                        <button class="btn-primary" id="add-cliente">Añadir Cliente</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="clientes-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Teléfono</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clientes-tbody">
+                                <!-- Los datos se cargarán dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Productos Section -->
+                <section id="productos-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Gestión de Productos</h2>
+                        <button class="btn-primary" id="add-producto">Añadir Producto</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="productos-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productos-tbody">
+                                <!-- Los datos se cargarán dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Ventas Section -->
+                <section id="ventas-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Gestión de Ventas</h2>
+                        <button class="btn-primary" id="nueva-venta">Nueva Venta</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="ventas-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cliente</th>
+                                    <th>Fecha</th>
+                                    <th>Total</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ventas-tbody">
+                                <!-- Los datos se cargarán dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Inventario Section -->
+                <section id="inventario-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Control de Inventario</h2>
+                    </div>
+                    <div class="inventory-alerts">
+                        <div class="alert-box">
+                            <h3>Productos con Stock Bajo</h3>
+                            <div id="low-stock-products">
+                                <!-- Se cargarán dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Reportes Section -->
+                <section id="reportes-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Reportes</h2>
+                    </div>
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <h3>Ventas por Mes</h3>
+                            <button class="btn-secondary">Generar</button>
+                        </div>
+                        <div class="report-card">
+                            <h3>Productos Más Vendidos</h3>
+                            <button class="btn-secondary">Generar</button>
+                        </div>
+                        <div class="report-card">
+                            <h3>Estado de Inventario</h3>
+                            <button class="btn-secondary">Generar</button>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal para formularios -->
+    <div id="modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modal-body">
+                <!-- El contenido del modal se cargará dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
