@@ -1,4 +1,4 @@
-/* Sistema ERP-CRM - Estilos CSS */
+/* Sistema de Gestión de Gimnasio - Estilos CSS */
 /* Desarrollo de Interfaces - Diseño responsive y profesional */
 
 * {
@@ -8,14 +8,16 @@
 }
 
 :root {
-    --primary-color: #2563eb;
+    --primary-color: #8b5cf6;
     --secondary-color: #64748b;
     --success-color: #10b981;
     --warning-color: #f59e0b;
     --danger-color: #ef4444;
+    --info-color: #3b82f6;
     --dark-color: #1e293b;
     --light-color: #f8fafc;
     --border-color: #e2e8f0;
+    --purple-color: #8b5cf6;
     --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
     --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.1);
     --transition: all 0.3s ease;
@@ -30,7 +32,7 @@ body {
 
 /* Header */
 .header {
-    background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
     color: white;
     padding: 1rem 2rem;
     box-shadow: var(--shadow-medium);
@@ -108,7 +110,7 @@ body {
 }
 
 .nav-link.active {
-    background-color: rgba(37, 99, 235, 0.1);
+    background-color: rgba(139, 92, 246, 0.1);
     color: var(--primary-color);
     border-left-color: var(--primary-color);
     font-weight: 600;
@@ -177,7 +179,7 @@ body {
 }
 
 .btn-primary:hover {
-    background-color: #1d4ed8;
+    background-color: #7c3aed;
     transform: translateY(-1px);
 }
 
@@ -297,7 +299,7 @@ body {
 }
 
 .data-table tbody tr:hover {
-    background-color: rgba(37, 99, 235, 0.05);
+    background-color: rgba(139, 92, 246, 0.05);
 }
 
 /* Alerts */
@@ -412,7 +414,7 @@ body {
 .form-input:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
 }
 
 .form-select {
@@ -547,4 +549,182 @@ body {
     to {
         transform: rotate(360deg);
     }
+}
+
+/* Estilos específicos para Gestión de Gimnasio */
+
+.badge-purple {
+    background-color: var(--purple-color);
+    color: white;
+}
+
+.badge-info {
+    background-color: var(--info-color);
+    color: white;
+}
+
+/* Detalles de entrenadores */
+.detalle-entrenador h4,
+.detalle-socio h4,
+.detalle-membresia h4 {
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Reportes de informes */
+.loading {
+    text-align: center;
+    color: var(--secondary-color);
+    font-style: italic;
+}
+
+/* Alertas del sistema */
+.alert {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.alert i {
+    font-size: 1.25rem;
+}
+
+.alert-info {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border-left: 4px solid var(--info-color);
+}
+
+.alert-success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border-left: 4px solid var(--success-color);
+}
+
+.alert-warning {
+    background-color: #fef3c7;
+    color: #92400e;
+    border-left: 4px solid var(--warning-color);
+}
+
+/* Tablas específicas de gimnasio */
+#tabla-clases tbody tr td:nth-child(8) {
+    font-weight: 600;
+}
+
+/* Mejoras de accesibilidad */
+button:focus,
+.btn:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Animación suave para carga de contenido */
+.content-section.active {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Clases de utilidad */
+.text-center {
+    text-align: center;
+}
+
+.text-success {
+    color: var(--success-color) !important;
+}
+
+.text-danger {
+    color: var(--danger-color) !important;
+}
+
+.text-warning {
+    color: var(--warning-color) !important;
+}
+
+.text-info {
+    color: var(--info-color) !important;
+}
+
+.text-secondary {
+    color: var(--secondary-color) !important;
+}
+
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 2rem; }
+
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mt-4 { margin-top: 2rem; }
+
+/* Clases de visualización */
+.d-none {
+    display: none !important;
+}
+
+.d-flex {
+    display: flex !important;
+}
+
+.justify-content-between {
+    justify-content: space-between !important;
+}
+
+.align-items-center {
+    align-items: center !important;
+}
+
+.gap-1 { gap: 0.5rem; }
+.gap-2 { gap: 1rem; }
+.gap-3 { gap: 1.5rem; }
+
+/* Estado de carga */
+.loading {
+    text-align: center;
+    color: var(--secondary-color);
+    font-style: italic;
+    padding: 2rem;
+}
+
+/* Mensajes de estado */
+.no-data {
+    text-align: center;
+    padding: 3rem;
+    color: var(--secondary-color);
+}
+
+.no-data i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+/* Mejora visual para tablas vacías */
+.data-table tbody tr.empty-row td {
+    text-align: center;
+    padding: 3rem;
+    color: var(--secondary-color);
+    font-style: italic;
 }
