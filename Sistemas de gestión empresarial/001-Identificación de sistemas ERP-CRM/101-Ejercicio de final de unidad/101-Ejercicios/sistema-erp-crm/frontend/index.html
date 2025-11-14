@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema ERP-CRM Empresarial</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-building"></i>
+                <span>ERP-CRM Sistema</span>
+            </div>
+            <div class="user-info">
+                <span id="usuario-logueado">Bienvenido, Usuario</span>
+                <button id="btn-logout" class="btn btn-outline">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegación -->
+    <nav class="sidebar">
+        <ul class="nav-menu">
+            <li><a href="#dashboard" class="nav-link active" data-section="dashboard">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a></li>
+            <li><a href="#clientes" class="nav-link" data-section="clientes">
+                <i class="fas fa-users"></i> Clientes (CRM)
+            </a></li>
+            <li><a href="#productos" class="nav-link" data-section="productos">
+                <i class="fas fa-box"></i> Productos (ERP)
+            </a></li>
+            <li><a href="#ventas" class="nav-link" data-section="ventas">
+                <i class="fas fa-shopping-cart"></i> Ventas
+            </a></li>
+            <li><a href="#informes" class="nav-link" data-section="informes">
+                <i class="fas fa-chart-bar"></i> Informes
+            </a></li>
+        </ul>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        <!-- Dashboard -->
+        <section id="dashboard" class="content-section active">
+            <div class="section-header">
+                <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+                <p>Resumen ejecutivo del sistema ERP-CRM</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon bg-blue">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-clientes">0</h3>
+                        <p>Clientes Registrados</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon bg-green">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-productos">0</h3>
+                        <p>Productos en Catálogo</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon bg-orange">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-ventas">0</h3>
+                        <p>Ventas Realizadas</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon bg-purple">
+                        <i class="fas fa-euro-sign"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="total-ingresos">0€</h3>
+                        <p>Ingresos Totales</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-charts">
+                <div class="chart-container">
+                    <h3>Alertas del Sistema</h3>
+                    <div id="alertas-sistema">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Productos con stock bajo detectados</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Clientes CRM -->
+        <section id="clientes" class="content-section">
+            <div class="section-header">
+                <h1><i class="fas fa-users"></i> Gestión de Clientes (CRM)</h1>
+                <button class="btn btn-primary" onclick="mostrarFormularioCliente()">
+                    <i class="fas fa-plus"></i> Nuevo Cliente
+                </button>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre Completo</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Ciudad</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-clientes">
+                        <!-- Datos cargados dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Productos ERP -->
+        <section id="productos" class="content-section">
+            <div class="section-header">
+                <h1><i class="fas fa-box"></i> Gestión de Productos (ERP)</h1>
+                <button class="btn btn-primary" onclick="mostrarFormularioProducto()">
+                    <i class="fas fa-plus"></i> Nuevo Producto
+                </button>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Estado Stock</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-productos">
+                        <!-- Datos cargados dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Ventas -->
+        <section id="ventas" class="content-section">
+            <div class="section-header">
+                <h1><i class="fas fa-shopping-cart"></i> Gestión de Ventas</h1>
+                <button class="btn btn-primary" onclick="mostrarFormularioVenta()">
+                    <i class="fas fa-plus"></i> Nueva Venta
+                </button>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-ventas">
+                        <!-- Datos cargados dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Informes -->
+        <section id="informes" class="content-section">
+            <div class="section-header">
+                <h1><i class="fas fa-chart-bar"></i> Informes y Analíticas</h1>
+                <p>Reportes del sistema ERP-CRM</p>
+            </div>
+            
+            <div class="reports-grid">
+                <div class="report-card">
+                    <h3>Ventas por Mes</h3>
+                    <div id="reporte-ventas-mes"></div>
+                    <button class="btn btn-outline" onclick="generarReporteVentas()">
+                        <i class="fas fa-refresh"></i> Actualizar
+                    </button>
+                </div>
+                
+                <div class="report-card">
+                    <h3>Productos con Stock Bajo</h3>
+                    <div id="reporte-stock-bajo"></div>
+                    <button class="btn btn-outline" onclick="generarReporteStock()">
+                        <i class="fas fa-refresh"></i> Actualizar
+                    </button>
+                </div>
+                
+                <div class="report-card">
+                    <h3>Top Clientes</h3>
+                    <div id="reporte-top-clientes"></div>
+                    <button class="btn btn-outline" onclick="generarReporteClientes()">
+                        <i class="fas fa-refresh"></i> Actualizar
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal para formularios -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modal-title">Título</h2>
+                <button class="modal-close" onclick="cerrarModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

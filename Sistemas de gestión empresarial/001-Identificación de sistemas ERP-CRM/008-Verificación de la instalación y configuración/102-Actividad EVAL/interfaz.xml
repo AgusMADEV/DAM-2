@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<formulario>
+  <campotexto nombre="nombre_jugador"></campotexto>
+  <campotexto nombre="equipo"></campotexto>
+  <campotexto nombre="posicion"></campotexto>
+  <areadetexto nombre="estadisticas"></areadetexto>
+</formulario>

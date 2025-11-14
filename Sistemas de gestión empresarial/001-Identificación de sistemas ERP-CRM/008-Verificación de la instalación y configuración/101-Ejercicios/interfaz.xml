@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<formulario>
-  <campotexto nombre="nombre"></campotexto>
-  <campotexto nombre="apellidos"></campotexto>
-  <campotexto nombre="email"></campotexto>
-  <campotexto nombre="direccion"></campotexto>
-  <campotexto nombre="pais"></campotexto>
-  <areadetexto nombre="mensaje"></areadetexto>
-</formulario>
