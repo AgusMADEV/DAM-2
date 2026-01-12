@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Demo jocarsa|video</title>
+    <link rel="stylesheet" href="jocarsa-video.css">
+  </head>
+  <body>
+    <!--
+      data-jocarsa-video activa la librería.
+      data-renditions es opcional: JSON con { renditions:[ {filename, label}, ... ] }
+    -->
+    <div data-jocarsa-video data-renditions="video/renditions.json">
+      <video src="video/entrevista.mp4"></video>
+    </div>
+
+    <script src="jocarsa-video.js"></script>
+    <script>
+      // Opcional: inicializar manualmente un contenedor concreto
+      // window["jocarsa|video"].init(document.querySelector("[data-jocarsa-video]"));
+    </script>
+  </body>
+</html>
+

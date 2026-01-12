@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Videos</title>
+    <style>
+        #video-container {
+            width: 800px;
+            height: 500px;
+            position: relative;
+            margin: auto;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="video-container">
+        <video id="myVideo" controls></video>
+        <div class="controls">
+            <button id="load1080">1080p</button>
+            <button id="load720">720p</button>
+            <button id="load480">480p</button>
+            <button id="load360">360p</button>
+            <button id="load240">240p</button>
+            <button id="load144">144p</button>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('myVideo');
+        const buttons = document.querySelectorAll('.controls button');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                switch (button.id) {
+                    case 'load1080':
+                        video.src = '../101-Ejercicios/video/video_1080p.mp4';
+                        break;
+                    case 'load720':
+                        video.src = '../101-Ejercicios/video/video_720p.mp4';
+                        break;
+                    case 'load480':
+                        video.src = '../101-Ejercicios/video/video_480p.mp4';
+                        break;
+                    case 'load360':
+                        video.src = '../101-Ejercicios/video/video_360p.mp4';
+                        break;
+                    case 'load240':
+                        video.src = '../101-Ejercicios/video/video_240p.mp4';
+                        break;
+                    case 'load144':
+                        video.src = '../101-Ejercicios/video/video_144p.mp4';
+                        break;
+                }
+                video.load();
+                video.play();
+            });
+        });
+    </script>
+</body>
+</html>

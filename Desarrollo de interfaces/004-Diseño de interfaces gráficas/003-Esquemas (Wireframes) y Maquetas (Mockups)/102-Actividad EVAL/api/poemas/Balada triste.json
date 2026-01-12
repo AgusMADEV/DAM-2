@@ -1,0 +1,49 @@
+{
+  "poema": {
+    "titulo": "Balada triste",
+    "autor": "Federico García Lorca",
+    "libro": "Libro de Poemas",
+    "año": 1921,
+    "estilo": "Modernismo",
+    "estrofas": [
+      {
+        "numero": 1,
+        "versos": [
+          "Mi corazón es una mariposa,",
+          "niños buenos del prado,",
+          "que presa en una red de oro,",
+          "agoniza mirando al sol."
+        ]
+      },
+      {
+        "numero": 2,
+        "versos": [
+          "¡Dejarla libre!",
+          "¡Segadores de mi huerto!",
+          "Y que las alas de colores",
+          "de mi mariposa se pierdan por el aire."
+        ]
+      },
+      {
+        "numero": 3,
+        "versos": [
+          "Soy un muchacho campesino,",
+          "dulce amigo Pastor,",
+          "y callo mis penas",
+          "por que penas tengo."
+        ]
+      },
+      {
+        "numero": 4,
+        "versos": [
+          "Pero a veces, las penas cantan",
+          "y hay que dejarlas",
+          "para que lloren un poco",
+          "y se duerman entre las rosas."
+        ]
+      }
+    ],
+    "temas": ["Tristeza", "Libertad", "Naturaleza", "Melancolía", "Juventud"],
+    "simbolos": ["mariposa", "red de oro", "sol", "alas de colores", "rosas"]
+  }
+}

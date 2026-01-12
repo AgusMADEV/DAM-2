@@ -1,0 +1,67 @@
+{
+  "poema": {
+    "titulo": "Romance sonámbulo",
+    "autor": "Federico García Lorca",
+    "libro": "Romancero Gitano",
+    "año": 1928,
+    "estilo": "Neopopularismo",
+    "estrofas": [
+      {
+        "numero": 1,
+        "versos": [
+          "Verde que te quiero verde.",
+          "Verde viento. Verdes ramas.",
+          "El barco sobre la mar",
+          "y el caballo en la montaña."
+        ]
+      },
+      {
+        "numero": 2,
+        "versos": [
+          "Con la sombra en la cintura",
+          "ella sueña en su baranda,",
+          "verde carne, pelo verde,",
+          "con ojos de fría plata."
+        ]
+      },
+      {
+        "numero": 3,
+        "versos": [
+          "Verde que te quiero verde.",
+          "Bajo la luna gitana,",
+          "las cosas la están mirando",
+          "y ella no puede mirarlas."
+        ]
+      },
+      {
+        "numero": 4,
+        "versos": [
+          "Verde que te quiero verde.",
+          "Grandes estrellas de escarcha",
+          "vienen con el pez de sombra",
+          "que abre el camino del alba."
+        ]
+      },
+      {
+        "numero": 5,
+        "versos": [
+          "La higuera frota su viento",
+          "con la lija de sus ramas,",
+          "y el monte, gato garduño,",
+          "eriza sus pitas agrias."
+        ]
+      },
+      {
+        "numero": 6,
+        "versos": [
+          "¿Pero quién vendrá? ¿Y por dónde...?",
+          "Ella sigue en su baranda,",
+          "verde carne, pelo verde,",
+          "soñando en la mar amarga."
+        ]
+      }
+    ],
+    "temas": ["Amor imposible", "Muerte", "Esperanza frustrada", "Sueño", "Color verde"],
+    "simbolos": ["verde", "luna gitana", "barco", "baranda", "escarcha"]
+  }
+}

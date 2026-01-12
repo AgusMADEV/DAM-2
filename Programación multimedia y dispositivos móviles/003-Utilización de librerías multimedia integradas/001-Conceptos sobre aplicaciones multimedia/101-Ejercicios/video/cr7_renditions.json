@@ -1,0 +1,43 @@
+{
+  "input_file": "D:\\xampp\\htdocs\\DAM-2\\Programación multimedia y dispositivos móviles\\003-Utilización de librerías multimedia integradas\\001-Conceptos sobre aplicaciones multimedia\\101-Ejercicios\\video\\cr7.mp4",
+  "source_width": 1920,
+  "source_height": 1080,
+  "renditions": [
+    {
+      "label": "1080p",
+      "width": 1920,
+      "height": 1080,
+      "filename": "video_1080p.mp4"
+    },
+    {
+      "label": "720p",
+      "width": 1280,
+      "height": 720,
+      "filename": "video_720p.mp4"
+    },
+    {
+      "label": "480p",
+      "width": 854,
+      "height": 480,
+      "filename": "video_480p.mp4"
+    },
+    {
+      "label": "360p",
+      "width": 640,
+      "height": 360,
+      "filename": "video_360p.mp4"
+    },
+    {
+      "label": "240p",
+      "width": 426,
+      "height": 240,
+      "filename": "video_240p.mp4"
+    },
+    {
+      "label": "144p",
+      "width": 256,
+      "height": 144,
+      "filename": "video_144p.mp4"
+    }
+  ]
+}

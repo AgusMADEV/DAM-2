@@ -1,0 +1,85 @@
+{
+  "poema": {
+    "titulo": "Canción otoñal",
+    "autor": "Federico García Lorca",
+    "libro": "Libro de Poemas",
+    "año": 1921,
+    "estilo": "Modernismo",
+    "estrofas": [
+      {
+        "numero": 1,
+        "versos": [
+          "¡Cómo canta la zumaya,",
+          "ay, cómo canta en el árbol!",
+          "Por el cielo va la luna",
+          "con un niño de la mano."
+        ]
+      },
+      {
+        "numero": 2,
+        "versos": [
+          "Dentro de la fragua lloran,",
+          "dando gritos, los gitanos.",
+          "El viento, señor del viento,",
+          "vestido de azul se para."
+        ]
+      },
+      {
+        "numero": 3,
+        "versos": [
+          "¡Cómo canta la zumaya,",
+          "ay, cómo canta en el árbol!",
+          "Por el río van las hojas",
+          "muertas de mi corazón."
+        ]
+      },
+      {
+        "numero": 4,
+        "versos": [
+          "Llevan oro en la galera,",
+          "los remos plata de luna.",
+          "Y en la popa van llorando",
+          "todas las estrellas rubias."
+        ]
+      },
+      {
+        "numero": 5,
+        "versos": [
+          "¡Cómo canta la zumaya,",
+          "ay, cómo canta en el árbol!",
+          "La noche deja un arroyo",
+          "temblor de plata en los campos."
+        ]
+      },
+      {
+        "numero": 6,
+        "versos": [
+          "Las almas de los que mueren,",
+          "van hilando el hilo a hilo.",
+          "¡Ay de mi amor, ay de mi!",
+          "¡Qué lejos se va la vida!"
+        ]
+      },
+      {
+        "numero": 7,
+        "versos": [
+          "¡Cómo canta la zumaya,",
+          "ay, cómo canta en el árbol!",
+          "Mañana me pondré triste,",
+          "pero esta noche ¡qué alegre!"
+        ]
+      },
+      {
+        "numero": 8,
+        "versos": [
+          "Esta noche tú y yo, amor,",
+          "en la cumbre del tejado.",
+          "Dejaré mi cuerpo al viento,",
+          "¡con un clavel en la mano!"
+        ]
+      }
+    ],
+    "temas": ["Otoño", "Amor", "Muerte", "Naturaleza", "Melancolía"],
+    "simbolos": ["zumaya", "luna", "viento", "hojas muertas", "noche"]
+  }
+}

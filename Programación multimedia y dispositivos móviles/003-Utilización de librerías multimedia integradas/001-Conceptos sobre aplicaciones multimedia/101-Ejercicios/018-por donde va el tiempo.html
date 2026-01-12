@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      #contenedorvideo video{
+        border-radius:10px;
+        width:100%;
+        height:100%;
+      }
+      #contenedorvideo{
+        display:flex;
+        position:relative;
+        width:800px;
+        height:500px;
+        justify-content: center;
+        align-items: center;
+      }
+      #contenedorvideo video{
+        position:absolute;
+        top:0px;
+        left:0px;
+      }
+      #contenedorvideo #controlesvideo{
+        position:absolute;
+        padding:20px;
+        background:rgba(0,0,0,0.5);
+        border-radius:40px;
+        backdrop-filter:blur(5px);
+        opacity:1;
+        transition:all 1s;
+        display:flex;
+        gap:10px;
+        align-items:center;
+      }
+      #contenedorvideo #controlesvideo:hover{
+        opacity:1;
+      }
+      #contenedorvideo #controlesvideo button{
+        width:30px;
+        height:30px;
+        border:none;
+        background:white;
+        color:black;
+        text-align:center;
+        border-radius:40px;
+        padding:1px;
+        cursor:pointer;
+      }
+      #contenedorvideo #controlesvideo select{
+        height:30px;
+        border:none;
+        background:white;
+        color:black;
+        text-align:center;
+        border-radius:40px;
+        padding:1px 8px;
+      }
+      #contenedorvideo #controlesvideo input[type="range"]{
+        width:120px;
+      }
+      #tiempo{
+        margin-top:10px;
+        font-family:monospace;
+        color:white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="contenedorvideo">
+      <video src="entrevista.mp4"></video>
+      <div id="controlesvideo">
+        <button id="rebobinar">
+          <svg width="30" height="30" viewBox="0 0 8 8" fill="currentColor">
+            <path d="M1 1v6"/>
+            <path d="M7 1L3.5 4 7 7z"/>
+            <path d="M4.5 1L1 4l3.5 3z"/>
+          </svg>
+        </button>
+
+        <button id="menosdiez">
+          <svg width="30" height="30" viewBox="0 0 8 8" fill="currentColor">
+            <path d="M7 1L3.5 4 7 7z"/>
+            <path d="M4.5 1L1 4l3.5 3z"/>
+          </svg>
+        </button>
+
+        <button id="reproducir">
+          <svg width="30" height="30" viewBox="0 0 7.9375 7.9375">
+            <path d="M2.0150083 2.0150083V5.9224916L5.9224916 3.908733Z" />
+          </svg>
+        </button>
+
+        <button id="parar">
+          <svg width="30" height="30" viewBox="0 0 8 8" fill="currentColor">
+            <rect x="2" y="2" width="4" height="4" />
+          </svg>
+        </button>
+
+        <button id="masdiez">
+          <svg width="30" height="30" viewBox="0 0 8 8" fill="currentColor">
+            <path d="M1 1l3.5 3L1 7z"/>
+            <path d="M3.5 1l3.5 3-3.5 3z"/>
+          </svg>
+        </button>
+
+        <!-- Volumen dentro de controles -->
+        <input id="volumen" type="range" min="0" max="1" step="0.01">
+<div id="tiempo"></div>
+        <!-- Select de resoluciones dentro de controles -->
+        <select id="resoluciones"></select>
+      </div>
+    </div>
+
+    
+
+    <script>
+      let video = document.querySelector("video");
+      let botones = document.querySelectorAll("button");
+      let volumen = document.querySelector("#volumen");
+      let selector = document.querySelector("#resoluciones");
+      let divTiempo = document.querySelector("#tiempo");
+
+      // Inicializar volumen
+      volumen.value = video.volume;
+
+      botones.forEach(function(boton){
+        boton.onclick = function(){
+          switch(this.getAttribute("id")){
+            case "rebobinar":
+              video.currentTime = 0;
+              break;
+            case "menosdiez":
+              video.currentTime -= 10;
+              break;
+            case "reproducir":
+              video.play();
+              break;
+            case "parar":
+              video.pause();
+              break;
+            case "masdiez":
+              video.currentTime += 10;
+              break;
+          }
+        }
+      });
+
+      volumen.oninput = function(){
+        video.volume = this.value;
+      };
+
+      fetch("video/renditions.json")
+      .then(function(response){return response.json()})
+      .then(function(datos){
+        console.log(datos);
+        datos.renditions.forEach(function(dato){
+          let opcion = document.createElement("option");
+          opcion.value = dato.filename;
+          opcion.textContent = dato.label;
+          selector.appendChild(opcion);
+        });
+        selector.onchange = function(){
+          let tiempoactual = video.currentTime;
+          video.src= "video/"+this.value;
+          video.currentTime = tiempoactual;
+          video.play();
+        };
+      });
+
+      // Actualizar tiempo cada segundo mientras está reproduciendo
+      let temporizador = null;
+
+      function formateaTiempo(segundosTotales){
+        let s = Math.floor(segundosTotales);
+        let minutos = Math.floor(s / 60).toString().padStart(2, "0");
+        let segundos = (s % 60).toString().padStart(2, "0");
+        return minutos + ":" + segundos;
+      }
+
+      function arrancarTemporizador(){
+        if (temporizador !== null) return;
+        temporizador = setInterval(function(){
+          divTiempo.textContent = formateaTiempo(video.currentTime);
+          // Aquí podrías hacer cualquier otra cosa "cada segundo"
+          // console.log("Segundo actual:", Math.floor(video.currentTime));
+        }, 1000);
+      }
+
+      function pararTemporizador(){
+        if (temporizador !== null){
+          clearInterval(temporizador);
+          temporizador = null;
+        }
+      }
+
+      video.addEventListener("play", arrancarTemporizador);
+      video.addEventListener("pause", pararTemporizador);
+      video.addEventListener("ended", pararTemporizador);
+
+      // Mostrar 00:00 al inicio
+      divTiempo.textContent = "00:00";
+    </script>
+  </body>
+</html>
+

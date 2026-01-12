@@ -1,0 +1,99 @@
+/* jocarsa-video.css */
+/* Contenedor principal */
+[data-jocarsa-video].jocarsa-video {
+  display: flex;
+  position: relative;
+  max-width: 800px;
+  aspect-ratio: 16 / 10;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Vídeo */
+.jocarsa-video__video {
+  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+}
+
+/* Controles */
+.jocarsa-video__controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 40px;
+  backdrop-filter: blur(5px);
+  opacity: 1;
+  transition: opacity 0.5s;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.jocarsa-video__controls:hover {
+  opacity: 1;
+}
+
+/* Botones */
+.jocarsa-video__button {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: white;
+  color: black;
+  text-align: center;
+  border-radius: 40px;
+  padding: 1px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.jocarsa-video__button svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+/* Tiempo */
+.jocarsa-video__time {
+  color: white;
+  font-family: system-ui, sans-serif;
+  font-size: 12px;
+  min-width: 80px;
+  text-align: center;
+}
+
+/* Volumen */
+.jocarsa-video__volume {
+  width: 100px;
+}
+
+/* Resoluciones */
+.jocarsa-video__resolution {
+  width: 80px;
+  height: 30px;
+  border: none;
+  background: white;
+  color: black;
+  text-align: center;
+  border-radius: 40px;
+  padding: 1px 6px;
+  cursor: pointer;
+}
+
+/* Opcional: ocultar controles nativos */
+.jocarsa-video__video::-webkit-media-controls {
+  display: none !important;
+}
+.jocarsa-video__video::-moz-media-controls {
+  display: none !important;
+}
+

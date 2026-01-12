@@ -667,36 +667,8 @@ def obtener_dashboard():
 
 ---
 
-### Puntos Clave del Proyecto
+Este sistema de gestión de gimnasio representa mucho más que un ejercicio académico. Es un **ejemplo tangible y funcional** de cómo los sistemas ERP-CRM transforman la gestión empresarial moderna, automatizando procesos operativos, centralizando información crítica en repositorios únicos, eliminando redundancias y proporcionando herramientas de análisis que potencian la toma de decisiones estratégicas basadas en datos.
 
-1. **Arquitectura multicapa**: El proyecto implementa correctamente una separación clara entre presentación (frontend), lógica de negocio (backend) y datos (database), siguiendo principios de ingeniería de software moderna.
+La experiencia de construir un sistema completo desde cero —desde el modelado conceptual de datos hasta la interfaz de usuario— proporciona una **comprensión holística** difícil de obtener mediante el estudio exclusivamente teórico. Entender cómo una acción del usuario en el frontend desencadena una cascada de operaciones que atraviesan capas de software, ejecutan consultas SQL y finalmente persisten información en una base de datos, para luego retornar una respuesta visualizable, es fundamental para cualquier profesional del desarrollo de software.
 
-2. **Integración ERP-CRM**: Se demuestra cómo un mismo sistema puede gestionar tanto procesos internos (ERP: entrenadores, clases, recursos) como relaciones con clientes (CRM: socios, membresías, asistencias).
-
-3. **API REST como puente**: El uso de una API REST permite la comunicación eficiente entre frontend y backend, facilitando la escalabilidad y el mantenimiento del sistema.
-
-4. **Modelo de datos relacional**: El diseño normalizado de la base de datos con relaciones de integridad referencial garantiza la consistencia de los datos y evita redundancias.
-
-5. **Buenas prácticas de seguridad**: Uso de consultas parametrizadas, validación de datos y manejo apropiado de errores protege el sistema de vulnerabilidades comunes.
-
-### Relación con Contenidos de la Unidad
-
-Este proyecto integra múltiples conceptos vistos en la unidad **"Identificación de sistemas ERP-CRM"**:
-
-- **Características de sistemas ERP**: Gestión integrada de recursos (entrenadores, clases, instalaciones)
-- **Características de sistemas CRM**: Base de datos de clientes, seguimiento de interacciones, análisis de comportamiento
-- **Módulos típicos**: El sistema incluye módulos equivalentes a los de un ERP-CRM comercial (gestión de contactos, ventas/membresías, recursos humanos, informes)
-- **Arquitectura de tres capas**: Implementación práctica de la arquitectura estándar en sistemas empresariales
-- **Acceso a datos**: Aplicación de técnicas de persistencia, operaciones CRUD y consultas SQL complejas
-- **Interfaces de usuario**: Desarrollo de una interfaz web profesional que permite la interacción eficiente con el sistema
-
-### Proyección Profesional
-
-Los conocimientos aplicados en este proyecto son directamente transferibles al mundo laboral:
-
-- **Desarrollo full-stack**: Capacidad de trabajar en todas las capas de una aplicación empresarial
-- **Integración de sistemas**: Habilidad para conectar diferentes componentes mediante APIs
-- **Análisis de requisitos**: Traducción de necesidades de negocio en funcionalidades técnicas
-- **Mantenimiento y escalabilidad**: Código organizado que facilita futuras ampliaciones
-
-Este sistema de gestión de gimnasio es un ejemplo funcional de cómo los sistemas ERP-CRM modernizan la gestión empresarial, automatizando procesos, centralizando información y proporcionando herramientas de análisis que mejoran la toma de decisiones estratégicas.
+En definitiva, este proyecto consolida la transición del conocimiento conceptual sobre sistemas ERP-CRM hacia la **capacidad práctica de diseñar, implementar y mantener** soluciones empresariales reales, preparando el camino para afrontar con solvencia los desafíos técnicos del desarrollo de aplicaciones empresariales en contextos profesionales.

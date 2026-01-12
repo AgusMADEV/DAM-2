@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ERP Inteligente</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-page">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-brain"></i>
+            <h1>ERP IA</h1>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" onclick="cambiarSeccion('dashboard', event); return false;">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" onclick="cambiarSeccion('productos', event); return false;">
+                <i class="fas fa-box"></i>
+                <span>Productos</span>
+            </a>
+            <a href="#" class="nav-item" onclick="cambiarSeccion('ventas', event); return false;">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Ventas</span>
+            </a>
+            <a href="#" class="nav-item" onclick="cambiarSeccion('clientes', event); return false;">
+                <i class="fas fa-users"></i>
+                <span>Clientes</span>
+            </a>
+            <a href="#" class="nav-item" onclick="cambiarSeccion('inventario', event); return false;">
+                <i class="fas fa-warehouse"></i>
+                <span>Inventario</span>
+            </a>
+            <a href="#" class="nav-item" onclick="cambiarSeccion('estadisticas', event); return false;">
+                <i class="fas fa-chart-line"></i>
+                <span>Estadísticas</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-details">
+                    <span class="user-name" id="userName">Admin</span>
+                    <span class="user-role" id="userRole">Administrador</span>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="btn-menu" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2>Dashboard</h2>
+            </div>
+            
+            <div class="topbar-right">
+                <button class="btn-icon" onclick="openChat()">
+                    <i class="fas fa-robot"></i>
+                    <span class="tooltip">Asistente IA</span>
+                </button>
+                <button class="btn-icon">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                    <span class="tooltip">Notificaciones</span>
+                </button>
+                <button class="btn-icon">
+                    <i class="fas fa-cog"></i>
+                    <span class="tooltip">Configuración</span>
+                </button>
+            </div>
+        </header>
+        
+        <!-- Dashboard Content -->
+        <div id="dashboard-section" class="dashboard-content">
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon blue">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Ventas Hoy</span>
+                        <span class="kpi-value" id="ventasHoy">€0.00</span>
+                        <span class="kpi-change positive">+12.5%</span>
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-icon green">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Productos</span>
+                        <span class="kpi-value" id="totalProductos">0</span>
+                        <span class="kpi-change neutral">En stock</span>
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-icon orange">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Stock Bajo</span>
+                        <span class="kpi-value" id="stockBajo">0</span>
+                        <span class="kpi-change negative">Alertas activas</span>
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-icon purple">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="kpi-info">
+                        <span class="kpi-label">Clientes</span>
+                        <span class="kpi-value" id="totalClientes">0</span>
+                        <span class="kpi-change positive">+5 este mes</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charts and Tables -->
+            <div class="dashboard-grid">
+                <!-- Alertas de Stock -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3>
+                            <i class="fas fa-exclamation-circle"></i>
+                            Alertas de Stock
+                        </h3>
+                        <button class="btn-sm btn-primary" onclick="askIA('¿Qué productos tienen stock bajo?')">
+                            <i class="fas fa-robot"></i> Preguntar a IA
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="alertasStock" class="alertas-list">
+                            <div class="loading-spinner">
+                                <i class="fas fa-spinner fa-spin"></i> Cargando...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ventas Recientes -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3>
+                            <i class="fas fa-shopping-cart"></i>
+                            Ventas Recientes
+                        </h3>
+                        <button class="btn-sm btn-primary" onclick="askIA('¿Cuánto vendimos hoy?')">
+                            <i class="fas fa-robot"></i> Preguntar a IA
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="ventasRecientes" class="ventas-list">
+                            <div class="loading-spinner">
+                                <i class="fas fa-spinner fa-spin"></i> Cargando...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Top Clientes -->
+                <div class="dashboard-card full-width">
+                    <div class="card-header">
+                        <h3>
+                            <i class="fas fa-star"></i>
+                            Mejores Clientes
+                        </h3>
+                        <button class="btn-sm btn-primary" onclick="askIA('Muéstrame los mejores clientes')">
+                            <i class="fas fa-robot"></i> Preguntar a IA
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="topClientes" class="clientes-list">
+                            <div class="loading-spinner">
+                                <i class="fas fa-spinner fa-spin"></i> Cargando...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sección Productos -->
+        <div id="productos-section" class="dashboard-content" style="display: none;">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-filter"></i> Filtros y Búsqueda</h3>
+                </div>
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
+                        <div class="form-group">
+                            <label>Buscar</label>
+                            <input type="text" id="searchProducto" placeholder="Nombre o código..." onkeyup="filtrarProductos()" style="padding: 10px; border: 2px solid var(--gray-200); border-radius: var(--radius); width: 100%;">
+                        </div>
+                        <div class="form-group">
+                            <label>Categoría</label>
+                            <select id="categoriaFilter" onchange="filtrarProductos()" style="padding: 10px; border: 2px solid var(--gray-200); border-radius: var(--radius); width: 100%;">
+                                <option value="">Todas</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado Stock</label>
+                            <select id="stockFilter" onchange="filtrarProductos()" style="padding: 10px; border: 2px solid var(--gray-200); border-radius: var(--radius); width: 100%;">
+                                <option value="">Todos</option>
+                                <option value="critico">🔴 Crítico</option>
+                                <option value="bajo">🟡 Bajo</option>
+                                <option value="normal">🟢 Normal</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="limpiarFiltrosProductos()">
+                            <i class="fas fa-redo"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-box"></i> Catálogo de Productos</h3>
+                    <span id="totalProductos" style="color: var(--gray-500); font-size: 14px;">Cargando...</span>
+                </div>
+                <div class="card-body">
+                    <div id="productosContainer" style="overflow-x: auto;">
+                        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando productos...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sección Ventas -->
+        <div id="ventas-section" class="dashboard-content" style="display: none;">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-shopping-cart"></i> Registro de Ventas</h3>
+                    <span id="totalVentas" style="color: var(--gray-500); font-size: 14px;">Cargando...</span>
+                </div>
+                <div class="card-body">
+                    <div id="ventasContainer" style="overflow-x: auto;">
+                        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando ventas...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sección Clientes -->
+        <div id="clientes-section" class="dashboard-content" style="display: none;">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-users"></i> Base de Clientes</h3>
+                    <span id="totalClientesSection" style="color: var(--gray-500); font-size: 14px;">Cargando...</span>
+                </div>
+                <div class="card-body">
+                    <div id="clientesContainer" style="overflow-x: auto;">
+                        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando clientes...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sección Inventario -->
+        <div id="inventario-section" class="dashboard-content" style="display: none;">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-warehouse"></i> Estado del Inventario</h3>
+                    <span id="totalInventario" style="color: var(--gray-500); font-size: 14px;">Cargando...</span>
+                </div>
+                <div class="card-body">
+                    <div id="inventarioContainer" style="overflow-x: auto;">
+                        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Cargando inventario...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Chat Modal -->
+    <div id="chatModal" class="modal">
+        <div class="modal-content chat-modal">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-robot"></i>
+                    Asistente IA
+                </h3>
+                <button class="btn-close" onclick="closeChat()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="chatMessages" class="chat-messages"></div>
+                <div class="chat-input">
+                    <input 
+                        type="text" 
+                        id="chatInput" 
+                        placeholder="Pregúntame algo sobre tu negocio..."
+                        onkeypress="handleChatEnter(event)"
+                    >
+                    <button class="btn-send" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="chat-suggestions">
+                    <button class="btn-suggestion" onclick="askIA('¿Qué productos tienen stock bajo?')">
+                        📦 Stock bajo
+                    </button>
+                    <button class="btn-suggestion" onclick="askIA('¿Cuánto vendimos hoy?')">
+                        💰 Ventas de hoy
+                    </button>
+                    <button class="btn-suggestion" onclick="askIA('Muéstrame los mejores clientes')">
+                        ⭐ Top clientes
+                    </button>
+                    <button class="btn-suggestion" onclick="askIA('¿Hay alertas pendientes?')">
+                        🚨 Alertas
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sección Estadísticas -->
+        <div id="estadisticas-section" class="dashboard-content" style="display: none;">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-line"></i> Estadísticas y Análisis</h2>
+                <button class="btn-primary" onclick="askIA('Analiza las estadísticas de ventas')">
+                    <i class="fas fa-robot"></i> Analizar con IA
+                </button>
+            </div>
+            
+            <div class="charts-grid">
+                <!-- Gráfico de Ventas por Mes -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-line"></i> Ventas por Mes</h3>
+                        <div class="chart-controls">
+                            <button class="btn-sm" onclick="actualizarGraficos()">
+                                <i class="fas fa-sync-alt"></i> Actualizar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="chartVentasMes" width="400" height="200"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Gráfico de Productos Más Vendidos -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-bar"></i> Top 10 Productos Vendidos</h3>
+                        <div class="chart-controls">
+                            <select id="periodoProductos" onchange="cargarProductosTop()">
+                                <option value="mes">Este mes</option>
+                                <option value="trimestre">Último trimestre</option>
+                                <option value="anio">Este año</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="chartProductosTop" width="400" height="200"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Gráfico de Categorías de Productos -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-pie"></i> Ventas por Categoría</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="chartCategorias" width="400" height="200"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Gráfico de Evolución del Inventario -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-warehouse"></i> Estado del Inventario</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="chartInventario" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabla de Resumen de Estadísticas -->
+            <div class="dashboard-card full-width">
+                <div class="card-header">
+                    <h3><i class="fas fa-table"></i> Resumen de Métricas</h3>
+                </div>
+                <div class="card-body">
+                    <div class="stats-summary" id="statsSummary">
+                        <div class="stat-item">
+                            <span class="stat-label">Venta Promedio</span>
+                            <span class="stat-value" id="ventaPromedio">€0.00</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Producto Más Vendido</span>
+                            <span class="stat-value" id="productoTop">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Total Facturado</span>
+                            <span class="stat-value" id="totalFacturado">€0.00</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Margen Promedio</span>
+                            <span class="stat-value" id="margenPromedio">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Chat IA -->
+    <div id="chatModal" class="modal">
+        <div class="modal-content chat-modal">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-robot"></i>
+                    Asistente Inteligente
+                </h3>
+                <button class="btn-close" onclick="cerrarChatIA()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="chatMessages" class="chat-messages">
+                    <!-- Messages will be inserted here -->
+                </div>
+                <div class="chat-input">
+                    <input 
+                        type="text" 
+                        id="chatInput" 
+                        placeholder="Pregúntame algo sobre tu negocio..."
+                        onkeypress="handleChatEnter(event)"
+                    >
+                    <button class="btn-send" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="chat-suggestions">
+                    <button class="btn-suggestion" onclick="askIA('¿Qué productos tienen stock bajo?')">
+                        📦 Stock bajo
+                    </button>
+                    <button class="btn-suggestion" onclick="askIA('¿Cuánto vendimos hoy?')">
+                        💰 Ventas de hoy
+                    </button>
+                    <button class="btn-suggestion" onclick="askIA('Muéstrame los mejores clientes')">
+                        ⭐ Top clientes
+                    </button>
+                    <button class="btn-suggestion" onclick="askIA('¿Hay alertas pendientes?')">
+                        🚨 Alertas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
