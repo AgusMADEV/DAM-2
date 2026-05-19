@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memories Recorder</title>
+  <style>
+    :root {
+      --primary-color: #6a5acd;
+      --secondary-color: #9370db;
+      --background-color: #f9f7ff;
+      --bubble-color: #fff;
+      --text-color: #333;
+      --shadow-color: rgba(0, 0, 0, 0.1);
+      --highlight-color: #ffeb3b;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      overflow: hidden;
+    }
+
+    .form-container {
+      width: 350px;
+      padding: 25px;
+      background-color: white;
+      box-shadow: 0 4px 15px var(--shadow-color);
+      border-radius: 12px;
+      margin: 20px;
+      overflow-y: auto;
+      max-height: calc(100vh - 40px);
+      z-index: 10;
+    }
+
+    .form-container h2 {
+      color: var(--primary-color);
+      margin-bottom: 20px;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .form-group textarea,
+    .form-group input[type="text"],
+    .form-group input[type="date"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+      resize: vertical;
+      min-height: 40px;
+    }
+
+    .form-group textarea {
+      min-height: 60px;
+    }
+
+    .record-button {
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      cursor: pointer;
+      font-size: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 10px;
+      transition: background-color 0.3s;
+    }
+
+    .record-button:hover {
+      background-color: var(--primary-color);
+    }
+
+    .form-container button[type="submit"] {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      margin-top: 10px;
+      transition: background-color 0.3s;
+    }
+
+    .form-container button[type="submit"]:hover {
+      background-color: #5a4fbf;
+    }
+
+    .search-container {
+      margin-bottom: 20px;
+    }
+
+    .search-container input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .stage {
+      flex: 1;
+      position: relative;
+      background: linear-gradient(135deg, #e6e6fa 0%, #d8bfd8 100%);
+      border-radius: 12px;
+      margin: 20px;
+      overflow: hidden;
+      cursor: grab;
+      transform-origin: 0 0;
+    }
+
+    .bubble {
+      position: absolute;
+      z-index: 2; /* Burbujas por encima de las líneas */
+      background-color: var(--bubble-color);
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      box-shadow: 0 4px 10px var(--shadow-color);
+      cursor: pointer;
+      animation: float 8s ease-in-out infinite;
+      border: 1px solid rgba(147, 112, 219, 0.3);
+      transition: transform 0.3s, border-width 0.3s, border-color 0.3s;
+      transform-origin: center center;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .bubble:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 15px var(--shadow-color);
+      z-index: 100;
+    }
+
+    .bubble.highlight {
+      border-color: var(--highlight-color);
+      border-width: 3px;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(5deg); }
+    }
+
+    .input-with-button {
+      display: flex;
+      align-items: center;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      overflow: auto;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      margin: auto;
+      padding: 20px;
+      border-radius: 12px;
+      width: 80%;
+      max-width: 500px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      color: var(--primary-color);
+    }
+
+    .close-button {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #aaa;
+    }
+
+    .close-button:hover {
+      color: var(--text-color);
+    }
+
+    .modal-body { margin-bottom: 15px; }
+    .modal-body p { margin: 8px 0; }
+    .modal-body strong { color: var(--primary-color); }
+
+    /* Líneas entre burbujas */
+    .connection-line {
+      position: absolute;
+      z-index: 1; /* detrás de burbujas pero visible */
+      pointer-events: none;
+      transform-origin: 0 0;
+      background-color: rgba(147, 112, 219, 0.5);
+      height: 2px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="form-container">
+    <h2>Nuevo Recuerdo</h2>
+    <form id="memoryForm">
+      <div class="form-group">
+        <label for="vista">Vista:</label>
+        <div class="input-with-button">
+          <textarea id="vista" placeholder="Describe lo que viste..."></textarea>
+          <button type="button" class="record-button" data-target="vista">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="momento">Momento:</label>
+        <input type="date" id="momento">
+      </div>
+
+      <div class="form-group">
+        <label for="oido">Oído:</label>
+        <div class="input-with-button">
+          <textarea id="oido" placeholder="Describe lo que escuchaste..."></textarea>
+          <button type="button" class="record-button" data-target="oido">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="sentimos">Sentimos:</label>
+        <div class="input-with-button">
+          <textarea id="sentimos" placeholder="Describe lo que sentiste..."></textarea>
+          <button type="button" class="record-button" data-target="sentimos">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="olemos">Olemos:</label>
+        <div class="input-with-button">
+          <textarea id="olemos" placeholder="Describe lo que oliste..."></textarea>
+          <button type="button" class="record-button" data-target="olemos">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="sabor">Sabor:</label>
+        <div class="input-with-button">
+          <textarea id="sabor" placeholder="Describe lo que saboreaste..."></textarea>
+          <button type="button" class="record-button" data-target="sabor">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="palpamos">Palpamos:</label>
+        <div class="input-with-button">
+          <textarea id="palpamos" placeholder="Describe lo que tocaste..."></textarea>
+          <button type="button" class="record-button" data-target="palpamos">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="pensamos">Pensamos:</label>
+        <div class="input-with-button">
+          <textarea id="pensamos" placeholder="Describe en qué pensaste..."></textarea>
+          <button type="button" class="record-button" data-target="pensamos">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="ubicacion">Ubicación:</label>
+        <div class="input-with-button">
+          <input type="text" id="ubicacion" placeholder="¿Dónde estabas?">
+          <button type="button" class="record-button" data-target="ubicacion">🎤</button>
+        </div>
+      </div>
+
+      <button type="submit">Guardar Recuerdo</button>
+    </form>
+
+    <div class="search-container">
+      <label for="search">Buscar en recuerdos:</label>
+      <input type="text" id="search" placeholder="Escribe aquí para buscar...">
+    </div>
+  </div>
+
+  <div class="stage" id="stage"></div>
+
+  <!-- Modal -->
+  <div id="memoryModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Detalles del Recuerdo</h3>
+        <button class="close-button" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body" id="modalContent"></div>
+    </div>
+  </div>
+
+  <script>
+    // ----------------------------
+    // Voz (webkitSpeechRecognition)
+    // ----------------------------
+    let recognition;
+    let currentTarget = null;
+
+    if ('webkitSpeechRecognition' in window) {
+      recognition = new webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'es-ES';
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (currentTarget) {
+          document.getElementById(currentTarget).value = transcript;
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Error en grabación:', event.error);
+      };
+    } else {
+      alert('Tu navegador no soporta la grabación de voz.');
+      document.querySelectorAll('.record-button').forEach(b => b.style.display = 'none');
+    }
+
+    document.querySelectorAll('.record-button').forEach(button => {
+      button.addEventListener('click', () => {
+        currentTarget = button.getAttribute('data-target');
+        if (recognition) {
+          recognition.start();
+          button.textContent = '🛑';
+          recognition.onend = () => { button.textContent = '🎤'; };
+        }
+      });
+    });
+
+    // ----------------------------
+    // Pan/Zoom del stage
+    // ----------------------------
+    let isDragging = false;
+    let startX, startY;
+    let translateX = 0, translateY = 0;
+    let scale = 1;
+    const stage = document.getElementById('stage');
+
+    function applyTransform() {
+      stage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    }
+
+    stage.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX - translateX;
+      startY = e.clientY - translateY;
+      stage.style.cursor = 'grabbing';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      translateX = e.clientX - startX;
+      translateY = e.clientY - startY;
+      applyTransform();
+      // NO hace falta updateConnections aquí: líneas y burbujas se transforman juntas
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+      stage.style.cursor = 'grab';
+    });
+
+    stage.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? 0.9 : 1.1;
+      const rect = stage.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      const newScale = Math.min(Math.max(scale * delta, 0.5), 2);
+      const scaleFactor = newScale / scale;
+
+      translateX = mouseX - (mouseX - translateX) * scaleFactor;
+      translateY = mouseY - (mouseY - translateY) * scaleFactor;
+      scale = newScale;
+
+      applyTransform();
+      // NO hace falta updateConnections aquí
+    });
+
+    // ----------------------------
+    // Memorias + UI
+    // ----------------------------
+    const memoryForm = document.getElementById('memoryForm');
+    const searchInput = document.getElementById('search');
+    const modal = document.getElementById('memoryModal');
+    const modalContent = document.getElementById('modalContent');
+    const closeModal = document.getElementById('closeModal');
+
+    document.addEventListener('DOMContentLoaded', loadMemories);
+
+    function loadMemories() {
+      fetch('save_memories.php')
+        .then(r => r.json())
+        .then(memories => {
+          memories.forEach(memory => createBubble(memory));
+          updateConnections();
+        })
+        .catch(err => console.error('Error al cargar recuerdos:', err));
+    }
+
+    memoryForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const memory = {
+        vista: document.getElementById('vista').value,
+        momento: document.getElementById('momento').value,
+        oido: document.getElementById('oido').value,
+        sentimos: document.getElementById('sentimos').value,
+        olemos: document.getElementById('olemos').value,
+        sabor: document.getElementById('sabor').value,
+        palpamos: document.getElementById('palpamos').value,
+        pensamos: document.getElementById('pensamos').value,
+        ubicacion: document.getElementById('ubicacion').value,
+      };
+
+      fetch('save_memories.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(memory),
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          createBubble(memory);
+          memoryForm.reset();
+          updateConnections();
+        }
+      })
+      .catch(err => console.error('Error al guardar el recuerdo:', err));
+    });
+
+    function createBubble(memory) {
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+
+      const x = Math.random() * (stage.offsetWidth - 100);
+      const y = Math.random() * (stage.offsetHeight - 100);
+      bubble.style.left = `${x}px`;
+      bubble.style.top  = `${y}px`;
+
+      bubble.dataset.memory = JSON.stringify(memory);
+      bubble.dataset.id = Date.now() + "-" + Math.random().toString(16).slice(2);
+
+      bubble.textContent = '💭';
+      stage.appendChild(bubble);
+
+      bubble.addEventListener('click', () => showMemoryModal(memory));
+      return bubble;
+    }
+
+    function showMemoryModal(memory) {
+      modalContent.innerHTML = `
+        <p><strong>Ubicación:</strong> ${escapeHtml(memory.ubicacion || 'Sin ubicación')}</p>
+        <p><strong>Momento:</strong> ${escapeHtml(memory.momento || 'Sin fecha')}</p>
+        <p><strong>Vista:</strong> ${escapeHtml(memory.vista || 'Nada')}</p>
+        <p><strong>Oído:</strong> ${escapeHtml(memory.oido || 'Nada')}</p>
+        <p><strong>Sentimos:</strong> ${escapeHtml(memory.sentimos || 'Nada')}</p>
+        <p><strong>Olemos:</strong> ${escapeHtml(memory.olemos || 'Nada')}</p>
+        <p><strong>Sabor:</strong> ${escapeHtml(memory.sabor || 'Nada')}</p>
+        <p><strong>Palpamos:</strong> ${escapeHtml(memory.palpamos || 'Nada')}</p>
+        <p><strong>Pensamos:</strong> ${escapeHtml(memory.pensamos || 'Nada')}</p>
+      `;
+      modal.style.display = 'flex';
+    }
+
+    closeModal.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, m => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+      }[m]));
+    }
+
+    // ----------------------------
+    // Búsqueda y resaltado
+    // ----------------------------
+    searchInput.addEventListener('input', () => {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+      const allBubbles = document.querySelectorAll('.bubble');
+
+      allBubbles.forEach(bubble => {
+        const memory = JSON.parse(bubble.dataset.memory);
+        const memoryText = Object.values(memory).join(' ').toLowerCase();
+
+        if (searchTerm === '') {
+          bubble.classList.remove('highlight');
+          bubble.style.borderWidth = '1px';
+          bubble.style.borderColor = 'rgba(147, 112, 219, 0.3)';
+          return;
+        }
+
+        const matches = searchTerm.split(' ').filter(t => t.length > 0);
+        let matchCount = 0;
+
+        matches.forEach(term => {
+          if (memoryText.includes(term)) matchCount++;
+        });
+
+        if (matchCount > 0) {
+          bubble.classList.add('highlight');
+          const borderWidth = 1 + (matchCount * 1.5);
+          bubble.style.borderWidth = `${borderWidth}px`;
+        } else {
+          bubble.classList.remove('highlight');
+          bubble.style.borderWidth = '1px';
+          bubble.style.borderColor = 'rgba(147, 112, 219, 0.3)';
+        }
+      });
+    });
+
+    // ----------------------------
+    // Conexiones (FIX)
+    // - Coordenadas locales (offsetLeft/Top)
+    // - Coincidencia por palabras (tokenización)
+    // ----------------------------
+    function tokenize(text) {
+      return (text || "")
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // quitar acentos
+        .replace(/[^\p{L}\p{N}\s]+/gu, " ")               // puntuación -> espacio
+        .split(/\s+/)
+        .filter(w => w.length >= 3);                      // filtrar palabras cortas
+    }
+
+    function memoryTokens(memory) {
+      const fields = [
+        memory.vista, memory.ubicacion, memory.sentimos, memory.pensamos,
+        memory.oido, memory.olemos, memory.sabor, memory.palpamos
+      ];
+      const set = new Set();
+      fields.forEach(t => tokenize(t).forEach(w => set.add(w)));
+      return set;
+    }
+
+    function updateConnections() {
+      const allBubbles = Array.from(document.querySelectorAll('.bubble'));
+
+      // eliminar líneas existentes
+      document.querySelectorAll('.connection-line').forEach(line => line.remove());
+
+      // precalcular tokens
+      const tokensByBubble = new Map();
+      allBubbles.forEach(b => {
+        tokensByBubble.set(b, memoryTokens(JSON.parse(b.dataset.memory)));
+      });
+
+      for (let i = 0; i < allBubbles.length; i++) {
+        for (let j = i + 1; j < allBubbles.length; j++) {
+          const b1 = allBubbles[i];
+          const b2 = allBubbles[j];
+
+          const s1 = tokensByBubble.get(b1);
+          const s2 = tokensByBubble.get(b2);
+
+          let shared = 0;
+          for (const w of s1) if (s2.has(w)) shared++;
+
+          if (shared > 0) {
+            const line = document.createElement('div');
+            line.className = 'connection-line';
+
+            // coordenadas locales del stage
+            const x1 = b1.offsetLeft + b1.offsetWidth / 2;
+            const y1 = b1.offsetTop  + b1.offsetHeight / 2;
+            const x2 = b2.offsetLeft + b2.offsetWidth / 2;
+            const y2 = b2.offsetTop  + b2.offsetHeight / 2;
+
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+
+            const length = Math.hypot(dx, dy);
+            const angle  = Math.atan2(dy, dx) * (180 / Math.PI);
+
+            line.style.width = `${length}px`;
+            line.style.left  = `${x1}px`;
+            line.style.top   = `${y1}px`;
+            line.style.transform = `rotate(${angle}deg)`;
+
+            // grosor/opacidad según nº de palabras compartidas
+            line.style.height = `${Math.min(10, 2 + shared * 1.5)}px`;
+            line.style.opacity = `${Math.min(1, 0.25 + shared * 0.08)}`;
+
+            stage.appendChild(line);
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>
+

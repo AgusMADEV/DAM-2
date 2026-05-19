@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memories Recorder</title>
+    <style>
+        :root {
+            --primary-color: #6a5acd;
+            --secondary-color: #9370db;
+            --background-color: #f9f7ff;
+            --bubble-color: #fff;
+            --text-color: #333;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            overflow: hidden;
+        }
+
+        .form-container {
+            width: 350px;
+            padding: 25px;
+            background-color: white;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            border-radius: 12px;
+            margin: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 40px);
+            z-index: 10;
+        }
+
+        .form-container h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .form-group textarea,
+        .form-group input[type="text"],
+        .form-group input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            resize: vertical;
+            min-height: 40px;
+        }
+
+        .form-group textarea {
+            min-height: 60px;
+        }
+
+        .record-button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .record-button:hover {
+            background-color: var(--primary-color);
+        }
+
+        .form-container button[type="submit"] {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .form-container button[type="submit"]:hover {
+            background-color: #5a4fbf;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .stage {
+            flex: 1;
+            position: relative;
+            background: linear-gradient(135deg, #e6e6fa 0%, #d8bfd8 100%);
+            border-radius: 12px;
+            margin: 20px;
+            overflow: hidden;
+            cursor: grab;
+            transform-origin: 0 0;
+        }
+
+        .bubble {
+            position: absolute;
+            background-color: var(--bubble-color);
+            border-radius: 50%;
+            padding: 15px 20px;
+            box-shadow: 0 4px 10px var(--shadow-color);
+            cursor: pointer;
+            max-width: 200px;
+            word-wrap: break-word;
+            animation: float 8s ease-in-out infinite;
+            border: 1px solid rgba(147, 112, 219, 0.3);
+            font-size: 14px;
+            line-height: 1.4;
+            transition: transform 0.3s, border-width 0.3s, border-color 0.3s;
+            transform-origin: center center;
+            user-select: none;
+        }
+
+        .bubble:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px var(--shadow-color);
+            z-index: 100;
+        }
+
+        .bubble strong {
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .bubble small {
+            color: #666;
+            font-size: 12px;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-15px) rotate(3deg);
+            }
+        }
+
+        .input-with-button {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Nuevo Recuerdo</h2>
+        <form id="memoryForm">
+            <div class="form-group">
+                <label for="vista">Vista:</label>
+                <div class="input-with-button">
+                    <textarea id="vista" placeholder="Describe lo que viste..."></textarea>
+                    <button type="button" class="record-button" data-target="vista">🎤</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="momento">Momento:</label>
+                <input type="date" id="momento">
+            </div>
+
+            <div class="form-group">
+                <label for="oido">Oído:</label>
+                <div class="input-with-button">
+                    <textarea id="oido" placeholder="Describe lo que escuchaste..."></textarea>
+                    <button type="button" class="record-button" data-target="oido">🎤</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="sentimos">Sentimos:</label>
+                <div class="input-with-button">
+                    <textarea id="sentimos" placeholder="Describe lo que sentiste..."></textarea>
+                    <button type="button" class="record-button" data-target="sentimos">🎤</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="olemos">Olemos:</label>
+                <div class="input-with-button">
+                    <textarea id="olemos" placeholder="Describe lo que oliste..."></textarea>
+                    <button type="button" class="record-button" data-target="olemos">🎤</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="sabor">Sabor:</label>
+                <div class="input-with-button">
+                    <textarea id="sabor" placeholder="Describe lo que saboreaste..."></textarea>
+                    <button type="button" class="record-button" data-target="sabor">🎤</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="palpamos">Palpamos:</label>
+                <div class="input-with-button">
+                    <textarea id="palpamos" placeholder="Describe lo que tocaste..."></textarea>
+                    <button type="button" class="record-button" data-target="palpamos">🎤</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="pensamos">Pensamos:</label>
+                <div class="input-with-button">
+                    <textarea id="pensamos" placeholder="Describe en qué pensaste..."></textarea>
+                    <button type="button" class="record-button" data-target="pensamos">🎤</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="ubicacion">Ubicación:</label>
+                <div class="input-with-button">
+                    <input type="text" id="ubicacion" placeholder="¿Dónde estabas?">
+                    <button type="button" class="record-button" data-target="ubicacion">🎤</button>
+                </div>
+            </div>
+
+            <button type="submit">Guardar Recuerdo</button>
+        </form>
+
+        <div class="search-container">
+            <label for="search">Buscar en recuerdos:</label>
+            <input type="text" id="search" placeholder="Escribe aquí para buscar...">
+        </div>
+    </div>
+
+    <div class="stage" id="stage">
+        <!-- Las burbujas de recuerdos aparecerán aquí -->
+    </div>
+
+    <script>
+        // Inicializar reconocimiento de voz
+        let recognition;
+        let currentTarget = null;
+
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'es-ES';
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                if (currentTarget) {
+                    document.getElementById(currentTarget).value = transcript;
+                }
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Error en grabación:', event.error);
+            };
+        } else {
+            alert('Tu navegador no soporta la grabación de voz.');
+            const recordButtons = document.querySelectorAll('.record-button');
+            recordButtons.forEach(button => {
+                button.style.display = 'none';
+            });
+        }
+
+        // Asignar evento a los botones de grabación
+        const recordButtons = document.querySelectorAll('.record-button');
+        recordButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                currentTarget = button.getAttribute('data-target');
+                if (recognition) {
+                    recognition.start();
+                    button.textContent = '🛑';
+                    recognition.onend = () => {
+                        button.textContent = '🎤';
+                    };
+                }
+            });
+        });
+
+        // Variables para el drag-pan y zoom
+        let isDragging = false;
+        let startX, startY;
+        let translateX = 0, translateY = 0;
+        let scale = 1;
+        const stage = document.getElementById('stage');
+
+        // Función para aplicar transformaciones al escenario
+        function applyTransform() {
+            stage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        }
+
+        // Eventos para arrastrar el escenario
+        stage.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX - translateX;
+            startY = e.clientY - translateY;
+            stage.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            translateX = e.clientX - startX;
+            translateY = e.clientY - startY;
+            applyTransform();
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+            stage.style.cursor = 'grab';
+        });
+
+        // Evento para zoom con la rueda del ratón
+        stage.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            const rect = stage.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            // Ajustar el zoom centrado en el cursor
+            const newScale = Math.min(Math.max(scale * delta, 0.5), 2);
+            const scaleFactor = newScale / scale;
+
+            translateX = mouseX - (mouseX - translateX) * scaleFactor;
+            translateY = mouseY - (mouseY - translateY) * scaleFactor;
+            scale = newScale;
+
+            applyTransform();
+        });
+
+        // Crear burbujas de recuerdos
+        const memoryForm = document.getElementById('memoryForm');
+        const searchInput = document.getElementById('search');
+
+        memoryForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const memory = {
+                vista: document.getElementById('vista').value,
+                momento: document.getElementById('momento').value,
+                oido: document.getElementById('oido').value,
+                sentimos: document.getElementById('sentimos').value,
+                olemos: document.getElementById('olemos').value,
+                sabor: document.getElementById('sabor').value,
+                palpamos: document.getElementById('palpamos').value,
+                pensamos: document.getElementById('pensamos').value,
+                ubicacion: document.getElementById('ubicacion').value,
+            };
+
+            createBubble(memory);
+            memoryForm.reset();
+        });
+
+        function createBubble(memory) {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+
+            // Posición aleatoria en el escenario
+            const x = Math.random() * (stage.offsetWidth - 200);
+            const y = Math.random() * (stage.offsetHeight - 200);
+            bubble.style.left = `${x}px`;
+            bubble.style.top = `${y}px`;
+
+            // Contenido de la burbuja
+            bubble.innerHTML = `
+                <strong>${memory.ubicacion || 'Sin ubicación'}</strong>
+                <small>${memory.momento || 'Sin fecha'}</small><br>
+                ${memory.vista || ''}
+            `;
+
+            // Guardar los datos del recuerdo en el elemento
+            bubble.dataset.memory = JSON.stringify(memory);
+
+            // Agregar al escenario
+            stage.appendChild(bubble);
+
+            // Lógica para agrupar burbujas por palabras clave
+            setTimeout(() => {
+                attractSimilarBubbles(bubble, memory);
+            }, 100);
+        }
+
+        function attractSimilarBubbles(newBubble, newMemory) {
+            const allBubbles = document.querySelectorAll('.bubble');
+            const keywords = [
+                newMemory.vista,
+                newMemory.ubicacion,
+                newMemory.sentimos,
+                newMemory.pensamos
+            ].filter(kw => kw && kw.trim().length > 0);
+
+            allBubbles.forEach(bubble => {
+                if (bubble !== newBubble) {
+                    const bubbleText = bubble.textContent.toLowerCase();
+                    const hasSimilarKeyword = keywords.some(
+                        kw => bubbleText.includes(kw.toLowerCase())
+                    );
+
+                    if (hasSimilarKeyword) {
+                        // Mover burbujas similares más cerca
+                        const newX = parseFloat(newBubble.style.left);
+                        const newY = parseFloat(newBubble.style.top);
+                        const bubbleX = parseFloat(bubble.style.left);
+                        const bubbleY = parseFloat(bubble.style.top);
+
+                        const distance = Math.sqrt(
+                            Math.pow(newX - bubbleX, 2) + Math.pow(newY - bubbleY, 2)
+                        );
+
+                        if (distance > 50) {
+                            const angle = Math.atan2(newY - bubbleY, newX - bubbleX);
+                            const moveX = Math.cos(angle) * 10;
+                            const moveY = Math.sin(angle) * 10;
+
+                            bubble.style.left = `${bubbleX + moveX}px`;
+                            bubble.style.top = `${bubbleY + moveY}px`;
+                        }
+                    }
+                }
+            });
+        }
+
+        // Función para buscar y resaltar coincidencias
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const allBubbles = document.querySelectorAll('.bubble');
+
+            allBubbles.forEach(bubble => {
+                const memory = JSON.parse(bubble.dataset.memory);
+                const memoryText = Object.values(memory).join(' ').toLowerCase();
+
+                if (searchTerm === '') {
+                    bubble.style.borderWidth = '1px';
+                    bubble.style.borderColor = 'rgba(147, 112, 219, 0.3)';
+                    return;
+                }
+
+                const matches = searchTerm.split(' ').filter(term => term.length > 0);
+                let matchCount = 0;
+
+                matches.forEach(term => {
+                    if (memoryText.includes(term)) {
+                        matchCount++;
+                    }
+                });
+
+                if (matchCount > 0) {
+                    const borderWidth = 1 + (matchCount * 2); // Aumentar grosor según coincidencias
+                    const borderColorIntensity = Math.min(100, matchCount * 20); // Aumentar intensidad del color
+                    bubble.style.borderWidth = `${borderWidth}px`;
+                    bubble.style.borderColor = `rgba(147, 112, 219, ${0.3 + (matchCount * 0.1)})`;
+                } else {
+                    bubble.style.borderWidth = '1px';
+                    bubble.style.borderColor = 'rgba(147, 112, 219, 0.3)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

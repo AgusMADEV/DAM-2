@@ -1,0 +1,5 @@
+# Dependencias del proyecto Biblioteca Digital
+# Instalación: pip install -r requirements.txt
+
+# Procesamiento de imágenes para esteganografía
+Pillow>=10.0.0

@@ -1,0 +1,3042 @@
+[
+  {
+    "vista": "estaba conduciendo en el coche por una carretera y era de día",
+    "momento": "2025-12-02",
+    "oido": "la radio baja y el ruido constante del motor",
+    "sentimos": "algo de prisa y concentración",
+    "olemos": "olor tenue a calefacción del coche",
+    "sabor": "",
+    "palpamos": "hacía frío de diciembre entrando por la ventana",
+    "pensamos": "no quería llegar tarde a clase",
+    "ubicacion": "carretera cerca de Valencia",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 8,
+      "miedo": 3,
+      "ira": 6,
+      "asco": 5,
+      "sorpresa": 4
+    }
+  },
+  {
+    "vista": "ayer por la noche iba conduciendo por la carretera con pocas luces",
+    "momento": "2025-12-10",
+    "oido": "los neumáticos sobre el asfalto mojado",
+    "sentimos": "tranquilidad con un punto de cansancio",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "",
+    "pensamos": "me sorprendió que no hubiera llovido mucho",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 6,
+      "tristeza": 1,
+      "miedo": 0,
+      "ira": 7,
+      "asco": 3,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "estoy dando una clase y veo a los alumnos tomando apuntes",
+    "momento": "2025-12-16",
+    "oido": "teclados, sillas y murmullos puntuales",
+    "sentimos": "responsabilidad y ganas de que quede claro",
+    "olemos": "olor a aula y rotulador",
+    "sabor": "",
+    "palpamos": "aquí hace calor",
+    "pensamos": "quiero que este ejercicio quede bien",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 8,
+      "tristeza": 7,
+      "miedo": 3,
+      "ira": 5,
+      "asco": 5,
+      "sorpresa": 7
+    }
+  },
+  {
+    "vista": "iba en la bici y al girarme para mirar un coche noté un tirón",
+    "momento": "2025-05-14",
+    "oido": "ruido de tráfico y viento",
+    "sentimos": "dolor fuerte en el cuello",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "era un día de primavera y hacía calor",
+    "pensamos": "cada año me pasa alguna contractura y no sé por qué",
+    "ubicacion": "antiguo cauce del río de Valencia",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 10,
+      "miedo": 6,
+      "ira": 3,
+      "asco": 10,
+      "sorpresa": 6
+    }
+  },
+  {
+    "vista": "camino por una calle con tiendas y gente mirando escaparates",
+    "momento": "2025-11-28",
+    "oido": "conversaciones y una moto pasando",
+    "sentimos": "curiosidad y calma",
+    "olemos": "olor a castañas asadas",
+    "sabor": "",
+    "palpamos": "aire fresco en la cara",
+    "pensamos": "debería comprar un detalle para casa",
+    "ubicacion": "centro de Valencia",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 6,
+      "miedo": 0,
+      "ira": 7,
+      "asco": 1,
+      "sorpresa": 0
+    }
+  },
+  {
+    "vista": "en un supermercado comparando precios en la estantería",
+    "momento": "2025-10-03",
+    "oido": "carros y pitidos de caja",
+    "sentimos": "ligera saturación por el ruido",
+    "olemos": "pan recién hecho",
+    "sabor": "",
+    "palpamos": "",
+    "pensamos": "tengo que organizar mejor la lista",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 3,
+      "miedo": 1,
+      "ira": 9,
+      "asco": 5,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "en la cocina preparando café por la mañana",
+    "momento": "2025-12-01",
+    "oido": "la cafetera burbujeando",
+    "sentimos": "sueño y rutina",
+    "olemos": "café intenso",
+    "sabor": "primer sorbo amargo",
+    "palpamos": "taza caliente en las manos",
+    "pensamos": "hoy toca avanzar trabajo",
+    "ubicacion": "casa",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 5,
+      "miedo": 9,
+      "ira": 0,
+      "asco": 4,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "paseo por el parque con árboles y hojas en el suelo",
+    "momento": "2025-11-09",
+    "oido": "pájaros y niños a lo lejos",
+    "sentimos": "descanso mental",
+    "olemos": "tierra húmeda",
+    "sabor": "",
+    "palpamos": "brisa suave",
+    "pensamos": "necesitaba parar un rato",
+    "ubicacion": "parque en Mislata",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 4,
+      "miedo": 0,
+      "ira": 9,
+      "asco": 10,
+      "sorpresa": 1
+    }
+  },
+  {
+    "vista": "en un aula con proyector mostrando código en pantalla",
+    "momento": "2025-10-21",
+    "oido": "preguntas y teclas",
+    "sentimos": "motivación",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "",
+    "pensamos": "voy a poner un ejemplo más simple",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 3,
+      "miedo": 1,
+      "ira": 7,
+      "asco": 7,
+      "sorpresa": 6
+    }
+  },
+  {
+    "vista": "reunión rápida en un pasillo antes de entrar",
+    "momento": "2025-12-05",
+    "oido": "eco del pasillo y pasos",
+    "sentimos": "prisa",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "frío en las manos",
+    "pensamos": "no quiero olvidarme del material",
+    "ubicacion": "instituto en Valencia",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 6,
+      "miedo": 7,
+      "ira": 2,
+      "asco": 7,
+      "sorpresa": 2
+    }
+  },
+  {
+    "vista": "tarde de lluvia mirando por la ventana",
+    "momento": "2025-10-29",
+    "oido": "gotas golpeando el cristal",
+    "sentimos": "melancolía ligera",
+    "olemos": "olor a lluvia",
+    "sabor": "",
+    "palpamos": "calor de la manta",
+    "pensamos": "mañana reorganizo todo",
+    "ubicacion": "casa",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 4,
+      "miedo": 2,
+      "ira": 9,
+      "asco": 3,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "en el coche, parado en un semáforo con luces rojas",
+    "momento": "2025-12-07",
+    "oido": "intermitente y motor al ralentí",
+    "sentimos": "paciencia",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "",
+    "pensamos": "tengo que responder correos",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 7,
+      "miedo": 5,
+      "ira": 9,
+      "asco": 1,
+      "sorpresa": 8
+    }
+  },
+  {
+    "vista": "subiendo escaleras con prisa por llegar",
+    "momento": "2025-09-18",
+    "oido": "pasos y respiración",
+    "sentimos": "agobio breve",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "corazón acelerado",
+    "pensamos": "voy justo de tiempo",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 3,
+      "tristeza": 6,
+      "miedo": 2,
+      "ira": 3,
+      "asco": 6,
+      "sorpresa": 1
+    }
+  },
+  {
+    "vista": "en una cafetería con gente trabajando con portátil",
+    "momento": "2025-11-15",
+    "oido": "tazas, murmullos, una máquina de café",
+    "sentimos": "concentración",
+    "olemos": "café y bollería",
+    "sabor": "café con leche",
+    "palpamos": "mesa fría",
+    "pensamos": "este diseño va a quedar bien",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 10,
+      "tristeza": 0,
+      "miedo": 7,
+      "ira": 8,
+      "asco": 8,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "paseando cerca de un río con carril bici",
+    "momento": "2025-04-22",
+    "oido": "ruido de bicis y pájaros",
+    "sentimos": "energía",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "sol en la piel",
+    "pensamos": "debería salir más a menudo",
+    "ubicacion": "cauce del Turia, Valencia",
+    "emociones": {
+      "alegria": 2,
+      "tristeza": 6,
+      "miedo": 1,
+      "ira": 1,
+      "asco": 4,
+      "sorpresa": 9
+    }
+  },
+  {
+    "vista": "en casa, ordenando papeles en una mesa",
+    "momento": "2025-08-30",
+    "oido": "silencio y alguna notificación del móvil",
+    "sentimos": "orden y control",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "papel áspero",
+    "pensamos": "si lo dejo listo hoy, mañana descanso",
+    "ubicacion": "casa",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 3,
+      "miedo": 1,
+      "ira": 6,
+      "asco": 7,
+      "sorpresa": 7
+    }
+  },
+  {
+    "vista": "en una parada esperando el autobús",
+    "momento": "2025-12-12",
+    "oido": "tráfico y un bus frenando",
+    "sentimos": "frío y paciencia",
+    "olemos": "humo de escape",
+    "sabor": "",
+    "palpamos": "manos frías",
+    "pensamos": "llego justo, pero llego",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 2,
+      "tristeza": 3,
+      "miedo": 2,
+      "ira": 6,
+      "asco": 7,
+      "sorpresa": 9
+    }
+  },
+  {
+    "vista": "caminando por una avenida grande con semáforos",
+    "momento": "2025-09-06",
+    "oido": "coches y sirena a lo lejos",
+    "sentimos": "alerta",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "calor fuerte",
+    "pensamos": "tengo que hidratarme más",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 10,
+      "tristeza": 3,
+      "miedo": 8,
+      "ira": 10,
+      "asco": 1,
+      "sorpresa": 4
+    }
+  },
+  {
+    "vista": "en el aula, un alumno pregunta y el resto mira",
+    "momento": "2025-11-19",
+    "oido": "una pregunta clara y breve silencio",
+    "sentimos": "satisfacción",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "",
+    "pensamos": "esta duda es buena, la explico a todos",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 4,
+      "miedo": 9,
+      "ira": 4,
+      "asco": 5,
+      "sorpresa": 4
+    }
+  },
+  {
+    "vista": "en un paso de peatones esperando para cruzar",
+    "momento": "2025-10-11",
+    "oido": "pitido de semáforo y pasos",
+    "sentimos": "prisa",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "viento",
+    "pensamos": "no quiero perder el tren",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 3,
+      "miedo": 7,
+      "ira": 3,
+      "asco": 2,
+      "sorpresa": 3
+    }
+  },
+  {
+    "vista": "por la tarde, revisando código en una pantalla grande",
+    "momento": "2025-12-03",
+    "oido": "ventilador del ordenador",
+    "sentimos": "concentración y cansancio",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "ojos secos",
+    "pensamos": "voy a simplificar la función",
+    "ubicacion": "casa",
+    "emociones": {
+      "alegria": 3,
+      "tristeza": 2,
+      "miedo": 4,
+      "ira": 9,
+      "asco": 3,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "en un aula, explicando un ejercicio paso a paso",
+    "momento": "2025-10-08",
+    "oido": "teclas y alguna risa",
+    "sentimos": "confianza",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "",
+    "pensamos": "si lo ven en pequeño, lo entienden",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 6,
+      "miedo": 4,
+      "ira": 3,
+      "asco": 8,
+      "sorpresa": 8
+    }
+  },
+  {
+    "vista": "en un trayecto corto en coche con el sol bajo",
+    "momento": "2025-11-02",
+    "oido": "radio con noticias",
+    "sentimos": "tranquilidad",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "luz cálida en la cara",
+    "pensamos": "hoy el día ha rendido",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 3,
+      "tristeza": 10,
+      "miedo": 1,
+      "ira": 10,
+      "asco": 7,
+      "sorpresa": 0
+    }
+  },
+  {
+    "vista": "en una biblioteca buscando un libro en una estantería alta",
+    "momento": "2025-09-26",
+    "oido": "silencio y páginas pasando",
+    "sentimos": "curiosidad",
+    "olemos": "papel viejo",
+    "sabor": "",
+    "palpamos": "cubierta dura",
+    "pensamos": "quiero algo práctico y directo",
+    "ubicacion": "biblioteca en Valencia",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 0,
+      "miedo": 7,
+      "ira": 3,
+      "asco": 7,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "en una terraza con una bebida fría al atardecer",
+    "momento": "2025-07-19",
+    "oido": "voces y platos",
+    "sentimos": "relajación",
+    "olemos": "",
+    "sabor": "refresco dulce",
+    "palpamos": "aire templado",
+    "pensamos": "necesitaba desconectar",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 4,
+      "miedo": 3,
+      "ira": 1,
+      "asco": 0,
+      "sorpresa": 3
+    }
+  },
+  {
+    "vista": "en un gimnasio mirando el espejo antes de empezar",
+    "momento": "2025-06-06",
+    "oido": "música y pesas",
+    "sentimos": "motivación",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "sudor",
+    "pensamos": "con constancia, mejora",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 9,
+      "tristeza": 9,
+      "miedo": 3,
+      "ira": 1,
+      "asco": 5,
+      "sorpresa": 8
+    }
+  },
+  {
+    "vista": "en la cocina preparando una cena sencilla",
+    "momento": "2025-10-17",
+    "oido": "sartén y agua hirviendo",
+    "sentimos": "calma",
+    "olemos": "ajo y aceite",
+    "sabor": "sal y tomate",
+    "palpamos": "calor de los fogones",
+    "pensamos": "me apetece algo rápido",
+    "ubicacion": "casa",
+    "emociones": {
+      "alegria": 2,
+      "tristeza": 7,
+      "miedo": 9,
+      "ira": 4,
+      "asco": 10,
+      "sorpresa": 0
+    }
+  },
+  {
+    "vista": "en un pasillo del centro, saludando a alguien de lejos",
+    "momento": "2025-12-09",
+    "oido": "pasos y voces",
+    "sentimos": "buen humor",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "",
+    "pensamos": "hoy voy con tiempo",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 10,
+      "miedo": 9,
+      "ira": 9,
+      "asco": 5,
+      "sorpresa": 3
+    }
+  },
+  {
+    "vista": "en el coche buscando aparcamiento, dando vueltas",
+    "momento": "2025-11-25",
+    "oido": "intermitente y coches",
+    "sentimos": "impaciencia",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "",
+    "pensamos": "siempre pasa lo mismo a esta hora",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 5,
+      "miedo": 5,
+      "ira": 2,
+      "asco": 0,
+      "sorpresa": 3
+    }
+  },
+  {
+    "vista": "en un aula, corrigiendo ejercicios con calma",
+    "momento": "2025-10-30",
+    "oido": "silencio y teclado",
+    "sentimos": "foco",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "",
+    "pensamos": "voy a dar feedback claro",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 0,
+      "miedo": 9,
+      "ira": 10,
+      "asco": 3,
+      "sorpresa": 0
+    }
+  },
+  {
+    "vista": "paseo corto por la mañana temprano con poca gente",
+    "momento": "2025-12-04",
+    "oido": "pájaros y algún coche",
+    "sentimos": "energía tranquila",
+    "olemos": "aire frío",
+    "sabor": "",
+    "palpamos": "frío en la nariz",
+    "pensamos": "me viene bien caminar",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 6,
+      "miedo": 10,
+      "ira": 5,
+      "asco": 2,
+      "sorpresa": 9
+    }
+  },
+  {
+    "vista": "en un tren mirando por la ventanilla",
+    "momento": "2025-08-12",
+    "oido": "ruido rítmico de vías",
+    "sentimos": "desconexión",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "vibración del asiento",
+    "pensamos": "voy a aprovechar para leer",
+    "ubicacion": "trayecto en tren",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 1,
+      "miedo": 3,
+      "ira": 0,
+      "asco": 7,
+      "sorpresa": 8
+    }
+  },
+  {
+    "vista": "en un aula, explicando cómo funciona una API",
+    "momento": "2025-11-07",
+    "oido": "preguntas y respuestas",
+    "sentimos": "entusiasmo",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "",
+    "pensamos": "si lo conectan con un ejemplo real, lo retienen",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 7,
+      "tristeza": 1,
+      "miedo": 6,
+      "ira": 1,
+      "asco": 6,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en la calle, el cielo estaba gris y amenazaba lluvia",
+    "momento": "2025-11-03",
+    "oido": "viento entre edificios",
+    "sentimos": "prudencia",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "viento fuerte",
+    "pensamos": "me llevo chaqueta por si acaso",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 8,
+      "tristeza": 2,
+      "miedo": 10,
+      "ira": 8,
+      "asco": 1,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en casa, haciendo una copia de seguridad del ordenador",
+    "momento": "2025-09-14",
+    "oido": "disco trabajando",
+    "sentimos": "seguridad",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "",
+    "pensamos": "mejor prevenir que perder datos",
+    "ubicacion": "casa",
+    "emociones": {
+      "alegria": 2,
+      "tristeza": 6,
+      "miedo": 4,
+      "ira": 6,
+      "asco": 4,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en un aula, mirando un error en consola y encontrando la causa",
+    "momento": "2025-12-13",
+    "oido": "un 'ah' general cuando se entiende",
+    "sentimos": "satisfacción",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "",
+    "pensamos": "la explicación breve funciona",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 6,
+      "miedo": 0,
+      "ira": 4,
+      "asco": 9,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "caminando por una calle estrecha con luces de navidad",
+    "momento": "2025-12-11",
+    "oido": "gente hablando y música de fondo",
+    "sentimos": "ambiente agradable",
+    "olemos": "dulces y chocolate",
+    "sabor": "",
+    "palpamos": "frío",
+    "pensamos": "la ciudad cambia mucho en diciembre",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 6,
+      "tristeza": 6,
+      "miedo": 0,
+      "ira": 5,
+      "asco": 10,
+      "sorpresa": 3
+    }
+  },
+  {
+    "vista": "en una sala silenciosa revisando notas en una libreta",
+    "momento": "2025-10-06",
+    "oido": "bolígrafo sobre papel",
+    "sentimos": "orden mental",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "papel suave",
+    "pensamos": "así lo tengo claro para la próxima clase",
+    "ubicacion": "casa",
+    "emociones": {
+      "alegria": 6,
+      "tristeza": 6,
+      "miedo": 3,
+      "ira": 0,
+      "asco": 6,
+      "sorpresa": 2
+    }
+  },
+  {
+    "vista": "en un aparcamiento subterráneo buscando el coche",
+    "momento": "2025-09-09",
+    "oido": "eco y motores",
+    "sentimos": "desorientación breve",
+    "olemos": "humedad y gasolina",
+    "sabor": "",
+    "palpamos": "aire frío",
+    "pensamos": "tengo que recordar la columna",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 6,
+      "tristeza": 1,
+      "miedo": 1,
+      "ira": 6,
+      "asco": 9,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "en una clase, escribiendo en la pizarra un esquema",
+    "momento": "2025-11-26",
+    "oido": "tiza y silencio atento",
+    "sentimos": "claridad",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "",
+    "pensamos": "estructura primero, detalle después",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 7,
+      "tristeza": 2,
+      "miedo": 2,
+      "ira": 0,
+      "asco": 0,
+      "sorpresa": 8
+    }
+  },
+  {
+    "vista": "en un supermercado eligiendo frutas",
+    "momento": "2025-03-19",
+    "oido": "silencio roto por páginas pasando",
+    "sentimos": "responsabilidad",
+    "olemos": "café",
+    "sabor": "un sorbo amargo",
+    "palpamos": "aire fresco en la cara",
+    "pensamos": "voy a simplificar la explicación",
+    "ubicacion": "casa (despacho)",
+    "emociones": {
+      "alegria": 2,
+      "tristeza": 10,
+      "miedo": 6,
+      "ira": 1,
+      "asco": 9,
+      "sorpresa": 9
+    }
+  },
+  {
+    "vista": "en la cocina preparando algo rápido",
+    "momento": "2025-01-30",
+    "oido": "lluvia golpeando el cristal",
+    "sentimos": "satisfacción",
+    "olemos": "café",
+    "sabor": "un sorbo amargo",
+    "palpamos": "corazón acelerado",
+    "pensamos": "respondo mensajes luego",
+    "ubicacion": "casa",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 8,
+      "miedo": 2,
+      "ira": 2,
+      "asco": 5,
+      "sorpresa": 4
+    }
+  },
+  {
+    "vista": "en el coche, conduciendo por una avenida con semáforos",
+    "momento": "2025-02-16",
+    "oido": "motor al ralentí",
+    "sentimos": "motivación",
+    "olemos": "café",
+    "sabor": "un sorbo amargo",
+    "palpamos": "ojos secos",
+    "pensamos": "me viene bien parar un rato",
+    "ubicacion": "carretera cerca de Valencia",
+    "emociones": {
+      "alegria": 2,
+      "tristeza": 8,
+      "miedo": 2,
+      "ira": 1,
+      "asco": 1,
+      "sorpresa": 6
+    }
+  },
+  {
+    "vista": "en la cocina preparando algo rápido",
+    "momento": "2025-10-27",
+    "oido": "silencio roto por páginas pasando",
+    "sentimos": "concentración",
+    "olemos": "olor a lluvia",
+    "sabor": "café con leche",
+    "palpamos": "aire fresco en la cara",
+    "pensamos": "voy con tiempo",
+    "ubicacion": "parque en Mislata",
+    "emociones": {
+      "alegria": 7,
+      "tristeza": 3,
+      "miedo": 4,
+      "ira": 2,
+      "asco": 0,
+      "sorpresa": 7
+    }
+  },
+  {
+    "vista": "en el metro, de pie sujetando la barra",
+    "momento": "2025-08-03",
+    "oido": "ruido del motor y la radio baja",
+    "sentimos": "ligera saturación",
+    "olemos": "pan recién hecho",
+    "sabor": "",
+    "palpamos": "aire fresco en la cara",
+    "pensamos": "voy con tiempo",
+    "ubicacion": "centro de Valencia",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 0,
+      "miedo": 9,
+      "ira": 10,
+      "asco": 6,
+      "sorpresa": 1
+    }
+  },
+  {
+    "vista": "en casa, revisando notas y preparando la siguiente clase",
+    "momento": "2025-10-25",
+    "oido": "ventilador del ordenador",
+    "sentimos": "responsabilidad",
+    "olemos": "olor a lluvia",
+    "sabor": "chocolate caliente",
+    "palpamos": "taza caliente",
+    "pensamos": "voy justo de tiempo",
+    "ubicacion": "casa",
+    "emociones": {
+      "alegria": 9,
+      "tristeza": 2,
+      "miedo": 10,
+      "ira": 3,
+      "asco": 9,
+      "sorpresa": 6
+    }
+  },
+  {
+    "vista": "en la cocina preparando algo rápido",
+    "momento": "2025-01-31",
+    "oido": "ventilador del ordenador",
+    "sentimos": "satisfacción",
+    "olemos": "papel viejo",
+    "sabor": "",
+    "palpamos": "frío",
+    "pensamos": "hoy el día ha rendido",
+    "ubicacion": "estación de tren",
+    "emociones": {
+      "alegria": 9,
+      "tristeza": 3,
+      "miedo": 7,
+      "ira": 2,
+      "asco": 9,
+      "sorpresa": 3
+    }
+  },
+  {
+    "vista": "en el metro, de pie sujetando la barra",
+    "momento": "2025-05-08",
+    "oido": "",
+    "sentimos": "prisa",
+    "olemos": "aire limpio",
+    "sabor": "refresco dulce",
+    "palpamos": "taza caliente",
+    "pensamos": "quiero dejarlo claro y simple",
+    "ubicacion": "casa (salón)",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 6,
+      "miedo": 8,
+      "ira": 2,
+      "asco": 6,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "en una cafetería con portátil y libreta",
+    "momento": "2025-06-25",
+    "oido": "intermitente y coches pasando",
+    "sentimos": "paciencia",
+    "olemos": "rotulador",
+    "sabor": "un sorbo amargo",
+    "palpamos": "taza caliente",
+    "pensamos": "voy justo de tiempo",
+    "ubicacion": "parada de bus en Mislata",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 2,
+      "miedo": 3,
+      "ira": 3,
+      "asco": 0,
+      "sorpresa": 8
+    }
+  },
+  {
+    "vista": "en casa, delante del ordenador con varias ventanas abiertas",
+    "momento": "2025-06-25",
+    "oido": "ruido del motor y la radio baja",
+    "sentimos": "orden y control",
+    "olemos": "papel viejo",
+    "sabor": "",
+    "palpamos": "frío en las manos",
+    "pensamos": "me viene bien parar un rato",
+    "ubicacion": "casa",
+    "emociones": {
+      "alegria": 10,
+      "tristeza": 0,
+      "miedo": 10,
+      "ira": 5,
+      "asco": 1,
+      "sorpresa": 6
+    }
+  },
+  {
+    "vista": "en un gimnasio empezando la rutina",
+    "momento": "2025-10-13",
+    "oido": "ventilador del ordenador",
+    "sentimos": "alerta",
+    "olemos": "castañas asadas",
+    "sabor": "chocolate caliente",
+    "palpamos": "",
+    "pensamos": "esto con un ejemplo real se entiende",
+    "ubicacion": "antiguo cauce del río de Valencia",
+    "emociones": {
+      "alegria": 9,
+      "tristeza": 7,
+      "miedo": 8,
+      "ira": 10,
+      "asco": 4,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en una cafetería con portátil y libreta",
+    "momento": "2025-10-24",
+    "oido": "",
+    "sentimos": "paciencia",
+    "olemos": "pan recién hecho",
+    "sabor": "un sorbo amargo",
+    "palpamos": "calor en el aula",
+    "pensamos": "hoy el día ha rendido",
+    "ubicacion": "casa",
+    "emociones": {
+      "alegria": 6,
+      "tristeza": 4,
+      "miedo": 9,
+      "ira": 3,
+      "asco": 6,
+      "sorpresa": 6
+    }
+  },
+  {
+    "vista": "caminando por una calle con gente y escaparates",
+    "momento": "2025-06-08",
+    "oido": "pasos y maletas",
+    "sentimos": "buen humor",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "vibración del asiento",
+    "pensamos": "debería cuidar más la postura",
+    "ubicacion": "metro en Valencia",
+    "emociones": {
+      "alegria": 10,
+      "tristeza": 5,
+      "miedo": 7,
+      "ira": 8,
+      "asco": 7,
+      "sorpresa": 2
+    }
+  },
+  {
+    "vista": "en una cafetería con portátil y libreta",
+    "momento": "2025-07-01",
+    "oido": "ruido del motor y la radio baja",
+    "sentimos": "buen humor",
+    "olemos": "pan recién hecho",
+    "sabor": "",
+    "palpamos": "frío en las manos",
+    "pensamos": "mejor hacerlo hoy y descansar mañana",
+    "ubicacion": "casa (salón)",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 0,
+      "miedo": 9,
+      "ira": 7,
+      "asco": 7,
+      "sorpresa": 3
+    }
+  },
+  {
+    "vista": "en casa, delante del ordenador con varias ventanas abiertas",
+    "momento": "2025-05-07",
+    "oido": "pasos y maletas",
+    "sentimos": "motivación",
+    "olemos": "papel viejo",
+    "sabor": "un sorbo amargo",
+    "palpamos": "vibración del asiento",
+    "pensamos": "hoy el día ha rendido",
+    "ubicacion": "metro en Valencia",
+    "emociones": {
+      "alegria": 7,
+      "tristeza": 9,
+      "miedo": 7,
+      "ira": 2,
+      "asco": 7,
+      "sorpresa": 6
+    }
+  },
+  {
+    "vista": "en el mercado viendo puestos de verduras",
+    "momento": "2025-08-09",
+    "oido": "ruido rítmico de vías",
+    "sentimos": "cansancio",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "vibración del asiento",
+    "pensamos": "me viene bien parar un rato",
+    "ubicacion": "metro en Valencia",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 1,
+      "miedo": 2,
+      "ira": 5,
+      "asco": 6,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "en el aula explicando un concepto con ejemplos",
+    "momento": "2025-04-01",
+    "oido": "ruido rítmico de vías",
+    "sentimos": "satisfacción",
+    "olemos": "",
+    "sabor": "refresco dulce",
+    "palpamos": "frío",
+    "pensamos": "hoy el día ha rendido",
+    "ubicacion": "estación de tren",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 7,
+      "miedo": 8,
+      "ira": 8,
+      "asco": 10,
+      "sorpresa": 0
+    }
+  },
+  {
+    "vista": "en el metro, de pie sujetando la barra",
+    "momento": "2025-01-03",
+    "oido": "ruido del motor y la radio baja",
+    "sentimos": "motivación",
+    "olemos": "ambientador del coche",
+    "sabor": "chocolate caliente",
+    "palpamos": "vibración del asiento",
+    "pensamos": "quiero dejarlo claro y simple",
+    "ubicacion": "casa (cocina)",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 10,
+      "miedo": 2,
+      "ira": 1,
+      "asco": 5,
+      "sorpresa": 8
+    }
+  },
+  {
+    "vista": "en casa, delante del ordenador con varias ventanas abiertas",
+    "momento": "2025-09-21",
+    "oido": "ventilador del ordenador",
+    "sentimos": "responsabilidad",
+    "olemos": "",
+    "sabor": "café con leche",
+    "palpamos": "calor de los fogones",
+    "pensamos": "voy con tiempo",
+    "ubicacion": "paseo marítimo en Valencia",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 0,
+      "miedo": 8,
+      "ira": 6,
+      "asco": 10,
+      "sorpresa": 2
+    }
+  },
+  {
+    "vista": "en una biblioteca revisando apuntes",
+    "momento": "2025-07-23",
+    "oido": "silencio roto por páginas pasando",
+    "sentimos": "motivación",
+    "olemos": "pan recién hecho",
+    "sabor": "",
+    "palpamos": "",
+    "pensamos": "respondo mensajes luego",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 1,
+      "miedo": 9,
+      "ira": 1,
+      "asco": 3,
+      "sorpresa": 2
+    }
+  },
+  {
+    "vista": "en el coche, conduciendo por una avenida con semáforos",
+    "momento": "2025-02-04",
+    "oido": "motor al ralentí",
+    "sentimos": "paciencia",
+    "olemos": "tierra húmeda",
+    "sabor": "un sorbo amargo",
+    "palpamos": "viento fuerte",
+    "pensamos": "quiero dejarlo claro y simple",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 7,
+      "tristeza": 4,
+      "miedo": 2,
+      "ira": 10,
+      "asco": 3,
+      "sorpresa": 1
+    }
+  },
+  {
+    "vista": "caminando por una calle con gente y escaparates",
+    "momento": "2025-10-18",
+    "oido": "ruido del motor y la radio baja",
+    "sentimos": "ligera saturación",
+    "olemos": "pan recién hecho",
+    "sabor": "chocolate caliente",
+    "palpamos": "vibración del asiento",
+    "pensamos": "tengo que organizar mejor la lista",
+    "ubicacion": "casa",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 9,
+      "miedo": 4,
+      "ira": 2,
+      "asco": 5,
+      "sorpresa": 9
+    }
+  },
+  {
+    "vista": "en el mercado viendo puestos de verduras",
+    "momento": "2025-04-17",
+    "oido": "ventilador del ordenador",
+    "sentimos": "motivación",
+    "olemos": "tierra húmeda",
+    "sabor": "",
+    "palpamos": "viento fuerte",
+    "pensamos": "quiero dejarlo claro y simple",
+    "ubicacion": "casa (despacho)",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 7,
+      "miedo": 2,
+      "ira": 4,
+      "asco": 8,
+      "sorpresa": 7
+    }
+  },
+  {
+    "vista": "en una cafetería con portátil y libreta",
+    "momento": "2025-03-04",
+    "oido": "teclados y alguna pregunta",
+    "sentimos": "relajación",
+    "olemos": "papel viejo",
+    "sabor": "",
+    "palpamos": "calor de los fogones",
+    "pensamos": "hoy el día ha rendido",
+    "ubicacion": "casa (salón)",
+    "emociones": {
+      "alegria": 3,
+      "tristeza": 9,
+      "miedo": 4,
+      "ira": 9,
+      "asco": 8,
+      "sorpresa": 3
+    }
+  },
+  {
+    "vista": "en el aula explicando un concepto con ejemplos",
+    "momento": "2025-03-15",
+    "oido": "teclados y alguna pregunta",
+    "sentimos": "descanso mental",
+    "olemos": "castañas asadas",
+    "sabor": "",
+    "palpamos": "calor de los fogones",
+    "pensamos": "voy con tiempo",
+    "ubicacion": "centro de Valencia",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 5,
+      "miedo": 0,
+      "ira": 3,
+      "asco": 2,
+      "sorpresa": 6
+    }
+  },
+  {
+    "vista": "paseando por el parque con el cielo despejado",
+    "momento": "2025-01-12",
+    "oido": "sonido del metro y avisos por megafonía",
+    "sentimos": "ligera saturación",
+    "olemos": "castañas asadas",
+    "sabor": "agua fresca",
+    "palpamos": "",
+    "pensamos": "voy justo de tiempo",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 2,
+      "tristeza": 10,
+      "miedo": 4,
+      "ira": 10,
+      "asco": 5,
+      "sorpresa": 6
+    }
+  },
+  {
+    "vista": "en un gimnasio empezando la rutina",
+    "momento": "2025-09-28",
+    "oido": "carros y pitidos de caja",
+    "sentimos": "responsabilidad",
+    "olemos": "pan recién hecho",
+    "sabor": "",
+    "palpamos": "aire fresco en la cara",
+    "pensamos": "esto con un ejemplo real se entiende",
+    "ubicacion": "centro de Valencia",
+    "emociones": {
+      "alegria": 2,
+      "tristeza": 4,
+      "miedo": 1,
+      "ira": 8,
+      "asco": 0,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en un supermercado eligiendo frutas",
+    "momento": "2025-04-25",
+    "oido": "lluvia golpeando el cristal",
+    "sentimos": "ligera saturación",
+    "olemos": "ambientador del coche",
+    "sabor": "chocolate caliente",
+    "palpamos": "",
+    "pensamos": "mejor hacerlo hoy y descansar mañana",
+    "ubicacion": "antiguo cauce del río de Valencia",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 7,
+      "miedo": 8,
+      "ira": 8,
+      "asco": 9,
+      "sorpresa": 1
+    }
+  },
+  {
+    "vista": "en un gimnasio empezando la rutina",
+    "momento": "2025-04-10",
+    "oido": "",
+    "sentimos": "satisfacción",
+    "olemos": "ajo y aceite",
+    "sabor": "refresco dulce",
+    "palpamos": "ojos secos",
+    "pensamos": "voy justo de tiempo",
+    "ubicacion": "cafetería en Valencia",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 8,
+      "miedo": 10,
+      "ira": 6,
+      "asco": 5,
+      "sorpresa": 4
+    }
+  },
+  {
+    "vista": "en un supermercado eligiendo frutas",
+    "momento": "2025-01-15",
+    "oido": "murmullos y pasos alrededor",
+    "sentimos": "alerta",
+    "olemos": "rotulador",
+    "sabor": "",
+    "palpamos": "calor en el aula",
+    "pensamos": "mejor hacerlo hoy y descansar mañana",
+    "ubicacion": "antiguo cauce del río de Valencia",
+    "emociones": {
+      "alegria": 6,
+      "tristeza": 5,
+      "miedo": 9,
+      "ira": 2,
+      "asco": 5,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "en un supermercado eligiendo frutas",
+    "momento": "2025-08-17",
+    "oido": "",
+    "sentimos": "orden y control",
+    "olemos": "",
+    "sabor": "chocolate caliente",
+    "palpamos": "viento fuerte",
+    "pensamos": "voy a simplificar la explicación",
+    "ubicacion": "biblioteca en Valencia",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 7,
+      "miedo": 3,
+      "ira": 2,
+      "asco": 9,
+      "sorpresa": 0
+    }
+  },
+  {
+    "vista": "en el aula explicando un concepto con ejemplos",
+    "momento": "2025-04-27",
+    "oido": "tazas, cucharillas y una cafetera",
+    "sentimos": "satisfacción",
+    "olemos": "castañas asadas",
+    "sabor": "refresco dulce",
+    "palpamos": "calor de los fogones",
+    "pensamos": "quiero dejarlo claro y simple",
+    "ubicacion": "antiguo cauce del río de Valencia",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 8,
+      "miedo": 4,
+      "ira": 4,
+      "asco": 10,
+      "sorpresa": 9
+    }
+  },
+  {
+    "vista": "en el mercado viendo puestos de verduras",
+    "momento": "2025-01-01",
+    "oido": "tazas, cucharillas y una cafetera",
+    "sentimos": "orden y control",
+    "olemos": "",
+    "sabor": "chocolate caliente",
+    "palpamos": "",
+    "pensamos": "voy a simplificar la explicación",
+    "ubicacion": "instituto en Valencia",
+    "emociones": {
+      "alegria": 10,
+      "tristeza": 5,
+      "miedo": 0,
+      "ira": 0,
+      "asco": 3,
+      "sorpresa": 2
+    }
+  },
+  {
+    "vista": "en casa, organizando tareas y notas",
+    "momento": "2025-07-18",
+    "oido": "radio con noticias",
+    "sentimos": "descanso mental",
+    "olemos": "olor a lluvia",
+    "sabor": "",
+    "palpamos": "brisa suave",
+    "pensamos": "respondo mensajes luego",
+    "ubicacion": "carretera cerca de Valencia",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 9,
+      "miedo": 10,
+      "ira": 6,
+      "asco": 6,
+      "sorpresa": 8
+    }
+  },
+  {
+    "vista": "en el aula explicando un concepto con ejemplos",
+    "momento": "2025-07-22",
+    "oido": "tazas, cucharillas y una cafetera",
+    "sentimos": "motivación",
+    "olemos": "",
+    "sabor": "un sorbo amargo",
+    "palpamos": "",
+    "pensamos": "no quiero llegar tarde",
+    "ubicacion": "centro de Valencia",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 0,
+      "miedo": 2,
+      "ira": 7,
+      "asco": 3,
+      "sorpresa": 9
+    }
+  },
+  {
+    "vista": "en casa, delante del ordenador con varias ventanas abiertas",
+    "momento": "2025-01-15",
+    "oido": "ruido del motor y la radio baja",
+    "sentimos": "buen humor",
+    "olemos": "papel viejo",
+    "sabor": "agua fresca",
+    "palpamos": "vibración del asiento",
+    "pensamos": "voy con tiempo",
+    "ubicacion": "antiguo cauce del río de Valencia",
+    "emociones": {
+      "alegria": 10,
+      "tristeza": 0,
+      "miedo": 0,
+      "ira": 0,
+      "asco": 0,
+      "sorpresa": 9
+    }
+  },
+  {
+    "vista": "en una cafetería con portátil y libreta",
+    "momento": "2025-12-03",
+    "oido": "motor al ralentí",
+    "sentimos": "prisa",
+    "olemos": "ambientador del coche",
+    "sabor": "agua fresca",
+    "palpamos": "frío en las manos",
+    "pensamos": "tengo que organizar mejor la lista",
+    "ubicacion": "carretera cerca de Valencia",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 4,
+      "miedo": 1,
+      "ira": 8,
+      "asco": 5,
+      "sorpresa": 8
+    }
+  },
+  {
+    "vista": "paseando por el parque con el cielo despejado",
+    "momento": "2025-03-13",
+    "oido": "silencio roto por páginas pasando",
+    "sentimos": "relajación",
+    "olemos": "olor a lluvia",
+    "sabor": "refresco dulce",
+    "palpamos": "frío en las manos",
+    "pensamos": "necesito priorizar tareas",
+    "ubicacion": "cauce del Turia, Valencia",
+    "emociones": {
+      "alegria": 3,
+      "tristeza": 6,
+      "miedo": 9,
+      "ira": 4,
+      "asco": 9,
+      "sorpresa": 2
+    }
+  },
+  {
+    "vista": "en el metro, de pie sujetando la barra",
+    "momento": "2025-09-14",
+    "oido": "sonido del metro y avisos por megafonía",
+    "sentimos": "alerta",
+    "olemos": "aire frío",
+    "sabor": "chocolate caliente",
+    "palpamos": "calor en el aula",
+    "pensamos": "voy justo de tiempo",
+    "ubicacion": "parada de bus en Mislata",
+    "emociones": {
+      "alegria": 3,
+      "tristeza": 5,
+      "miedo": 9,
+      "ira": 7,
+      "asco": 2,
+      "sorpresa": 2
+    }
+  },
+  {
+    "vista": "en el mercado viendo puestos de verduras",
+    "momento": "2025-03-09",
+    "oido": "murmullos y pasos alrededor",
+    "sentimos": "orden y control",
+    "olemos": "",
+    "sabor": "chocolate caliente",
+    "palpamos": "calor de los fogones",
+    "pensamos": "me viene bien parar un rato",
+    "ubicacion": "estación de tren",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 3,
+      "miedo": 2,
+      "ira": 7,
+      "asco": 1,
+      "sorpresa": 1
+    }
+  },
+  {
+    "vista": "en casa, delante del ordenador con varias ventanas abiertas",
+    "momento": "2025-09-30",
+    "oido": "ruido del motor y la radio baja",
+    "sentimos": "ligera saturación",
+    "olemos": "ambientador del coche",
+    "sabor": "café con leche",
+    "palpamos": "calor de los fogones",
+    "pensamos": "tengo que hidratarme más",
+    "ubicacion": "centro de Valencia",
+    "emociones": {
+      "alegria": 10,
+      "tristeza": 2,
+      "miedo": 10,
+      "ira": 4,
+      "asco": 6,
+      "sorpresa": 4
+    }
+  },
+  {
+    "vista": "en la cocina preparando algo rápido",
+    "momento": "2025-01-03",
+    "oido": "",
+    "sentimos": "alerta",
+    "olemos": "tierra húmeda",
+    "sabor": "agua fresca",
+    "palpamos": "brisa suave",
+    "pensamos": "hoy el día ha rendido",
+    "ubicacion": "antiguo cauce del río de Valencia",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 0,
+      "miedo": 10,
+      "ira": 8,
+      "asco": 5,
+      "sorpresa": 9
+    }
+  },
+  {
+    "vista": "en la calle esperando para cruzar",
+    "momento": "2025-03-03",
+    "oido": "lluvia golpeando el cristal",
+    "sentimos": "concentración",
+    "olemos": "castañas asadas",
+    "sabor": "",
+    "palpamos": "taza caliente",
+    "pensamos": "voy justo de tiempo",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 10,
+      "tristeza": 9,
+      "miedo": 7,
+      "ira": 9,
+      "asco": 8,
+      "sorpresa": 7
+    }
+  },
+  {
+    "vista": "en el coche, conduciendo por una avenida con semáforos",
+    "momento": "2025-04-08",
+    "oido": "carros y pitidos de caja",
+    "sentimos": "concentración",
+    "olemos": "pan recién hecho",
+    "sabor": "",
+    "palpamos": "aire fresco en la cara",
+    "pensamos": "tengo que organizar mejor la lista",
+    "ubicacion": "casa",
+    "emociones": {
+      "alegria": 3,
+      "tristeza": 2,
+      "miedo": 0,
+      "ira": 0,
+      "asco": 0,
+      "sorpresa": 8
+    }
+  },
+  {
+    "vista": "en una cafetería con portátil y libreta",
+    "momento": "2025-06-16",
+    "oido": "ventilador del ordenador",
+    "sentimos": "ligera saturación",
+    "olemos": "aire frío",
+    "sabor": "refresco dulce",
+    "palpamos": "",
+    "pensamos": "necesito priorizar tareas",
+    "ubicacion": "avenida en Valencia",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 6,
+      "miedo": 2,
+      "ira": 3,
+      "asco": 2,
+      "sorpresa": 0
+    }
+  },
+  {
+    "vista": "paseando por el parque con el cielo despejado",
+    "momento": "2025-10-01",
+    "oido": "",
+    "sentimos": "paciencia",
+    "olemos": "ambientador del coche",
+    "sabor": "refresco dulce",
+    "palpamos": "",
+    "pensamos": "voy justo de tiempo",
+    "ubicacion": "mercado en Valencia",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 0,
+      "miedo": 9,
+      "ira": 8,
+      "asco": 10,
+      "sorpresa": 3
+    }
+  },
+  {
+    "vista": "en casa, organizando tareas y notas",
+    "momento": "2025-10-14",
+    "oido": "sonido del metro y avisos por megafonía",
+    "sentimos": "relajación",
+    "olemos": "papel viejo",
+    "sabor": "agua fresca",
+    "palpamos": "frío",
+    "pensamos": "voy a simplificar la explicación",
+    "ubicacion": "metro en Valencia",
+    "emociones": {
+      "alegria": 2,
+      "tristeza": 6,
+      "miedo": 3,
+      "ira": 8,
+      "asco": 9,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en el aula explicando un concepto con ejemplos",
+    "momento": "2025-12-10",
+    "oido": "sonido del metro y avisos por megafonía",
+    "sentimos": "motivación",
+    "olemos": "pan recién hecho",
+    "sabor": "refresco dulce",
+    "palpamos": "",
+    "pensamos": "necesito priorizar tareas",
+    "ubicacion": "instituto en Valencia",
+    "emociones": {
+      "alegria": 8,
+      "tristeza": 10,
+      "miedo": 10,
+      "ira": 6,
+      "asco": 9,
+      "sorpresa": 2
+    }
+  },
+  {
+    "vista": "en casa, organizando tareas y notas",
+    "momento": "2025-03-21",
+    "oido": "intermitente y coches pasando",
+    "sentimos": "responsabilidad",
+    "olemos": "",
+    "sabor": "chocolate caliente",
+    "palpamos": "brisa suave",
+    "pensamos": "necesito priorizar tareas",
+    "ubicacion": "parque en Mislata",
+    "emociones": {
+      "alegria": 8,
+      "tristeza": 4,
+      "miedo": 1,
+      "ira": 4,
+      "asco": 10,
+      "sorpresa": 0
+    }
+  },
+  {
+    "vista": "en una cafetería con portátil y libreta",
+    "momento": "2025-04-23",
+    "oido": "intermitente y coches pasando",
+    "sentimos": "calma",
+    "olemos": "ajo y aceite",
+    "sabor": "",
+    "palpamos": "brisa suave",
+    "pensamos": "me viene bien parar un rato",
+    "ubicacion": "biblioteca en Valencia",
+    "emociones": {
+      "alegria": 7,
+      "tristeza": 8,
+      "miedo": 0,
+      "ira": 6,
+      "asco": 6,
+      "sorpresa": 7
+    }
+  },
+  {
+    "vista": "en casa, delante del ordenador con varias ventanas abiertas",
+    "momento": "2025-08-09",
+    "oido": "lluvia golpeando el cristal",
+    "sentimos": "motivación",
+    "olemos": "castañas asadas",
+    "sabor": "",
+    "palpamos": "ojos secos",
+    "pensamos": "esto con un ejemplo real se entiende",
+    "ubicacion": "casa (cocina)",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 10,
+      "miedo": 7,
+      "ira": 2,
+      "asco": 3,
+      "sorpresa": 1
+    }
+  },
+  {
+    "vista": "en el aula explicando un concepto con ejemplos",
+    "momento": "2025-07-07",
+    "oido": "murmullos y pasos alrededor",
+    "sentimos": "curiosidad",
+    "olemos": "ambientador del coche",
+    "sabor": "",
+    "palpamos": "calor de los fogones",
+    "pensamos": "debería cuidar más la postura",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 3,
+      "miedo": 10,
+      "ira": 0,
+      "asco": 1,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "en una biblioteca revisando apuntes",
+    "momento": "2025-06-19",
+    "oido": "lluvia golpeando el cristal",
+    "sentimos": "buen humor",
+    "olemos": "rotulador",
+    "sabor": "un sorbo amargo",
+    "palpamos": "taza caliente",
+    "pensamos": "tengo que hidratarme más",
+    "ubicacion": "biblioteca en Valencia",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 0,
+      "miedo": 4,
+      "ira": 10,
+      "asco": 8,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en casa, organizando tareas y notas",
+    "momento": "2025-02-23",
+    "oido": "teclados y alguna pregunta",
+    "sentimos": "cansancio",
+    "olemos": "rotulador",
+    "sabor": "café con leche",
+    "palpamos": "brisa suave",
+    "pensamos": "necesito priorizar tareas",
+    "ubicacion": "parque en Mislata",
+    "emociones": {
+      "alegria": 6,
+      "tristeza": 10,
+      "miedo": 8,
+      "ira": 4,
+      "asco": 4,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en el mercado viendo puestos de verduras",
+    "momento": "2025-08-05",
+    "oido": "sirena a lo lejos y tráfico",
+    "sentimos": "relajación",
+    "olemos": "rotulador",
+    "sabor": "",
+    "palpamos": "brisa suave",
+    "pensamos": "voy justo de tiempo",
+    "ubicacion": "polideportivo en Mislata",
+    "emociones": {
+      "alegria": 3,
+      "tristeza": 1,
+      "miedo": 8,
+      "ira": 0,
+      "asco": 2,
+      "sorpresa": 4
+    }
+  },
+  {
+    "vista": "en la cocina preparando algo rápido",
+    "momento": "2025-09-11",
+    "oido": "intermitente y coches pasando",
+    "sentimos": "curiosidad",
+    "olemos": "pan recién hecho",
+    "sabor": "",
+    "palpamos": "frío en las manos",
+    "pensamos": "tengo que hidratarme más",
+    "ubicacion": "centro de Valencia",
+    "emociones": {
+      "alegria": 3,
+      "tristeza": 3,
+      "miedo": 2,
+      "ira": 5,
+      "asco": 3,
+      "sorpresa": 6
+    }
+  },
+  {
+    "vista": "en una biblioteca revisando apuntes",
+    "momento": "2025-02-07",
+    "oido": "carros y pitidos de caja",
+    "sentimos": "concentración",
+    "olemos": "",
+    "sabor": "un sorbo amargo",
+    "palpamos": "calor en el aula",
+    "pensamos": "voy a simplificar la explicación",
+    "ubicacion": "antiguo cauce del río de Valencia",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 9,
+      "miedo": 3,
+      "ira": 6,
+      "asco": 10,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en el mercado viendo puestos de verduras",
+    "momento": "2025-04-24",
+    "oido": "teclados y alguna pregunta",
+    "sentimos": "cansancio",
+    "olemos": "pan recién hecho",
+    "sabor": "",
+    "palpamos": "frío en las manos",
+    "pensamos": "esto con un ejemplo real se entiende",
+    "ubicacion": "paseo marítimo en Valencia",
+    "emociones": {
+      "alegria": 8,
+      "tristeza": 7,
+      "miedo": 7,
+      "ira": 8,
+      "asco": 0,
+      "sorpresa": 0
+    }
+  },
+  {
+    "vista": "en una biblioteca revisando apuntes",
+    "momento": "2025-05-18",
+    "oido": "ventilador del ordenador",
+    "sentimos": "prisa",
+    "olemos": "café",
+    "sabor": "refresco dulce",
+    "palpamos": "taza caliente",
+    "pensamos": "no quiero llegar tarde",
+    "ubicacion": "mercado en Valencia",
+    "emociones": {
+      "alegria": 6,
+      "tristeza": 3,
+      "miedo": 9,
+      "ira": 4,
+      "asco": 3,
+      "sorpresa": 6
+    }
+  },
+  {
+    "vista": "caminando por una calle con gente y escaparates",
+    "momento": "2025-04-03",
+    "oido": "sonido del metro y avisos por megafonía",
+    "sentimos": "orden y control",
+    "olemos": "rotulador",
+    "sabor": "",
+    "palpamos": "aire fresco en la cara",
+    "pensamos": "tengo que hidratarme más",
+    "ubicacion": "cauce del Turia, Valencia",
+    "emociones": {
+      "alegria": 9,
+      "tristeza": 9,
+      "miedo": 1,
+      "ira": 9,
+      "asco": 2,
+      "sorpresa": 2
+    }
+  },
+  {
+    "vista": "en el metro, de pie sujetando la barra",
+    "momento": "2025-08-17",
+    "oido": "lluvia golpeando el cristal",
+    "sentimos": "responsabilidad",
+    "olemos": "tierra húmeda",
+    "sabor": "",
+    "palpamos": "viento fuerte",
+    "pensamos": "tengo que hidratarme más",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 0,
+      "miedo": 1,
+      "ira": 1,
+      "asco": 9,
+      "sorpresa": 2
+    }
+  },
+  {
+    "vista": "en el metro, de pie sujetando la barra",
+    "momento": "2025-01-19",
+    "oido": "murmullos y pasos alrededor",
+    "sentimos": "concentración",
+    "olemos": "",
+    "sabor": "refresco dulce",
+    "palpamos": "aire fresco en la cara",
+    "pensamos": "hoy el día ha rendido",
+    "ubicacion": "biblioteca en Valencia",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 2,
+      "miedo": 0,
+      "ira": 0,
+      "asco": 0,
+      "sorpresa": 2
+    }
+  },
+  {
+    "vista": "en casa, organizando tareas y notas",
+    "momento": "2025-08-17",
+    "oido": "teclados y alguna pregunta",
+    "sentimos": "responsabilidad",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "",
+    "pensamos": "hoy el día ha rendido",
+    "ubicacion": "paseo marítimo en Valencia",
+    "emociones": {
+      "alegria": 10,
+      "tristeza": 10,
+      "miedo": 0,
+      "ira": 1,
+      "asco": 0,
+      "sorpresa": 1
+    }
+  },
+  {
+    "vista": "en el mercado viendo puestos de verduras",
+    "momento": "2025-07-21",
+    "oido": "lluvia golpeando el cristal",
+    "sentimos": "cansancio",
+    "olemos": "",
+    "sabor": "refresco dulce",
+    "palpamos": "ojos secos",
+    "pensamos": "esto con un ejemplo real se entiende",
+    "ubicacion": "cauce del Turia, Valencia",
+    "emociones": {
+      "alegria": 9,
+      "tristeza": 5,
+      "miedo": 3,
+      "ira": 8,
+      "asco": 10,
+      "sorpresa": 1
+    }
+  },
+  {
+    "vista": "en el mercado viendo puestos de verduras",
+    "momento": "2025-11-22",
+    "oido": "ruido del motor y la radio baja",
+    "sentimos": "motivación",
+    "olemos": "castañas asadas",
+    "sabor": "café con leche",
+    "palpamos": "brisa suave",
+    "pensamos": "tengo que organizar mejor la lista",
+    "ubicacion": "casa",
+    "emociones": {
+      "alegria": 6,
+      "tristeza": 1,
+      "miedo": 3,
+      "ira": 3,
+      "asco": 3,
+      "sorpresa": 1
+    }
+  },
+  {
+    "vista": "en un pasillo saludando a alguien",
+    "momento": "2025-05-11",
+    "oido": "pasos y maletas",
+    "sentimos": "prisa",
+    "olemos": "café",
+    "sabor": "un sorbo amargo",
+    "palpamos": "",
+    "pensamos": "voy con tiempo",
+    "ubicacion": "metro en Valencia",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 0,
+      "miedo": 10,
+      "ira": 1,
+      "asco": 10,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en el coche, conduciendo por una avenida con semáforos",
+    "momento": "2025-05-31",
+    "oido": "murmullos y pasos alrededor",
+    "sentimos": "paciencia",
+    "olemos": "tierra húmeda",
+    "sabor": "agua fresca",
+    "palpamos": "calor en el aula",
+    "pensamos": "hoy el día ha rendido",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 7,
+      "miedo": 1,
+      "ira": 2,
+      "asco": 1,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en el metro, de pie sujetando la barra",
+    "momento": "2025-07-06",
+    "oido": "pájaros y viento suave",
+    "sentimos": "ligera saturación",
+    "olemos": "castañas asadas",
+    "sabor": "refresco dulce",
+    "palpamos": "frío en las manos",
+    "pensamos": "necesito priorizar tareas",
+    "ubicacion": "cauce del Turia, Valencia",
+    "emociones": {
+      "alegria": 3,
+      "tristeza": 4,
+      "miedo": 5,
+      "ira": 5,
+      "asco": 6,
+      "sorpresa": 4
+    }
+  },
+  {
+    "vista": "en un supermercado eligiendo frutas",
+    "momento": "2025-04-04",
+    "oido": "murmullos y pasos alrededor",
+    "sentimos": "curiosidad",
+    "olemos": "ajo y aceite",
+    "sabor": "un sorbo amargo",
+    "palpamos": "calor de los fogones",
+    "pensamos": "necesito priorizar tareas",
+    "ubicacion": "polideportivo en Mislata",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 5,
+      "miedo": 4,
+      "ira": 4,
+      "asco": 0,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "en un pasillo saludando a alguien",
+    "momento": "2025-04-13",
+    "oido": "sonido del metro y avisos por megafonía",
+    "sentimos": "ligera saturación",
+    "olemos": "café",
+    "sabor": "un sorbo amargo",
+    "palpamos": "calor en el aula",
+    "pensamos": "voy con tiempo",
+    "ubicacion": "casa",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 9,
+      "miedo": 8,
+      "ira": 7,
+      "asco": 4,
+      "sorpresa": 9
+    }
+  },
+  {
+    "vista": "en casa, delante del ordenador con varias ventanas abiertas",
+    "momento": "2025-07-24",
+    "oido": "ruido del tráfico",
+    "sentimos": "concentración",
+    "olemos": "ajo y aceite",
+    "sabor": "café con leche",
+    "palpamos": "calor en el aula",
+    "pensamos": "necesito priorizar tareas",
+    "ubicacion": "carretera cerca de Valencia",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 6,
+      "miedo": 0,
+      "ira": 6,
+      "asco": 8,
+      "sorpresa": 1
+    }
+  },
+  {
+    "vista": "en el aula explicando un concepto con ejemplos",
+    "momento": "2025-10-27",
+    "oido": "lluvia golpeando el cristal",
+    "sentimos": "relajación",
+    "olemos": "tierra húmeda",
+    "sabor": "",
+    "palpamos": "viento fuerte",
+    "pensamos": "debería cuidar más la postura",
+    "ubicacion": "cafetería en Valencia",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 7,
+      "miedo": 0,
+      "ira": 8,
+      "asco": 9,
+      "sorpresa": 3
+    }
+  },
+  {
+    "vista": "en casa, delante del ordenador con varias ventanas abiertas",
+    "momento": "2025-05-26",
+    "oido": "intermitente y coches pasando",
+    "sentimos": "buen humor",
+    "olemos": "",
+    "sabor": "agua fresca",
+    "palpamos": "frío en las manos",
+    "pensamos": "voy con tiempo",
+    "ubicacion": "polideportivo en Mislata",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 9,
+      "miedo": 4,
+      "ira": 2,
+      "asco": 6,
+      "sorpresa": 0
+    }
+  },
+  {
+    "vista": "en un pasillo saludando a alguien",
+    "momento": "2025-08-08",
+    "oido": "intermitente y coches pasando",
+    "sentimos": "descanso mental",
+    "olemos": "ambientador del coche",
+    "sabor": "agua fresca",
+    "palpamos": "aire fresco en la cara",
+    "pensamos": "tengo que hidratarme más",
+    "ubicacion": "polideportivo en Mislata",
+    "emociones": {
+      "alegria": 8,
+      "tristeza": 3,
+      "miedo": 4,
+      "ira": 0,
+      "asco": 0,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "en la cocina preparando algo rápido",
+    "momento": "2025-01-09",
+    "oido": "sirena a lo lejos y tráfico",
+    "sentimos": "buen humor",
+    "olemos": "",
+    "sabor": "refresco dulce",
+    "palpamos": "taza caliente",
+    "pensamos": "tengo que organizar mejor la lista",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 7,
+      "tristeza": 1,
+      "miedo": 7,
+      "ira": 2,
+      "asco": 7,
+      "sorpresa": 9
+    }
+  },
+  {
+    "vista": "en casa, delante del ordenador con varias ventanas abiertas",
+    "momento": "2025-11-23",
+    "oido": "motor al ralentí",
+    "sentimos": "calma",
+    "olemos": "ajo y aceite",
+    "sabor": "",
+    "palpamos": "aire fresco en la cara",
+    "pensamos": "tengo que organizar mejor la lista",
+    "ubicacion": "carretera cerca de Valencia",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 8,
+      "miedo": 4,
+      "ira": 9,
+      "asco": 2,
+      "sorpresa": 4
+    }
+  },
+  {
+    "vista": "en un pasillo saludando a alguien",
+    "momento": "2025-09-30",
+    "oido": "sirena a lo lejos y tráfico",
+    "sentimos": "satisfacción",
+    "olemos": "papel viejo",
+    "sabor": "",
+    "palpamos": "frío en las manos",
+    "pensamos": "hoy el día ha rendido",
+    "ubicacion": "casa",
+    "emociones": {
+      "alegria": 3,
+      "tristeza": 3,
+      "miedo": 7,
+      "ira": 2,
+      "asco": 1,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en la calle esperando para cruzar",
+    "momento": "2025-09-15",
+    "oido": "lluvia golpeando el cristal",
+    "sentimos": "calma",
+    "olemos": "",
+    "sabor": "un sorbo amargo",
+    "palpamos": "",
+    "pensamos": "debería cuidar más la postura",
+    "ubicacion": "cafetería en Valencia",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 7,
+      "miedo": 8,
+      "ira": 1,
+      "asco": 10,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "en el metro, de pie sujetando la barra",
+    "momento": "2025-02-08",
+    "oido": "carros y pitidos de caja",
+    "sentimos": "satisfacción",
+    "olemos": "",
+    "sabor": "refresco dulce",
+    "palpamos": "ojos secos",
+    "pensamos": "debería cuidar más la postura",
+    "ubicacion": "carretera cerca de Valencia",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 1,
+      "miedo": 6,
+      "ira": 6,
+      "asco": 1,
+      "sorpresa": 6
+    }
+  },
+  {
+    "vista": "en una cafetería con portátil y libreta",
+    "momento": "2025-07-15",
+    "oido": "ruido del tráfico",
+    "sentimos": "paciencia",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "frío en las manos",
+    "pensamos": "quiero dejarlo claro y simple",
+    "ubicacion": "carretera cerca de Valencia",
+    "emociones": {
+      "alegria": 10,
+      "tristeza": 0,
+      "miedo": 5,
+      "ira": 3,
+      "asco": 4,
+      "sorpresa": 4
+    }
+  },
+  {
+    "vista": "en el aula explicando un concepto con ejemplos",
+    "momento": "2025-11-04",
+    "oido": "ruido del motor y la radio baja",
+    "sentimos": "curiosidad",
+    "olemos": "rotulador",
+    "sabor": "",
+    "palpamos": "vibración del asiento",
+    "pensamos": "quiero dejarlo claro y simple",
+    "ubicacion": "parque en Mislata",
+    "emociones": {
+      "alegria": 6,
+      "tristeza": 8,
+      "miedo": 8,
+      "ira": 2,
+      "asco": 6,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "caminando por una calle con gente y escaparates",
+    "momento": "2025-09-04",
+    "oido": "murmullos y pasos alrededor",
+    "sentimos": "paciencia",
+    "olemos": "rotulador",
+    "sabor": "un sorbo amargo",
+    "palpamos": "",
+    "pensamos": "mejor hacerlo hoy y descansar mañana",
+    "ubicacion": "cafetería en Valencia",
+    "emociones": {
+      "alegria": 3,
+      "tristeza": 7,
+      "miedo": 2,
+      "ira": 8,
+      "asco": 9,
+      "sorpresa": 9
+    }
+  },
+  {
+    "vista": "en el metro, de pie sujetando la barra",
+    "momento": "2025-09-22",
+    "oido": "carros y pitidos de caja",
+    "sentimos": "paciencia",
+    "olemos": "papel viejo",
+    "sabor": "",
+    "palpamos": "taza caliente",
+    "pensamos": "voy justo de tiempo",
+    "ubicacion": "cauce del Turia, Valencia",
+    "emociones": {
+      "alegria": 10,
+      "tristeza": 0,
+      "miedo": 5,
+      "ira": 9,
+      "asco": 5,
+      "sorpresa": 8
+    }
+  },
+  {
+    "vista": "en el metro, de pie sujetando la barra",
+    "momento": "2025-02-13",
+    "oido": "tazas, cucharillas y una cafetera",
+    "sentimos": "concentración",
+    "olemos": "rotulador",
+    "sabor": "",
+    "palpamos": "taza caliente",
+    "pensamos": "voy con tiempo",
+    "ubicacion": "polideportivo en Mislata",
+    "emociones": {
+      "alegria": 2,
+      "tristeza": 7,
+      "miedo": 10,
+      "ira": 8,
+      "asco": 5,
+      "sorpresa": 2
+    }
+  },
+  {
+    "vista": "en una cafetería con portátil y libreta",
+    "momento": "2025-05-18",
+    "oido": "silencio roto por páginas pasando",
+    "sentimos": "satisfacción",
+    "olemos": "olor a lluvia",
+    "sabor": "un sorbo amargo",
+    "palpamos": "vibración del asiento",
+    "pensamos": "voy a simplificar la explicación",
+    "ubicacion": "parque en Mislata",
+    "emociones": {
+      "alegria": 7,
+      "tristeza": 7,
+      "miedo": 4,
+      "ira": 9,
+      "asco": 3,
+      "sorpresa": 2
+    }
+  },
+  {
+    "vista": "en la calle esperando para cruzar",
+    "momento": "2025-09-26",
+    "oido": "carros y pitidos de caja",
+    "sentimos": "curiosidad",
+    "olemos": "tierra húmeda",
+    "sabor": "",
+    "palpamos": "taza caliente",
+    "pensamos": "debería cuidar más la postura",
+    "ubicacion": "casa (despacho)",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 7,
+      "miedo": 10,
+      "ira": 3,
+      "asco": 8,
+      "sorpresa": 3
+    }
+  },
+  {
+    "vista": "en el coche, conduciendo por una avenida con semáforos",
+    "momento": "2025-09-12",
+    "oido": "tazas, cucharillas y una cafetera",
+    "sentimos": "motivación",
+    "olemos": "café",
+    "sabor": "agua fresca",
+    "palpamos": "frío en las manos",
+    "pensamos": "hoy el día ha rendido",
+    "ubicacion": "avenida en Valencia",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 4,
+      "miedo": 9,
+      "ira": 2,
+      "asco": 2,
+      "sorpresa": 3
+    }
+  },
+  {
+    "vista": "en el metro, de pie sujetando la barra",
+    "momento": "2025-03-14",
+    "oido": "silencio roto por páginas pasando",
+    "sentimos": "curiosidad",
+    "olemos": "ajo y aceite",
+    "sabor": "chocolate caliente",
+    "palpamos": "taza caliente",
+    "pensamos": "voy con tiempo",
+    "ubicacion": "casa (cocina)",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 9,
+      "miedo": 8,
+      "ira": 5,
+      "asco": 2,
+      "sorpresa": 3
+    }
+  },
+  {
+    "vista": "caminando por una calle con gente y escaparates",
+    "momento": "2025-06-16",
+    "oido": "",
+    "sentimos": "curiosidad",
+    "olemos": "ajo y aceite",
+    "sabor": "un sorbo amargo",
+    "palpamos": "ojos secos",
+    "pensamos": "debería cuidar más la postura",
+    "ubicacion": "Mislata",
+    "emociones": {
+      "alegria": 5,
+      "tristeza": 3,
+      "miedo": 4,
+      "ira": 1,
+      "asco": 2,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en casa, organizando tareas y notas",
+    "momento": "2025-05-29",
+    "oido": "avisos por megafonía",
+    "sentimos": "curiosidad",
+    "olemos": "pan recién hecho",
+    "sabor": "",
+    "palpamos": "frío",
+    "pensamos": "voy con tiempo",
+    "ubicacion": "estación de tren",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 3,
+      "miedo": 6,
+      "ira": 2,
+      "asco": 2,
+      "sorpresa": 4
+    }
+  },
+  {
+    "vista": "en casa, organizando tareas y notas",
+    "momento": "2025-08-08",
+    "oido": "",
+    "sentimos": "cansancio",
+    "olemos": "café",
+    "sabor": "",
+    "palpamos": "taza caliente",
+    "pensamos": "tengo que organizar mejor la lista",
+    "ubicacion": "casa (salón)",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 6,
+      "miedo": 4,
+      "ira": 3,
+      "asco": 1,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en un pasillo saludando a alguien",
+    "momento": "2025-03-18",
+    "oido": "sonido del metro y avisos por megafonía",
+    "sentimos": "cansancio",
+    "olemos": "ajo y aceite",
+    "sabor": "chocolate caliente",
+    "palpamos": "ojos secos",
+    "pensamos": "tengo que hidratarme más",
+    "ubicacion": "casa (despacho)",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 4,
+      "miedo": 3,
+      "ira": 6,
+      "asco": 7,
+      "sorpresa": 0
+    }
+  },
+  {
+    "vista": "en un gimnasio empezando la rutina",
+    "momento": "2025-08-08",
+    "oido": "murmullos y pasos alrededor",
+    "sentimos": "alerta",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "aire fresco en la cara",
+    "pensamos": "voy justo de tiempo",
+    "ubicacion": "cauce del Turia, Valencia",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 6,
+      "miedo": 6,
+      "ira": 3,
+      "asco": 8,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en la calle esperando para cruzar",
+    "momento": "2025-02-11",
+    "oido": "murmullos y pasos alrededor",
+    "sentimos": "orden y control",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "calor de los fogones",
+    "pensamos": "quiero dejarlo claro y simple",
+    "ubicacion": "parque en Mislata",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 7,
+      "miedo": 0,
+      "ira": 2,
+      "asco": 4,
+      "sorpresa": 9
+    }
+  },
+  {
+    "vista": "en un pasillo saludando a alguien",
+    "momento": "2025-05-27",
+    "oido": "tazas, cucharillas y una cafetera",
+    "sentimos": "concentración",
+    "olemos": "ambientador del coche",
+    "sabor": "agua fresca",
+    "palpamos": "brisa suave",
+    "pensamos": "hoy el día ha rendido",
+    "ubicacion": "parada de bus en Mislata",
+    "emociones": {
+      "alegria": 6,
+      "tristeza": 0,
+      "miedo": 3,
+      "ira": 6,
+      "asco": 9,
+      "sorpresa": 9
+    }
+  },
+  {
+    "vista": "en un supermercado eligiendo frutas",
+    "momento": "2025-05-25",
+    "oido": "carros y pitidos de caja",
+    "sentimos": "cansancio",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "corazón acelerado",
+    "pensamos": "me viene bien parar un rato",
+    "ubicacion": "biblioteca en Valencia",
+    "emociones": {
+      "alegria": 10,
+      "tristeza": 6,
+      "miedo": 3,
+      "ira": 10,
+      "asco": 10,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en el metro, de pie sujetando la barra",
+    "momento": "2025-09-05",
+    "oido": "lluvia golpeando el cristal",
+    "sentimos": "responsabilidad",
+    "olemos": "ajo y aceite",
+    "sabor": "un sorbo amargo",
+    "palpamos": "brisa suave",
+    "pensamos": "me viene bien parar un rato",
+    "ubicacion": "centro de Valencia",
+    "emociones": {
+      "alegria": 9,
+      "tristeza": 3,
+      "miedo": 10,
+      "ira": 2,
+      "asco": 10,
+      "sorpresa": 1
+    }
+  },
+  {
+    "vista": "en el aula explicando un concepto con ejemplos",
+    "momento": "2025-04-17",
+    "oido": "lluvia golpeando el cristal",
+    "sentimos": "orden y control",
+    "olemos": "papel viejo",
+    "sabor": "refresco dulce",
+    "palpamos": "calor de los fogones",
+    "pensamos": "esto con un ejemplo real se entiende",
+    "ubicacion": "avenida en Valencia",
+    "emociones": {
+      "alegria": 7,
+      "tristeza": 6,
+      "miedo": 5,
+      "ira": 4,
+      "asco": 10,
+      "sorpresa": 1
+    }
+  },
+  {
+    "vista": "en una biblioteca revisando apuntes",
+    "momento": "2025-03-13",
+    "oido": "lluvia golpeando el cristal",
+    "sentimos": "satisfacción",
+    "olemos": "olor a lluvia",
+    "sabor": "un sorbo amargo",
+    "palpamos": "brisa suave",
+    "pensamos": "esto con un ejemplo real se entiende",
+    "ubicacion": "paseo marítimo en Valencia",
+    "emociones": {
+      "alegria": 6,
+      "tristeza": 3,
+      "miedo": 6,
+      "ira": 10,
+      "asco": 2,
+      "sorpresa": 4
+    }
+  },
+  {
+    "vista": "en el aula explicando un concepto con ejemplos",
+    "momento": "2025-06-13",
+    "oido": "sonido del metro y avisos por megafonía",
+    "sentimos": "curiosidad",
+    "olemos": "rotulador",
+    "sabor": "refresco dulce",
+    "palpamos": "frío en las manos",
+    "pensamos": "debería cuidar más la postura",
+    "ubicacion": "parada de bus en Mislata",
+    "emociones": {
+      "alegria": 6,
+      "tristeza": 7,
+      "miedo": 7,
+      "ira": 0,
+      "asco": 9,
+      "sorpresa": 6
+    }
+  },
+  {
+    "vista": "en una biblioteca revisando apuntes",
+    "momento": "2025-07-31",
+    "oido": "intermitente y coches pasando",
+    "sentimos": "ligera saturación",
+    "olemos": "olor a lluvia",
+    "sabor": "",
+    "palpamos": "calor en el aula",
+    "pensamos": "esto con un ejemplo real se entiende",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 8,
+      "tristeza": 10,
+      "miedo": 10,
+      "ira": 2,
+      "asco": 10,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "en una cafetería con portátil y libreta",
+    "momento": "2025-05-23",
+    "oido": "ventilador del ordenador",
+    "sentimos": "curiosidad",
+    "olemos": "tierra húmeda",
+    "sabor": "refresco dulce",
+    "palpamos": "taza caliente",
+    "pensamos": "necesito priorizar tareas",
+    "ubicacion": "biblioteca en Valencia",
+    "emociones": {
+      "alegria": 0,
+      "tristeza": 6,
+      "miedo": 7,
+      "ira": 1,
+      "asco": 0,
+      "sorpresa": 4
+    }
+  },
+  {
+    "vista": "en una biblioteca revisando apuntes",
+    "momento": "2025-07-24",
+    "oido": "sirena a lo lejos y tráfico",
+    "sentimos": "paciencia",
+    "olemos": "ajo y aceite",
+    "sabor": "",
+    "palpamos": "frío en las manos",
+    "pensamos": "no quiero llegar tarde",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 8,
+      "tristeza": 3,
+      "miedo": 2,
+      "ira": 3,
+      "asco": 8,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "en una biblioteca revisando apuntes",
+    "momento": "2025-08-31",
+    "oido": "ventilador del ordenador",
+    "sentimos": "paciencia",
+    "olemos": "café",
+    "sabor": "un sorbo amargo",
+    "palpamos": "corazón acelerado",
+    "pensamos": "voy con tiempo",
+    "ubicacion": "polideportivo en Mislata",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 9,
+      "miedo": 7,
+      "ira": 8,
+      "asco": 3,
+      "sorpresa": 7
+    }
+  },
+  {
+    "vista": "en el mercado viendo puestos de verduras",
+    "momento": "2025-08-28",
+    "oido": "tazas, cucharillas y una cafetera",
+    "sentimos": "satisfacción",
+    "olemos": "pan recién hecho",
+    "sabor": "refresco dulce",
+    "palpamos": "brisa suave",
+    "pensamos": "no quiero llegar tarde",
+    "ubicacion": "polideportivo en Mislata",
+    "emociones": {
+      "alegria": 8,
+      "tristeza": 0,
+      "miedo": 10,
+      "ira": 5,
+      "asco": 8,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "en un pasillo saludando a alguien",
+    "momento": "2025-02-25",
+    "oido": "intermitente y coches pasando",
+    "sentimos": "descanso mental",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "taza caliente",
+    "pensamos": "voy justo de tiempo",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 6,
+      "tristeza": 7,
+      "miedo": 3,
+      "ira": 10,
+      "asco": 2,
+      "sorpresa": 6
+    }
+  },
+  {
+    "vista": "caminando por una calle con gente y escaparates",
+    "momento": "2025-03-06",
+    "oido": "sonido del metro y avisos por megafonía",
+    "sentimos": "buen humor",
+    "olemos": "café",
+    "sabor": "",
+    "palpamos": "brisa suave",
+    "pensamos": "me viene bien parar un rato",
+    "ubicacion": "mercado en Valencia",
+    "emociones": {
+      "alegria": 8,
+      "tristeza": 1,
+      "miedo": 9,
+      "ira": 5,
+      "asco": 10,
+      "sorpresa": 0
+    }
+  },
+  {
+    "vista": "paseando por el parque con el cielo despejado",
+    "momento": "2025-11-22",
+    "oido": "silencio roto por páginas pasando",
+    "sentimos": "descanso mental",
+    "olemos": "pan recién hecho",
+    "sabor": "un sorbo amargo",
+    "palpamos": "taza caliente",
+    "pensamos": "necesito priorizar tareas",
+    "ubicacion": "polideportivo en Mislata",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 4,
+      "miedo": 6,
+      "ira": 6,
+      "asco": 0,
+      "sorpresa": 0
+    }
+  },
+  {
+    "vista": "en la cocina preparando algo rápido",
+    "momento": "2025-04-09",
+    "oido": "silencio roto por páginas pasando",
+    "sentimos": "cansancio",
+    "olemos": "olor a lluvia",
+    "sabor": "café con leche",
+    "palpamos": "frío en las manos",
+    "pensamos": "voy justo de tiempo",
+    "ubicacion": "casa (salón)",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 6,
+      "miedo": 6,
+      "ira": 10,
+      "asco": 10,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "en una cafetería con portátil y libreta",
+    "momento": "2025-05-23",
+    "oido": "pájaros y viento suave",
+    "sentimos": "responsabilidad",
+    "olemos": "olor a lluvia",
+    "sabor": "",
+    "palpamos": "aire fresco en la cara",
+    "pensamos": "mejor hacerlo hoy y descansar mañana",
+    "ubicacion": "paseo marítimo en Valencia",
+    "emociones": {
+      "alegria": 9,
+      "tristeza": 4,
+      "miedo": 1,
+      "ira": 3,
+      "asco": 4,
+      "sorpresa": 6
+    }
+  },
+  {
+    "vista": "en el coche, conduciendo por una avenida con semáforos",
+    "momento": "2025-01-15",
+    "oido": "silencio roto por páginas pasando",
+    "sentimos": "descanso mental",
+    "olemos": "",
+    "sabor": "",
+    "palpamos": "frío en las manos",
+    "pensamos": "tengo que organizar mejor la lista",
+    "ubicacion": "cauce del Turia, Valencia",
+    "emociones": {
+      "alegria": 8,
+      "tristeza": 3,
+      "miedo": 6,
+      "ira": 7,
+      "asco": 3,
+      "sorpresa": 2
+    }
+  },
+  {
+    "vista": "en casa, organizando tareas y notas",
+    "momento": "2025-12-12",
+    "oido": "sirena a lo lejos y tráfico",
+    "sentimos": "motivación",
+    "olemos": "pan recién hecho",
+    "sabor": "",
+    "palpamos": "ojos secos",
+    "pensamos": "me viene bien parar un rato",
+    "ubicacion": "parada de bus en Mislata",
+    "emociones": {
+      "alegria": 2,
+      "tristeza": 1,
+      "miedo": 10,
+      "ira": 3,
+      "asco": 7,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en casa, organizando tareas y notas",
+    "momento": "2025-07-09",
+    "oido": "sonido del metro y avisos por megafonía",
+    "sentimos": "paciencia",
+    "olemos": "café",
+    "sabor": "chocolate caliente",
+    "palpamos": "",
+    "pensamos": "respondo mensajes luego",
+    "ubicacion": "casa (despacho)",
+    "emociones": {
+      "alegria": 8,
+      "tristeza": 3,
+      "miedo": 2,
+      "ira": 5,
+      "asco": 10,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en un pasillo saludando a alguien",
+    "momento": "2025-07-22",
+    "oido": "sonido del metro y avisos por megafonía",
+    "sentimos": "concentración",
+    "olemos": "rotulador",
+    "sabor": "un sorbo amargo",
+    "palpamos": "ojos secos",
+    "pensamos": "hoy el día ha rendido",
+    "ubicacion": "cauce del Turia, Valencia",
+    "emociones": {
+      "alegria": 6,
+      "tristeza": 7,
+      "miedo": 4,
+      "ira": 8,
+      "asco": 10,
+      "sorpresa": 2
+    }
+  },
+  {
+    "vista": "en el metro, de pie sujetando la barra",
+    "momento": "2025-04-10",
+    "oido": "sonido del metro y avisos por megafonía",
+    "sentimos": "paciencia",
+    "olemos": "olor a lluvia",
+    "sabor": "",
+    "palpamos": "calor en el aula",
+    "pensamos": "voy a simplificar la explicación",
+    "ubicacion": "antiguo cauce del río de Valencia",
+    "emociones": {
+      "alegria": 7,
+      "tristeza": 5,
+      "miedo": 3,
+      "ira": 4,
+      "asco": 6,
+      "sorpresa": 10
+    }
+  },
+  {
+    "vista": "en una cafetería con portátil y libreta",
+    "momento": "2025-11-09",
+    "oido": "ruido del motor y la radio baja",
+    "sentimos": "orden y control",
+    "olemos": "olor a lluvia",
+    "sabor": "",
+    "palpamos": "corazón acelerado",
+    "pensamos": "me viene bien parar un rato",
+    "ubicacion": "Valencia",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 6,
+      "miedo": 10,
+      "ira": 2,
+      "asco": 7,
+      "sorpresa": 0
+    }
+  },
+  {
+    "vista": "en la cocina preparando algo rápido",
+    "momento": "2025-03-16",
+    "oido": "silencio roto por páginas pasando",
+    "sentimos": "concentración",
+    "olemos": "olor a lluvia",
+    "sabor": "café con leche",
+    "palpamos": "vibración del asiento",
+    "pensamos": "no quiero llegar tarde",
+    "ubicacion": "parada de bus en Mislata",
+    "emociones": {
+      "alegria": 4,
+      "tristeza": 5,
+      "miedo": 3,
+      "ira": 10,
+      "asco": 4,
+      "sorpresa": 5
+    }
+  },
+  {
+    "vista": "caminando por una calle con gente y escaparates",
+    "momento": "2025-01-31",
+    "oido": "ruido del motor y la radio baja",
+    "sentimos": "motivación",
+    "olemos": "papel viejo",
+    "sabor": "chocolate caliente",
+    "palpamos": "",
+    "pensamos": "voy a simplificar la explicación",
+    "ubicacion": "casa",
+    "emociones": {
+      "alegria": 7,
+      "tristeza": 7,
+      "miedo": 6,
+      "ira": 9,
+      "asco": 10,
+      "sorpresa": 1
+    }
+  },
+  {
+    "vista": "en casa, organizando tareas y notas",
+    "momento": "2025-03-26",
+    "oido": "pasos y maletas",
+    "sentimos": "satisfacción",
+    "olemos": "tierra húmeda",
+    "sabor": "",
+    "palpamos": "frío",
+    "pensamos": "necesito priorizar tareas",
+    "ubicacion": "metro en Valencia",
+    "emociones": {
+      "alegria": 10,
+      "tristeza": 5,
+      "miedo": 2,
+      "ira": 4,
+      "asco": 6,
+      "sorpresa": 0
+    }
+  },
+  {
+    "vista": "en una cafetería con portátil y libreta",
+    "momento": "2025-03-28",
+    "oido": "teclados y alguna pregunta",
+    "sentimos": "concentración",
+    "olemos": "pan recién hecho",
+    "sabor": "",
+    "palpamos": "taza caliente",
+    "pensamos": "esto con un ejemplo real se entiende",
+    "ubicacion": "parada de bus en Mislata",
+    "emociones": {
+      "alegria": 1,
+      "tristeza": 9,
+      "miedo": 5,
+      "ira": 2,
+      "asco": 8,
+      "sorpresa": 5
+    }
+  }
+]

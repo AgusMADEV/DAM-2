@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Memories Recorder</title>
+  <style>
+    :root{
+      --primary-color:#6a5acd;
+      --secondary-color:#9370db;
+      --background-color:#f9f7ff;
+      --text-color:#333;
+      --shadow-color:rgba(0,0,0,0.12);
+      --highlight-color:#ffeb3b;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin:0;
+      padding:0;
+      display:flex;
+      height:100vh;
+      background:var(--background-color);
+      color:var(--text-color);
+      overflow:hidden;
+    }
+
+    .form-container{
+      width:350px;
+      padding:25px;
+      background:#fff;
+      box-shadow:0 4px 15px var(--shadow-color);
+      border-radius:12px;
+      margin:20px;
+      overflow-y:auto;
+      max-height:calc(100vh - 40px);
+      z-index:10;
+    }
+
+    .form-container h2{
+      color:var(--primary-color);
+      margin:0 0 20px;
+      font-size:24px;
+      text-align:center;
+    }
+
+    .form-group{ margin-bottom:15px; }
+    .form-group label{
+      display:block;
+      margin-bottom:5px;
+      font-weight:600;
+      color:var(--primary-color);
+    }
+
+    .form-group textarea,
+    .form-group input[type="text"],
+    .form-group input[type="date"]{
+      width:100%;
+      padding:10px;
+      border:1px solid #ddd;
+      border-radius:6px;
+      font-size:14px;
+      resize:vertical;
+      min-height:40px;
+    }
+
+    .form-group textarea{ min-height:60px; }
+
+    .input-with-button{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .record-button{
+      background:var(--secondary-color);
+      color:#fff;
+      border:none;
+      border-radius:50%;
+      width:35px;
+      height:35px;
+      cursor:pointer;
+      font-size:16px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      transition:background-color .3s;
+      flex:0 0 auto;
+    }
+    .record-button:hover{ background:var(--primary-color); }
+
+    .form-container button[type="submit"]{
+      background:var(--primary-color);
+      color:#fff;
+      padding:12px;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:16px;
+      width:100%;
+      margin-top:10px;
+      transition:background-color .3s;
+    }
+    .form-container button[type="submit"]:hover{ background:#5a4fbf; }
+
+    .search-container{ margin:20px 0 0; }
+    .search-container input{
+      width:100%;
+      padding:10px;
+      border:1px solid #ddd;
+      border-radius:6px;
+      font-size:14px;
+    }
+
+    /* Canvas stage */
+    .stage-wrap{
+      flex:1;
+      position:relative;
+      margin:20px;
+      border-radius:12px;
+      overflow:hidden;
+      background: linear-gradient(135deg, #e6e6fa 0%, #d8bfd8 100%);
+      box-shadow:0 4px 15px var(--shadow-color);
+    }
+    canvas{
+      width:100%;
+      height:100%;
+      display:block;
+      cursor: default;
+    }
+
+    /* Modal */
+    .modal{
+      display:none;
+      position:fixed;
+      z-index:1000;
+      left:0; top:0;
+      width:100%; height:100%;
+      background:rgba(0,0,0,0.5);
+      align-items:center;
+      justify-content:center;
+    }
+    .modal-content{
+      background:#fff;
+      margin:auto;
+      padding:20px;
+      border-radius:12px;
+      width:80%;
+      max-width:520px;
+      box-shadow:0 5px 15px rgba(0,0,0,0.3);
+    }
+    .modal-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:15px;
+      padding-bottom:10px;
+      border-bottom:1px solid #eee;
+    }
+    .modal-header h3{
+      margin:0;
+      color:var(--primary-color);
+    }
+    .close-button{
+      background:none;
+      border:none;
+      font-size:20px;
+      cursor:pointer;
+      color:#aaa;
+    }
+    .close-button:hover{ color:var(--text-color); }
+    .modal-body p{ margin:8px 0; }
+    .modal-body strong{ color:var(--primary-color); }
+  </style>
+</head>
+
+<body>
+  <div class="form-container">
+    <h2>Nuevo Recuerdo</h2>
+    <form id="memoryForm">
+      <div class="form-group">
+        <label for="vista">Vista:</label>
+        <div class="input-with-button">
+          <textarea id="vista" placeholder="Describe lo que viste..."></textarea>
+          <button type="button" class="record-button" data-target="vista">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="momento">Momento:</label>
+        <input type="date" id="momento">
+      </div>
+
+      <div class="form-group">
+        <label for="oido">Oído:</label>
+        <div class="input-with-button">
+          <textarea id="oido" placeholder="Describe lo que escuchaste..."></textarea>
+          <button type="button" class="record-button" data-target="oido">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="sentimos">Sentimos:</label>
+        <div class="input-with-button">
+          <textarea id="sentimos" placeholder="Describe lo que sentiste..."></textarea>
+          <button type="button" class="record-button" data-target="sentimos">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="olemos">Olemos:</label>
+        <div class="input-with-button">
+          <textarea id="olemos" placeholder="Describe lo que oliste..."></textarea>
+          <button type="button" class="record-button" data-target="olemos">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="sabor">Sabor:</label>
+        <div class="input-with-button">
+          <textarea id="sabor" placeholder="Describe lo que saboreaste..."></textarea>
+          <button type="button" class="record-button" data-target="sabor">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="palpamos">Palpamos:</label>
+        <div class="input-with-button">
+          <textarea id="palpamos" placeholder="Describe lo que tocaste..."></textarea>
+          <button type="button" class="record-button" data-target="palpamos">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="pensamos">Pensamos:</label>
+        <div class="input-with-button">
+          <textarea id="pensamos" placeholder="Describe en qué pensaste..."></textarea>
+          <button type="button" class="record-button" data-target="pensamos">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="ubicacion">Ubicación:</label>
+        <div class="input-with-button">
+          <input type="text" id="ubicacion" placeholder="¿Dónde estabas?">
+          <button type="button" class="record-button" data-target="ubicacion">🎤</button>
+        </div>
+      </div>
+
+      <button type="submit">Guardar Recuerdo</button>
+    </form>
+
+    <div class="search-container">
+      <label for="search">Buscar en recuerdos:</label>
+      <input type="text" id="search" placeholder="Escribe aquí para conectar recuerdos relacionados...">
+    </div>
+  </div>
+
+  <div class="stage-wrap">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <!-- Modal -->
+  <div id="memoryModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Detalles del Recuerdo</h3>
+        <button class="close-button" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body" id="modalContent"></div>
+    </div>
+  </div>
+
+  <script>
+    // ----------------------------
+    // Voice (webkitSpeechRecognition)
+    // ----------------------------
+    let recognition;
+    let currentTarget = null;
+
+    if ('webkitSpeechRecognition' in window) {
+      recognition = new webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'es-ES';
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (currentTarget) document.getElementById(currentTarget).value = transcript;
+      };
+
+      recognition.onerror = (event) => console.error('Error en grabación:', event.error);
+    } else {
+      alert('Tu navegador no soporta la grabación de voz.');
+      document.querySelectorAll('.record-button').forEach(b => b.style.display = 'none');
+    }
+
+    document.querySelectorAll('.record-button').forEach(button => {
+      button.addEventListener('click', () => {
+        currentTarget = button.getAttribute('data-target');
+        if (recognition) {
+          recognition.start();
+          button.textContent = '🛑';
+          recognition.onend = () => { button.textContent = '🎤'; };
+        }
+      });
+    });
+
+    // ----------------------------
+    // Modal
+    // ----------------------------
+    const modal = document.getElementById('memoryModal');
+    const modalContent = document.getElementById('modalContent');
+    const closeModal = document.getElementById('closeModal');
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, m => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+      }[m]));
+    }
+
+    function showMemoryModal(memory) {
+      modalContent.innerHTML = `
+        <p><strong>Ubicación:</strong> ${escapeHtml(memory.ubicacion || 'Sin ubicación')}</p>
+        <p><strong>Momento:</strong> ${escapeHtml(memory.momento || 'Sin fecha')}</p>
+        <p><strong>Vista:</strong> ${escapeHtml(memory.vista || 'Nada')}</p>
+        <p><strong>Oído:</strong> ${escapeHtml(memory.oido || 'Nada')}</p>
+        <p><strong>Sentimos:</strong> ${escapeHtml(memory.sentimos || 'Nada')}</p>
+        <p><strong>Olemos:</strong> ${escapeHtml(memory.olemos || 'Nada')}</p>
+        <p><strong>Sabor:</strong> ${escapeHtml(memory.sabor || 'Nada')}</p>
+        <p><strong>Palpamos:</strong> ${escapeHtml(memory.palpamos || 'Nada')}</p>
+        <p><strong>Pensamos:</strong> ${escapeHtml(memory.pensamos || 'Nada')}</p>
+      `;
+      modal.style.display = 'flex';
+    }
+
+    closeModal.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+    // ----------------------------
+    // Canvas + physics
+    // ----------------------------
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width  = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener("resize", resizeCanvas);
+
+    function distance2D(x1,y1,x2,y2){
+      const dx=x2-x1, dy=y2-y1;
+      return Math.sqrt(dx*dx + dy*dy);
+    }
+
+    // Tokenization
+    function tokenize(text){
+      return (text || "")
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\p{L}\p{N}\s]+/gu, " ")
+        .split(/\s+/)
+        .filter(w => w.length >= 3);
+    }
+
+    function memoryText(memory){
+      return Object.values(memory).join(" ");
+    }
+
+    function memoryTokens(memory){
+      return new Set(tokenize(memoryText(memory)));
+    }
+
+    // Search state
+    const searchInput = document.getElementById("search");
+    let searchTerms = [];
+    searchInput.addEventListener("input", () => {
+      const raw = searchInput.value.trim().toLowerCase();
+      searchTerms = raw ? raw.split(/\s+/).filter(t => t.length >= 2) : [];
+      // When search changes: unlock particles to let them re-cluster
+      particles.forEach(p => { p.fija = false; p.estableFrames = 0; });
+    });
+
+    function matchCount(tokens, terms){
+      if (!terms.length) return 0;
+      let c = 0;
+      for (const t of terms){
+        // allow partial match: if any token startsWith term or includes term
+        for (const w of tokens){
+          if (w.includes(t)) { c++; break; }
+        }
+      }
+      return c;
+    }
+
+    // Particles
+    let memories = [];
+    let particles = [];
+
+    class Particle{
+      constructor(x,y,a, memory){
+        this.x = x; this.y = y;
+        this.v = 0.4;
+
+        this.vx = Math.cos(a)*this.v;
+        this.vy = Math.sin(a)*this.v;
+
+        this.ax = 0; this.ay = 0;
+        this.data = memory;
+        this.tokens = memoryTokens(memory);
+
+        this.fija = false;
+        this.estableFrames = 0;
+
+        // glass bubble radius
+        this.r = 18 + Math.random()*10; // 18..28
+      }
+
+      // How much this memory matches current search
+      score(){
+        return matchCount(this.tokens, searchTerms);
+      }
+
+      interactions(width,height){
+        if (this.fija){ this.ax=0; this.ay=0; return; }
+
+        // Base: gentle separation always (avoid overlap)
+        const distMin = 45;
+
+        // Only when searching: attract matching memories to each other
+        const searching = searchTerms.length > 0;
+
+        // Tuning
+        const kRepelClose = 0.10;
+        const kRepelFar   = 0.002;
+
+        const kAttract    = 0.0022;   // attraction strength
+        const distTarget  = 140;      // target distance for clustered group
+        const distMaxLink = 220;      // only connect within this range (visual & force)
+
+        let fx=0, fy=0;
+
+        const myScore = this.score();
+        const amActive = searching && myScore > 0;
+
+        for (const p of particles){
+          if (p === this) continue;
+
+          const d = distance2D(this.x,this.y,p.x,p.y);
+          if (d === 0) continue;
+
+          const dx = p.x - this.x;
+          const dy = p.y - this.y;
+          const ux = dx / d;
+          const uy = dy / d;
+
+          // Strong repulsion when too close
+          if (d < distMin){
+            const intensity = (distMin - d) * kRepelClose;
+            fx -= ux * intensity;
+            fy -= uy * intensity;
+            continue;
+          }
+
+          // Mild repulsion overall to keep scene spread
+          const repelRange = 260;
+          if (d < repelRange){
+            const intensity = (repelRange - d) * kRepelFar;
+            fx -= ux * intensity;
+            fy -= uy * intensity;
+          }
+
+          if (!searching) continue;
+
+          const otherScore = p.score();
+          const otherActive = otherScore > 0;
+
+          // If both match search: attract
+          if (amActive && otherActive){
+            // stronger if they match more terms (so cluster tighter)
+            const weight = 0.6 + 0.25 * Math.min(6, Math.min(myScore, otherScore));
+            const delta = d - distTarget;
+
+            // limit attraction to mid distances so it doesn't pull everything from far away instantly
+            if (d < distMaxLink*1.8){
+              fx += ux * delta * kAttract * weight;
+              fy += uy * delta * kAttract * weight;
+            }
+          }
+        }
+
+        // cap force
+        const maxForce = 0.08;
+        const mag = Math.sqrt(fx*fx + fy*fy);
+        if (mag > maxForce){
+          fx = fx/mag*maxForce;
+          fy = fy/mag*maxForce;
+        }
+
+        this.ax = fx;
+        this.ay = fy;
+      }
+
+      move(width,height){
+        if (this.fija) return;
+
+        this.vx += this.ax;
+        this.vy += this.ay;
+
+        const friction = 0.92;
+        this.vx *= friction;
+        this.vy *= friction;
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // settle if not searching (keeps scene stable)
+        const searching = searchTerms.length > 0;
+        const speed = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+        const force = Math.sqrt(this.ax*this.ax + this.ay*this.ay);
+
+        if (!searching && speed < 0.02 && force < 0.002){
+          this.estableFrames++;
+          if (this.estableFrames > 60){
+            this.fija = true;
+            this.vx=0; this.vy=0;
+          }
+        } else {
+          this.estableFrames = 0;
+        }
+
+        // bounce
+        const pad = this.r + 8;
+        const rebound = -0.5;
+
+        if (this.x > width - pad){ this.x = width - pad; this.vx *= rebound; }
+        if (this.x < pad){ this.x = pad; this.vx *= rebound; }
+        if (this.y > height - pad){ this.y = height - pad; this.vy *= rebound; }
+        if (this.y < pad){ this.y = pad; this.vy *= rebound; }
+      }
+
+      drawBubble(){
+        // Glass bubble (no text)
+        const x = this.x, y = this.y, r = this.r;
+
+        // subtle shadow
+        ctx.save();
+        ctx.globalAlpha = 0.22;
+        ctx.beginPath();
+        ctx.ellipse(x + r*0.25, y + r*0.35, r*0.85, r*0.65, 0, 0, Math.PI*2);
+        ctx.fillStyle = "rgba(0,0,0,0.35)";
+        ctx.fill();
+        ctx.restore();
+
+        // main bubble gradient
+        const g = ctx.createRadialGradient(x - r*0.35, y - r*0.35, r*0.2, x, y, r);
+        g.addColorStop(0, "rgba(255,255,255,0.65)");
+        g.addColorStop(0.35, "rgba(255,255,255,0.22)");
+        g.addColorStop(1, "rgba(255,255,255,0.10)");
+
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI*2);
+        ctx.fillStyle = g;
+        ctx.fill();
+
+        // border
+        const score = this.score();
+        ctx.lineWidth = score > 0 ? 2.5 : 1.2;
+        ctx.strokeStyle = score > 0 ? "rgba(255,235,59,0.85)" : "rgba(255,255,255,0.55)";
+        ctx.stroke();
+
+        // highlight glint
+        ctx.beginPath();
+        ctx.arc(x - r*0.25, y - r*0.25, r*0.25, 0, Math.PI*2);
+        ctx.fillStyle = "rgba(255,255,255,0.55)";
+        ctx.fill();
+
+        // tiny inner ring
+        ctx.beginPath();
+        ctx.arc(x, y, r*0.82, 0, Math.PI*2);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "rgba(106,90,205,0.12)";
+        ctx.stroke();
+      }
+
+      hitTest(mx,my){
+        const d = distance2D(mx,my,this.x,this.y);
+        return d <= this.r + 6;
+      }
+    }
+
+    // Draw connections ONLY among matching memories while searching
+    function drawConnections(){
+      if (searchTerms.length === 0) return;
+
+      const maxLinkDist = 220;
+
+      for (let i=0;i<particles.length;i++){
+        const a = particles[i];
+        const sa = a.score();
+        if (sa <= 0) continue;
+
+        for (let j=i+1;j<particles.length;j++){
+          const b = particles[j];
+          const sb = b.score();
+          if (sb <= 0) continue;
+
+          const d = distance2D(a.x,a.y,b.x,b.y);
+          if (d > maxLinkDist) continue;
+
+          // thickness/opacity by relevance + distance
+          const relevance = Math.min(10, sa + sb);
+          const alpha = Math.max(0.08, 0.45 * (1 - d/maxLinkDist));
+          const w = 1 + Math.min(8, relevance * 0.35);
+
+          // slight hue shift by relevance (still consistent look)
+          ctx.strokeStyle = `rgba(147,112,219,${alpha})`;
+          ctx.lineWidth = w;
+          ctx.lineCap = "round";
+
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    function loop(){
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      ctx.clearRect(0,0,w,h);
+
+      // physics
+      for (const p of particles) p.interactions(w,h);
+      for (const p of particles) p.move(w,h);
+
+      // lines then bubbles
+      drawConnections();
+      for (const p of particles) p.drawBubble();
+
+      requestAnimationFrame(loop);
+    }
+
+    // Click bubble -> modal
+    canvas.addEventListener("click", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+
+      for (let i = particles.length - 1; i >= 0; i--){
+        if (particles[i].hitTest(mx,my)){
+          showMemoryModal(particles[i].data);
+          return;
+        }
+      }
+    });
+
+    // ----------------------------
+    // Load + Save (same PHP endpoint)
+    // ----------------------------
+    const memoryForm = document.getElementById('memoryForm');
+
+    function loadMemories(){
+      return fetch("save_memories.php")
+        .then(r => r.json())
+        .then(list => {
+          memories = Array.isArray(list) ? list : [];
+          particles = memories.map(m => new Particle(
+            Math.random() * (canvas.getBoundingClientRect().width  - 60) + 30,
+            Math.random() * (canvas.getBoundingClientRect().height - 60) + 30,
+            Math.random() * Math.PI * 2,
+            m
+          ));
+        });
+    }
+
+    memoryForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const memory = {
+        vista: document.getElementById('vista').value,
+        momento: document.getElementById('momento').value,
+        oido: document.getElementById('oido').value,
+        sentimos: document.getElementById('sentimos').value,
+        olemos: document.getElementById('olemos').value,
+        sabor: document.getElementById('sabor').value,
+        palpamos: document.getElementById('palpamos').value,
+        pensamos: document.getElementById('pensamos').value,
+        ubicacion: document.getElementById('ubicacion').value
+      };
+
+      fetch("save_memories.php", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify(memory)
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (!data || !data.success) return;
+
+        memories.push(memory);
+        particles.push(new Particle(
+          Math.random() * (canvas.getBoundingClientRect().width  - 60) + 30,
+          Math.random() * (canvas.getBoundingClientRect().height - 60) + 30,
+          Math.random() * Math.PI * 2,
+          memory
+        ));
+
+        // allow re-layout if searching
+        particles.forEach(p => { p.fija = false; p.estableFrames = 0; });
+
+        memoryForm.reset();
+      })
+      .catch(err => console.error("Error al guardar:", err));
+    });
+
+    // ----------------------------
+    // Boot
+    // ----------------------------
+    document.addEventListener("DOMContentLoaded", () => {
+      resizeCanvas();
+      loadMemories()
+        .then(() => requestAnimationFrame(loop))
+        .catch(err => console.error("Error al cargar recuerdos:", err));
+    });
+  </script>
+</body>
+</html>
+

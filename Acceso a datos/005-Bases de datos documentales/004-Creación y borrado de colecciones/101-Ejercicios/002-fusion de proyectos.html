@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Memories Recorder</title>
+  <style>
+    :root{
+      --primary-color:#6a5acd;
+      --secondary-color:#9370db;
+      --background-color:#f9f7ff;
+      --text-color:#333;
+      --shadow-color:rgba(0,0,0,0.1);
+      --highlight-color:#ffeb3b;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin:0;
+      padding:0;
+      display:flex;
+      height:100vh;
+      background:var(--background-color);
+      color:var(--text-color);
+      overflow:hidden;
+    }
+
+    .form-container{
+      width:350px;
+      padding:25px;
+      background:#fff;
+      box-shadow:0 4px 15px var(--shadow-color);
+      border-radius:12px;
+      margin:20px;
+      overflow-y:auto;
+      max-height:calc(100vh - 40px);
+      z-index:10;
+    }
+
+    .form-container h2{
+      color:var(--primary-color);
+      margin-bottom:20px;
+      font-size:24px;
+      text-align:center;
+    }
+
+    .form-group{ margin-bottom:15px; }
+    .form-group label{
+      display:block;
+      margin-bottom:5px;
+      font-weight:600;
+      color:var(--primary-color);
+    }
+
+    .form-group textarea,
+    .form-group input[type="text"],
+    .form-group input[type="date"]{
+      width:100%;
+      padding:10px;
+      border:1px solid #ddd;
+      border-radius:6px;
+      font-size:14px;
+      resize:vertical;
+      min-height:40px;
+    }
+
+    .form-group textarea{ min-height:60px; }
+
+    .input-with-button{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .record-button{
+      background:var(--secondary-color);
+      color:#fff;
+      border:none;
+      border-radius:50%;
+      width:35px;
+      height:35px;
+      cursor:pointer;
+      font-size:16px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      transition:background-color .3s;
+      flex: 0 0 auto;
+    }
+    .record-button:hover{ background:var(--primary-color); }
+
+    .form-container button[type="submit"]{
+      background:var(--primary-color);
+      color:#fff;
+      padding:12px;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:16px;
+      width:100%;
+      margin-top:10px;
+      transition:background-color .3s;
+    }
+    .form-container button[type="submit"]:hover{ background:#5a4fbf; }
+
+    .search-container{ margin:20px 0 0; }
+    .search-container input{
+      width:100%;
+      padding:10px;
+      border:1px solid #ddd;
+      border-radius:6px;
+      font-size:14px;
+    }
+
+    /* Canvas stage */
+    .stage-wrap{
+      flex:1;
+      position:relative;
+      margin:20px;
+      border-radius:12px;
+      overflow:hidden;
+      background: linear-gradient(135deg, #e6e6fa 0%, #d8bfd8 100%);
+      box-shadow:0 4px 15px var(--shadow-color);
+    }
+    canvas{
+      width:100%;
+      height:100%;
+      display:block;
+    }
+
+    /* Controls overlay */
+    #controls{
+      position:absolute;
+      top:10px;
+      right:10px;
+      padding:10px 12px;
+      background:rgba(255,255,255,0.92);
+      border:1px solid #ccc;
+      border-radius:10px;
+      font-size:12px;
+      z-index:20;
+      max-height:calc(100% - 20px);
+      overflow:auto;
+      width:260px;
+      box-shadow:0 4px 15px rgba(0,0,0,0.12);
+    }
+    #controls label{ display:block; margin-bottom:6px; }
+    #controls input[type=range]{ width:160px; }
+    #controls .value{
+      display:inline-block;
+      width:28px;
+      text-align:right;
+      margin-left:6px;
+      font-variant-numeric: tabular-nums;
+    }
+    #controls .row{ margin-top:8px; }
+    #propControls .prop-block{
+      border-top:1px solid #e5e5e5;
+      margin-top:6px;
+      padding-top:6px;
+    }
+    #propControls .prop-title{
+      font-weight:700;
+      margin-bottom:4px;
+      color:var(--primary-color);
+    }
+    #propControls label{
+      display:block;
+      margin:2px 0;
+      color:#444;
+    }
+
+    /* Modal (as you had) */
+    .modal{
+      display:none;
+      position:fixed;
+      z-index:1000;
+      left:0; top:0;
+      width:100%; height:100%;
+      background:rgba(0,0,0,0.5);
+      align-items:center;
+      justify-content:center;
+    }
+    .modal-content{
+      background:#fff;
+      margin:auto;
+      padding:20px;
+      border-radius:12px;
+      width:80%;
+      max-width:520px;
+      box-shadow:0 5px 15px rgba(0,0,0,0.3);
+    }
+    .modal-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:15px;
+      padding-bottom:10px;
+      border-bottom:1px solid #eee;
+    }
+    .modal-header h3{
+      margin:0;
+      color:var(--primary-color);
+    }
+    .close-button{
+      background:none;
+      border:none;
+      font-size:20px;
+      cursor:pointer;
+      color:#aaa;
+    }
+    .close-button:hover{ color:var(--text-color); }
+    .modal-body p{ margin:8px 0; }
+    .modal-body strong{ color:var(--primary-color); }
+  </style>
+</head>
+
+<body>
+  <div class="form-container">
+    <h2>Nuevo Recuerdo</h2>
+    <form id="memoryForm">
+      <div class="form-group">
+        <label for="vista">Vista:</label>
+        <div class="input-with-button">
+          <textarea id="vista" placeholder="Describe lo que viste..."></textarea>
+          <button type="button" class="record-button" data-target="vista">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="momento">Momento:</label>
+        <input type="date" id="momento">
+      </div>
+
+      <div class="form-group">
+        <label for="oido">Oído:</label>
+        <div class="input-with-button">
+          <textarea id="oido" placeholder="Describe lo que escuchaste..."></textarea>
+          <button type="button" class="record-button" data-target="oido">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="sentimos">Sentimos:</label>
+        <div class="input-with-button">
+          <textarea id="sentimos" placeholder="Describe lo que sentiste..."></textarea>
+          <button type="button" class="record-button" data-target="sentimos">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="olemos">Olemos:</label>
+        <div class="input-with-button">
+          <textarea id="olemos" placeholder="Describe lo que oliste..."></textarea>
+          <button type="button" class="record-button" data-target="olemos">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="sabor">Sabor:</label>
+        <div class="input-with-button">
+          <textarea id="sabor" placeholder="Describe lo que saboreaste..."></textarea>
+          <button type="button" class="record-button" data-target="sabor">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="palpamos">Palpamos:</label>
+        <div class="input-with-button">
+          <textarea id="palpamos" placeholder="Describe lo que tocaste..."></textarea>
+          <button type="button" class="record-button" data-target="palpamos">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="pensamos">Pensamos:</label>
+        <div class="input-with-button">
+          <textarea id="pensamos" placeholder="Describe en qué pensaste..."></textarea>
+          <button type="button" class="record-button" data-target="pensamos">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="ubicacion">Ubicación:</label>
+        <div class="input-with-button">
+          <input type="text" id="ubicacion" placeholder="¿Dónde estabas?">
+          <button type="button" class="record-button" data-target="ubicacion">🎤</button>
+        </div>
+      </div>
+
+      <button type="submit">Guardar Recuerdo</button>
+    </form>
+
+    <div class="search-container">
+      <label for="search">Buscar en recuerdos:</label>
+      <input type="text" id="search" placeholder="Escribe aquí para buscar...">
+    </div>
+  </div>
+
+  <div class="stage-wrap">
+    <div id="controls">
+      <label>
+        Min thickness
+        <input id="minThickness" type="range" min="1" max="10" value="1">
+        <span id="minThicknessValue" class="value">1</span>
+      </label>
+      <label>
+        Max thickness
+        <input id="maxThickness" type="range" min="1" max="20" value="6">
+        <span id="maxThicknessValue" class="value">6</span>
+      </label>
+
+      <div class="row">
+        <label><input id="chkShowLines" type="checkbox" checked> Show connections</label>
+      </div>
+
+      <div class="row">
+        <div><strong>Properties</strong> (auto from JSON)</div>
+        <div id="propControls"></div>
+      </div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <!-- Modal -->
+  <div id="memoryModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Detalles del Recuerdo</h3>
+        <button class="close-button" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body" id="modalContent"></div>
+    </div>
+  </div>
+
+  <script>
+    // ----------------------------
+    // Voz (webkitSpeechRecognition)
+    // ----------------------------
+    let recognition;
+    let currentTarget = null;
+
+    if ('webkitSpeechRecognition' in window) {
+      recognition = new webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'es-ES';
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (currentTarget) document.getElementById(currentTarget).value = transcript;
+      };
+
+      recognition.onerror = (event) => console.error('Error en grabación:', event.error);
+    } else {
+      alert('Tu navegador no soporta la grabación de voz.');
+      document.querySelectorAll('.record-button').forEach(b => b.style.display = 'none');
+    }
+
+    document.querySelectorAll('.record-button').forEach(button => {
+      button.addEventListener('click', () => {
+        currentTarget = button.getAttribute('data-target');
+        if (recognition) {
+          recognition.start();
+          button.textContent = '🛑';
+          recognition.onend = () => { button.textContent = '🎤'; };
+        }
+      });
+    });
+
+    // ----------------------------
+    // Modal helpers
+    // ----------------------------
+    const modal = document.getElementById('memoryModal');
+    const modalContent = document.getElementById('modalContent');
+    const closeModal = document.getElementById('closeModal');
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, m => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+      }[m]));
+    }
+
+    function showMemoryModal(memory) {
+      modalContent.innerHTML = `
+        <p><strong>Ubicación:</strong> ${escapeHtml(memory.ubicacion || 'Sin ubicación')}</p>
+        <p><strong>Momento:</strong> ${escapeHtml(memory.momento || 'Sin fecha')}</p>
+        <p><strong>Vista:</strong> ${escapeHtml(memory.vista || 'Nada')}</p>
+        <p><strong>Oído:</strong> ${escapeHtml(memory.oido || 'Nada')}</p>
+        <p><strong>Sentimos:</strong> ${escapeHtml(memory.sentimos || 'Nada')}</p>
+        <p><strong>Olemos:</strong> ${escapeHtml(memory.olemos || 'Nada')}</p>
+        <p><strong>Sabor:</strong> ${escapeHtml(memory.sabor || 'Nada')}</p>
+        <p><strong>Palpamos:</strong> ${escapeHtml(memory.palpamos || 'Nada')}</p>
+        <p><strong>Pensamos:</strong> ${escapeHtml(memory.pensamos || 'Nada')}</p>
+      `;
+      modal.style.display = 'flex';
+    }
+
+    closeModal.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+    // ----------------------------
+    // Canvas + physics approach
+    // ----------------------------
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      // account for devicePixelRatio for sharp lines
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener("resize", () => resizeCanvas());
+
+    function distance2D(x1,y1,x2,y2){
+      const dx=x2-x1, dy=y2-y1;
+      return Math.sqrt(dx*dx + dy*dy);
+    }
+
+    function hashString(str){
+      let hash=0;
+      for(let i=0;i<str.length;i++) hash=(hash*31 + str.charCodeAt(i))|0;
+      return Math.abs(hash);
+    }
+
+    // Tokenization (so "Valencia" connects even if not identical sentences)
+    function tokenize(text){
+      return (text || "")
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\p{L}\p{N}\s]+/gu, " ")
+        .split(/\s+/)
+        .filter(w => w.length >= 3);
+    }
+
+    function tokensForMemoryByProp(memory, prop){
+      if (!memory || !(prop in memory)) return new Set();
+      const val = memory[prop];
+      if (prop === "momento") {
+        // date: keep exact match token
+        return new Set(val ? [String(val)] : []);
+      }
+      return new Set(tokenize(String(val || "")));
+    }
+
+    // Controls
+    let minLineThickness = 1;
+    let maxLineThickness = 6;
+    let showLines = true;
+
+    const minSlider = document.getElementById("minThickness");
+    const maxSlider = document.getElementById("maxThickness");
+    const minValueSpan = document.getElementById("minThicknessValue");
+    const maxValueSpan = document.getElementById("maxThicknessValue");
+    const chkShowLines = document.getElementById("chkShowLines");
+    const propControlsDiv = document.getElementById("propControls");
+
+    minSlider.addEventListener("input", () => {
+      minLineThickness = parseFloat(minSlider.value);
+      minValueSpan.textContent = minSlider.value;
+      if (minLineThickness > maxLineThickness) {
+        maxLineThickness = minLineThickness;
+        maxSlider.value = maxLineThickness;
+        maxValueSpan.textContent = maxLineThickness;
+      }
+    });
+    maxSlider.addEventListener("input", () => {
+      maxLineThickness = parseFloat(maxSlider.value);
+      maxValueSpan.textContent = maxSlider.value;
+      if (maxLineThickness < minLineThickness) {
+        minLineThickness = maxLineThickness;
+        minSlider.value = minLineThickness;
+        minValueSpan.textContent = minLineThickness;
+      }
+    });
+    chkShowLines.addEventListener("change", () => showLines = chkShowLines.checked);
+
+    let propertyKeys = [];
+    let relationProps = {}; // use in relation/physics
+    let showProps = {};     // show in label
+
+    function createPropertyControls(keys){
+      propControlsDiv.innerHTML = "";
+      propertyKeys = keys.slice();
+
+      propertyKeys.forEach(prop => {
+        if (!(prop in relationProps)) relationProps[prop] = true;
+        if (!(prop in showProps))     showProps[prop] = (prop === "ubicacion" || prop === "momento" || prop === "vista"); // sensible default
+
+        const block = document.createElement("div");
+        block.className = "prop-block";
+
+        const title = document.createElement("div");
+        title.className = "prop-title";
+        title.textContent = prop;
+        block.appendChild(title);
+
+        const labelUse = document.createElement("label");
+        const chkUse = document.createElement("input");
+        chkUse.type = "checkbox";
+        chkUse.checked = relationProps[prop];
+        chkUse.addEventListener("change", () => relationProps[prop] = chkUse.checked);
+        labelUse.appendChild(chkUse);
+        labelUse.appendChild(document.createTextNode(" Use in relation"));
+        block.appendChild(labelUse);
+
+        const labelShow = document.createElement("label");
+        const chkShow = document.createElement("input");
+        chkShow.type = "checkbox";
+        chkShow.checked = showProps[prop];
+        chkShow.addEventListener("change", () => showProps[prop] = chkShow.checked);
+        labelShow.appendChild(chkShow);
+        labelShow.appendChild(document.createTextNode(" Show in label"));
+        block.appendChild(labelShow);
+
+        propControlsDiv.appendChild(block);
+      });
+    }
+
+    // Search highlighting
+    const searchInput = document.getElementById('search');
+    let searchTerms = [];
+    searchInput.addEventListener("input", () => {
+      const raw = searchInput.value.toLowerCase().trim();
+      searchTerms = raw ? raw.split(/\s+/).filter(t => t.length > 0) : [];
+    });
+
+    // Particles
+    let particles = [];
+    let memories = [];
+
+    class Particle{
+      constructor(x,y,a, memory){
+        this.x = x; this.y = y;
+        this.v = 0.5;
+
+        this.vx = Math.cos(a) * this.v;
+        this.vy = Math.sin(a) * this.v;
+
+        this.ax = 0; this.ay = 0;
+        this.data = memory;
+
+        this.fija = false;
+        this.estableFrames = 0;
+
+        this.radius = 26;
+      }
+
+      matchesSearch(){
+        if (!searchTerms.length) return 0;
+        const text = Object.values(this.data).join(" ").toLowerCase();
+        let count = 0;
+        for (const t of searchTerms) if (text.includes(t)) count++;
+        return count;
+      }
+
+      // compute overlap count using active relation props
+      sharedScore(other){
+        let shared = 0;
+        let anyActive = false;
+
+        for (const prop of propertyKeys){
+          if (!relationProps[prop]) continue;
+          anyActive = true;
+
+          const a = tokensForMemoryByProp(this.data, prop);
+          const b = tokensForMemoryByProp(other.data, prop);
+
+          // date: exact match
+          if (prop === "momento") {
+            if (this.data.momento && this.data.momento === other.data.momento) shared += 3;
+            continue;
+          }
+
+          let local = 0;
+          for (const w of a) if (b.has(w)) local++;
+          shared += local;
+        }
+        return anyActive ? shared : 0;
+      }
+
+      drawLabel(){
+        const visibleProps = propertyKeys.filter(p => showProps[p]);
+        const lines = [];
+
+        for (const p of visibleProps){
+          const v = this.data[p];
+          if (v !== undefined && v !== null && String(v).trim() !== "") {
+            lines.push(String(v));
+          }
+        }
+        if (!lines.length) lines.push("💭");
+
+        // pill size based on line count
+        const lineHeight = 12;
+        const padX = 12;
+        const padY = 8;
+        const maxLines = Math.min(lines.length, 3);
+        const shown = lines.slice(0, maxLines);
+
+        // compute width (rough)
+        ctx.font = "12px sans-serif";
+        let w = 60;
+        shown.forEach((t,i)=>{
+          ctx.font = (i===0 ? "12px sans-serif" : "10px sans-serif");
+          w = Math.max(w, ctx.measureText(t).width + padX*2);
+        });
+        w = Math.min(w, 220);
+
+        const h = maxLines * lineHeight + padY*2;
+        const r = h/2;
+
+        // highlight if search matches
+        const matchCount = this.matchesSearch();
+        const borderW = matchCount ? Math.min(8, 1 + matchCount*1.5) : 1;
+
+        // draw pill
+        ctx.lineWidth = borderW;
+        ctx.fillStyle = "white";
+        ctx.strokeStyle = matchCount ? "#ffeb3b" : "rgba(0,0,0,0.85)";
+
+        const x = this.x, y = this.y;
+        const left = x - w/2, top = y - h/2;
+
+        ctx.beginPath();
+        ctx.moveTo(left + r, top);
+        ctx.lineTo(left + w - r, top);
+        ctx.arc(left + w - r, top + r, r, -Math.PI/2, Math.PI/2);
+        ctx.lineTo(left + r, top + h);
+        ctx.arc(left + r, top + r, r, Math.PI/2, -Math.PI/2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // text
+        ctx.fillStyle = "black";
+        const startY = y - ((maxLines - 1) * lineHeight) / 2;
+        shown.forEach((t,i)=>{
+          ctx.font = (i===0 ? "12px sans-serif" : "10px sans-serif");
+          const clipped = t.length > 34 ? t.slice(0, 34) + "…" : t;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(clipped, x, startY + i*lineHeight);
+        });
+
+        // store hitbox size for clicking
+        this._hitW = w;
+        this._hitH = h;
+      }
+
+      drawLines(){
+        if (!showLines) return;
+
+        for (let i=0;i<particles.length;i++){
+          const p = particles[i];
+          if (p === this) continue;
+
+          const d = distance2D(this.x,this.y,p.x,p.y);
+          if (d > 180) continue;
+
+          const shared = this.sharedScore(p);
+          if (shared <= 0) continue;
+
+          // color by relation key (approx)
+          const key = "shared_" + shared;
+          const h = hashString(key) % 360;
+          const alpha = 0.20 + 0.55 * (1 - d/180);
+          ctx.strokeStyle = `hsla(${h}, 70%, 45%, ${alpha})`;
+
+          const segments = 20;
+          for (let s=0;s<segments;s++){
+            const t1 = s/segments;
+            const t2 = (s+1)/segments;
+
+            const x1 = this.x + (p.x - this.x) * t1;
+            const y1 = this.y + (p.y - this.y) * t1;
+            const x2 = this.x + (p.x - this.x) * t2;
+            const y2 = this.y + (p.y - this.y) * t2;
+
+            const tc = (t1+t2)/2;
+            const factor = 4*(tc-0.5)*(tc-0.5); // thick ends, thin middle
+            const w = minLineThickness + (maxLineThickness - minLineThickness)*factor;
+
+            ctx.lineWidth = w + Math.min(6, shared*0.4);
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.moveTo(x1,y1);
+            ctx.lineTo(x2,y2);
+            ctx.stroke();
+          }
+        }
+      }
+
+      interactions(){
+        if (this.fija){ this.ax=0; this.ay=0; return; }
+
+        const distTarget = 120;
+        const distMin = 70;
+        const distRepelNoMatch = 220;
+
+        const kStrong = 0.0015;
+        const kMedium = 0.0009;
+        const kRepelNoMatchK = 0.001;
+        const kRepelClose = 0.06;
+
+        let fx=0, fy=0;
+
+        for (const p of particles){
+          if (p === this) continue;
+
+          const d = distance2D(this.x,this.y,p.x,p.y);
+          if (d === 0) continue;
+
+          const dx = p.x - this.x;
+          const dy = p.y - this.y;
+          const ux = dx / d;
+          const uy = dy / d;
+
+          // strong close repulsion (avoid overlap)
+          if (d < distMin){
+            const intensity = (distMin - d) * kRepelClose;
+            fx -= ux * intensity;
+            fy -= uy * intensity;
+            continue;
+          }
+
+          const shared = this.sharedScore(p);
+
+          if (shared >= 4){
+            const delta = d - distTarget;
+            fx += ux * delta * kStrong;
+            fy += uy * delta * kStrong;
+          } else if (shared >= 1){
+            const delta = d - distTarget;
+            fx += ux * delta * kMedium;
+            fy += uy * delta * kMedium;
+          } else {
+            if (d < distRepelNoMatch){
+              const intensity = (distRepelNoMatch - d) * kRepelNoMatchK;
+              fx -= ux * intensity;
+              fy -= uy * intensity;
+            }
+          }
+        }
+
+        const maxForce = 0.05;
+        const mag = Math.sqrt(fx*fx + fy*fy);
+        if (mag > maxForce){
+          fx = fx/mag*maxForce;
+          fy = fy/mag*maxForce;
+        }
+
+        this.ax = fx;
+        this.ay = fy;
+      }
+
+      move(boundsW, boundsH){
+        if (this.fija) return;
+
+        this.vx += this.ax;
+        this.vy += this.ay;
+
+        const friction = 0.93;
+        this.vx *= friction;
+        this.vy *= friction;
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // settle
+        const speed = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+        const force = Math.sqrt(this.ax*this.ax + this.ay*this.ay);
+        if (speed < 0.02 && force < 0.002){
+          this.estableFrames++;
+          if (this.estableFrames > 60){
+            this.fija = true;
+            this.vx=0; this.vy=0;
+          }
+        } else {
+          this.estableFrames = 0;
+        }
+
+        // bounce
+        const rebound = -0.5;
+        const pad = 10;
+        if (this.x > boundsW - pad){ this.x = boundsW - pad; this.vx *= rebound; }
+        if (this.x < pad){ this.x = pad; this.vx *= rebound; }
+        if (this.y > boundsH - pad){ this.y = boundsH - pad; this.vy *= rebound; }
+        if (this.y < pad){ this.y = pad; this.vy *= rebound; }
+      }
+
+      hitTest(mx,my){
+        const w = this._hitW || 80;
+        const h = this._hitH || 40;
+        return (mx >= this.x - w/2 && mx <= this.x + w/2 && my >= this.y - h/2 && my <= this.y + h/2);
+      }
+    }
+
+    function loop(){
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      ctx.clearRect(0,0,w,h);
+
+      // physics
+      for (const p of particles) p.interactions();
+      for (const p of particles) p.move(w,h);
+
+      // draw lines first
+      for (const p of particles) p.drawLines();
+      // draw labels on top
+      for (const p of particles) p.drawLabel();
+
+      requestAnimationFrame(loop);
+    }
+
+    // Click selection on canvas
+    canvas.addEventListener("click", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+
+      // find topmost hit (last drawn = later in array, but we can just check reverse)
+      for (let i = particles.length - 1; i >= 0; i--){
+        const p = particles[i];
+        if (p.hitTest(mx,my)){
+          showMemoryModal(p.data);
+          return;
+        }
+      }
+    });
+
+    // ----------------------------
+    // Load + Save (same approach as your PHP)
+    // ----------------------------
+    const memoryForm = document.getElementById('memoryForm');
+
+    function detectKeysFromMemories(memories){
+      const set = new Set();
+      memories.forEach(m => Object.keys(m).forEach(k => set.add(k)));
+      return Array.from(set);
+    }
+
+    function loadMemories(){
+      return fetch("save_memories.php")
+        .then(r => r.json())
+        .then(list => {
+          memories = Array.isArray(list) ? list : [];
+          const keys = detectKeysFromMemories(memories);
+          createPropertyControls(keys);
+
+          particles = memories.map(m => new Particle(
+            Math.random() * (canvas.getBoundingClientRect().width  - 40) + 20,
+            Math.random() * (canvas.getBoundingClientRect().height - 40) + 20,
+            Math.random() * Math.PI * 2,
+            m
+          ));
+        });
+    }
+
+    memoryForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const memory = {
+        vista: document.getElementById('vista').value,
+        momento: document.getElementById('momento').value,
+        oido: document.getElementById('oido').value,
+        sentimos: document.getElementById('sentimos').value,
+        olemos: document.getElementById('olemos').value,
+        sabor: document.getElementById('sabor').value,
+        palpamos: document.getElementById('palpamos').value,
+        pensamos: document.getElementById('pensamos').value,
+        ubicacion: document.getElementById('ubicacion').value
+      };
+
+      fetch("save_memories.php", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify(memory)
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (!data || !data.success) return;
+
+        memories.push(memory);
+
+        // update keys/controls if new keys appear (unlikely here, but safe)
+        const keys = detectKeysFromMemories(memories);
+        createPropertyControls(keys);
+
+        particles.push(new Particle(
+          Math.random() * (canvas.getBoundingClientRect().width  - 40) + 20,
+          Math.random() * (canvas.getBoundingClientRect().height - 40) + 20,
+          Math.random() * Math.PI * 2,
+          memory
+        ));
+
+        // allow movement again so it can re-stabilize
+        particles.forEach(p => { p.fija = false; p.estableFrames = 0; });
+
+        memoryForm.reset();
+      })
+      .catch(err => console.error("Error al guardar:", err));
+    });
+
+    // ----------------------------
+    // Boot
+    // ----------------------------
+    document.addEventListener("DOMContentLoaded", () => {
+      resizeCanvas();
+      loadMemories()
+        .then(() => requestAnimationFrame(loop))
+        .catch(err => console.error("Error al cargar recuerdos:", err));
+    });
+  </script>
+</body>
+</html>
+

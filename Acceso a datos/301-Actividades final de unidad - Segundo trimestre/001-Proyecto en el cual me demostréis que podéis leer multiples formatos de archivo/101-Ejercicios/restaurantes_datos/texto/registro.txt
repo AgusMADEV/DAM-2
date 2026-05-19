@@ -1,0 +1,3 @@
+[2026-03-06 10:43:30] Sistema iniciado
+[2026-03-06 10:43:30] Se guardaron 4 restaurantes en la base de datos
+[2026-03-06 10:43:30] Operación de lectura completada exitosamente

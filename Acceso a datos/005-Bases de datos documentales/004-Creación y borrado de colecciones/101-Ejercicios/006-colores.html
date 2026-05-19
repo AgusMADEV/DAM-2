@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Memories Recorder</title>
+  <style>
+    :root{
+      --primary-color:#6a5acd;
+      --secondary-color:#9370db;
+      --background-color:#f9f7ff;
+      --text-color:#333;
+      --shadow-color:rgba(0,0,0,0.12);
+      --highlight-color:#ffeb3b;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin:0;
+      padding:0;
+      display:flex;
+      height:100vh;
+      background:var(--background-color);
+      color:var(--text-color);
+      overflow:hidden;
+    }
+
+    .form-container{
+      width:360px;
+      padding:25px;
+      background:#fff;
+      box-shadow:0 4px 15px var(--shadow-color);
+      border-radius:12px;
+      margin:20px;
+      overflow-y:auto;
+      max-height:calc(100vh - 40px);
+      z-index:10;
+    }
+
+    .form-container h2{
+      color:var(--primary-color);
+      margin:0 0 14px;
+      font-size:24px;
+      text-align:center;
+    }
+
+    .form-group{ margin-bottom:15px; }
+    .form-group label{
+      display:block;
+      margin-bottom:5px;
+      font-weight:600;
+      color:var(--primary-color);
+    }
+
+    .form-group textarea,
+    .form-group input[type="text"],
+    .form-group input[type="date"]{
+      width:100%;
+      padding:10px;
+      border:1px solid #ddd;
+      border-radius:6px;
+      font-size:14px;
+      resize:vertical;
+      min-height:40px;
+    }
+
+    .form-group textarea{ min-height:60px; }
+
+    .input-with-button{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .record-button{
+      background:var(--secondary-color);
+      color:#fff;
+      border:none;
+      border-radius:50%;
+      width:35px;
+      height:35px;
+      cursor:pointer;
+      font-size:16px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      transition:background-color .3s;
+      flex:0 0 auto;
+    }
+    .record-button:hover{ background:var(--primary-color); }
+
+    .form-container button[type="submit"]{
+      background:var(--primary-color);
+      color:#fff;
+      padding:12px;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:16px;
+      width:100%;
+      margin-top:10px;
+      transition:background-color .3s;
+    }
+    .form-container button[type="submit"]:hover{ background:#5a4fbf; }
+
+    .search-container{ margin:20px 0 0; }
+    .search-container input{
+      width:100%;
+      padding:10px;
+      border:1px solid #ddd;
+      border-radius:6px;
+      font-size:14px;
+    }
+
+    /* Emotions block */
+    .emotions{
+      margin-top:14px;
+      padding-top:14px;
+      border-top:1px solid #eee;
+    }
+    .emotions h3{
+      margin:0 0 10px;
+      font-size:14px;
+      color:var(--primary-color);
+    }
+    .emo-row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      align-items:center;
+      margin-bottom:10px;
+    }
+    .emo-label{
+      font-size:13px;
+      color:#444;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .emo-dot{
+      width:10px;height:10px;border-radius:50%;
+      box-shadow:0 1px 3px rgba(0,0,0,0.18);
+      flex:0 0 auto;
+    }
+    .emo-slider{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .emo-slider input[type="range"]{ width:100%; }
+    .emo-value{
+      width:22px;
+      text-align:right;
+      font-size:12px;
+      color:#666;
+      flex:0 0 auto;
+    }
+
+    /* Canvas stage */
+    .stage-wrap{
+      flex:1;
+      position:relative;
+      margin:20px;
+      border-radius:12px;
+      overflow:hidden;
+      background: linear-gradient(135deg, #e6e6fa 0%, #d8bfd8 100%);
+      box-shadow:0 4px 15px var(--shadow-color);
+    }
+    canvas{
+      width:100%;
+      height:100%;
+      display:block;
+      cursor: default;
+    }
+
+    /* Modal */
+    .modal{
+      display:none;
+      position:fixed;
+      z-index:1000;
+      left:0; top:0;
+      width:100%; height:100%;
+      background:rgba(0,0,0,0.5);
+      align-items:center;
+      justify-content:center;
+    }
+    .modal-content{
+      background:#fff;
+      margin:auto;
+      padding:20px;
+      border-radius:12px;
+      width:80%;
+      max-width:560px;
+      box-shadow:0 5px 15px rgba(0,0,0,0.3);
+    }
+    .modal-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:15px;
+      padding-bottom:10px;
+      border-bottom:1px solid #eee;
+    }
+    .modal-header h3{
+      margin:0;
+      color:var(--primary-color);
+    }
+    .close-button{
+      background:none;
+      border:none;
+      font-size:20px;
+      cursor:pointer;
+      color:#aaa;
+    }
+    .close-button:hover{ color:var(--text-color); }
+    .modal-body p{ margin:8px 0; }
+    .modal-body strong{ color:var(--primary-color); }
+    .emo-badges{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin:10px 0 0;
+    }
+    .badge{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,0.08);
+      background:rgba(0,0,0,0.03);
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .badge .dot{
+      width:10px;height:10px;border-radius:50%;
+      box-shadow:0 1px 3px rgba(0,0,0,0.18);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="form-container">
+    <h2>Nuevo Recuerdo</h2>
+    <form id="memoryForm">
+      <div class="form-group">
+        <label for="vista">Vista:</label>
+        <div class="input-with-button">
+          <textarea id="vista" placeholder="Describe lo que viste..."></textarea>
+          <button type="button" class="record-button" data-target="vista">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="momento">Momento:</label>
+        <input type="date" id="momento">
+      </div>
+
+      <div class="form-group">
+        <label for="oido">Oído:</label>
+        <div class="input-with-button">
+          <textarea id="oido" placeholder="Describe lo que escuchaste..."></textarea>
+          <button type="button" class="record-button" data-target="oido">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="sentimos">Sentimos:</label>
+        <div class="input-with-button">
+          <textarea id="sentimos" placeholder="Describe lo que sentiste..."></textarea>
+          <button type="button" class="record-button" data-target="sentimos">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="olemos">Olemos:</label>
+        <div class="input-with-button">
+          <textarea id="olemos" placeholder="Describe lo que oliste..."></textarea>
+          <button type="button" class="record-button" data-target="olemos">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="sabor">Sabor:</label>
+        <div class="input-with-button">
+          <textarea id="sabor" placeholder="Describe lo que saboreaste..."></textarea>
+          <button type="button" class="record-button" data-target="sabor">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="palpamos">Palpamos:</label>
+        <div class="input-with-button">
+          <textarea id="palpamos" placeholder="Describe lo que tocaste..."></textarea>
+          <button type="button" class="record-button" data-target="palpamos">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="pensamos">Pensamos:</label>
+        <div class="input-with-button">
+          <textarea id="pensamos" placeholder="Describe en qué pensaste..."></textarea>
+          <button type="button" class="record-button" data-target="pensamos">🎤</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="ubicacion">Ubicación:</label>
+        <div class="input-with-button">
+          <input type="text" id="ubicacion" placeholder="¿Dónde estabas?">
+          <button type="button" class="record-button" data-target="ubicacion">🎤</button>
+        </div>
+      </div>
+
+      <!-- Ekman emotions -->
+      <div class="emotions">
+        <h3>Emociones principales (0–10)</h3>
+
+        <div class="emo-row">
+          <div class="emo-label"><span class="emo-dot" id="dot_alegria"></span>Alegría</div>
+          <div class="emo-slider">
+            <input id="alegria" type="range" min="0" max="10" value="0">
+            <span class="emo-value" id="val_alegria">0</span>
+          </div>
+        </div>
+
+        <div class="emo-row">
+          <div class="emo-label"><span class="emo-dot" id="dot_tristeza"></span>Tristeza</div>
+          <div class="emo-slider">
+            <input id="tristeza" type="range" min="0" max="10" value="0">
+            <span class="emo-value" id="val_tristeza">0</span>
+          </div>
+        </div>
+
+        <div class="emo-row">
+          <div class="emo-label"><span class="emo-dot" id="dot_miedo"></span>Miedo</div>
+          <div class="emo-slider">
+            <input id="miedo" type="range" min="0" max="10" value="0">
+            <span class="emo-value" id="val_miedo">0</span>
+          </div>
+        </div>
+
+        <div class="emo-row">
+          <div class="emo-label"><span class="emo-dot" id="dot_ira"></span>Ira</div>
+          <div class="emo-slider">
+            <input id="ira" type="range" min="0" max="10" value="0">
+            <span class="emo-value" id="val_ira">0</span>
+          </div>
+        </div>
+
+        <div class="emo-row">
+          <div class="emo-label"><span class="emo-dot" id="dot_asco"></span>Asco</div>
+          <div class="emo-slider">
+            <input id="asco" type="range" min="0" max="10" value="0">
+            <span class="emo-value" id="val_asco">0</span>
+          </div>
+        </div>
+
+        <div class="emo-row" style="margin-bottom:0;">
+          <div class="emo-label"><span class="emo-dot" id="dot_sorpresa"></span>Sorpresa</div>
+          <div class="emo-slider">
+            <input id="sorpresa" type="range" min="0" max="10" value="0">
+            <span class="emo-value" id="val_sorpresa">0</span>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit">Guardar Recuerdo</button>
+    </form>
+
+    <div class="search-container">
+      <label for="search">Buscar en recuerdos:</label>
+      <input type="text" id="search" placeholder="Escribe aquí para conectar recuerdos relacionados...">
+    </div>
+  </div>
+
+  <div class="stage-wrap">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <!-- Modal -->
+  <div id="memoryModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Detalles del Recuerdo</h3>
+        <button class="close-button" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body" id="modalContent"></div>
+    </div>
+  </div>
+
+  <script>
+    // ----------------------------
+    // "Inside Out"-like palette (approx)
+    // ----------------------------
+    const EMO = [
+      { key:"alegria",  label:"Alegría",  color:[255, 215,  64] }, // yellow
+      { key:"tristeza", label:"Tristeza", color:[ 64, 156, 255] }, // blue
+      { key:"miedo",    label:"Miedo",    color:[170,  80, 220] }, // purple
+      { key:"ira",      label:"Ira",      color:[255,  80,  80] }, // red
+      { key:"asco",     label:"Asco",     color:[ 90, 200,  90] }, // green
+      { key:"sorpresa", label:"Sorpresa", color:[255, 170,  70] }, // orange
+    ];
+
+    function clamp01(x){ return Math.max(0, Math.min(1, x)); }
+
+    function mixColorsRGB(baseRGB, weights){
+      // baseRGB: array of [r,g,b] per emotion (same order as EMO)
+      // weights:  0..1 per emotion
+      let r=0,g=0,b=0, sum=0;
+      for (let i=0;i<baseRGB.length;i++){
+        const w = Math.max(0, weights[i]);
+        sum += w;
+        r += baseRGB[i][0] * w;
+        g += baseRGB[i][1] * w;
+        b += baseRGB[i][2] * w;
+      }
+      if (sum <= 0) return [255,255,255];
+      return [r/sum, g/sum, b/sum];
+    }
+
+    function dominantEmotion(emotions){
+      // emotions: object {alegria:0..10, ...}
+      let best = { key: null, val: -1 };
+      for (const e of EMO){
+        const v = Number(emotions?.[e.key] ?? 0);
+        if (v > best.val){ best = { key:e.key, val:v }; }
+      }
+      return best.key;
+    }
+
+    function bubbleColorFromEmotions(emotions){
+      // normalize 0..10 -> 0..1
+      const weights = EMO.map(e => clamp01((Number(emotions?.[e.key] ?? 0)) / 10));
+      const rgb = mixColorsRGB(EMO.map(e=>e.color), weights);
+
+      const dom = dominantEmotion(emotions);
+      const domColor = EMO.find(e=>e.key===dom)?.color || [255,255,255];
+
+      return { rgb, domColor };
+    }
+
+    // Color dots in UI
+    function rgbToCss(rgb, a=1){
+      return `rgba(${Math.round(rgb[0])},${Math.round(rgb[1])},${Math.round(rgb[2])},${a})`;
+    }
+
+    function setupEmotionUI(){
+      for (const e of EMO){
+        const slider = document.getElementById(e.key);
+        const valSpan = document.getElementById("val_"+e.key);
+        const dot = document.getElementById("dot_"+e.key);
+        dot.style.background = rgbToCss(e.color, 1);
+
+        const sync = () => { valSpan.textContent = slider.value; };
+        slider.addEventListener("input", sync);
+        sync();
+      }
+    }
+
+    function readEmotionsFromForm(){
+      const emotions = {};
+      for (const e of EMO){
+        emotions[e.key] = Number(document.getElementById(e.key).value || 0);
+      }
+      return emotions;
+    }
+
+    function resetEmotions(){
+      for (const e of EMO){
+        const slider = document.getElementById(e.key);
+        slider.value = "0";
+        document.getElementById("val_"+e.key).textContent = "0";
+      }
+    }
+
+    // ----------------------------
+    // Voice (webkitSpeechRecognition)
+    // ----------------------------
+    let recognition;
+    let currentTarget = null;
+
+    if ('webkitSpeechRecognition' in window) {
+      recognition = new webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'es-ES';
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (currentTarget) document.getElementById(currentTarget).value = transcript;
+      };
+
+      recognition.onerror = (event) => console.error('Error en grabación:', event.error);
+    } else {
+      alert('Tu navegador no soporta la grabación de voz.');
+      document.querySelectorAll('.record-button').forEach(b => b.style.display = 'none');
+    }
+
+    document.querySelectorAll('.record-button').forEach(button => {
+      button.addEventListener('click', () => {
+        currentTarget = button.getAttribute('data-target');
+        if (recognition) {
+          recognition.start();
+          button.textContent = '🛑';
+          recognition.onend = () => { button.textContent = '🎤'; };
+        }
+      });
+    });
+
+    // ----------------------------
+    // Modal
+    // ----------------------------
+    const modal = document.getElementById('memoryModal');
+    const modalContent = document.getElementById('modalContent');
+    const closeModal = document.getElementById('closeModal');
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, m => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+      }[m]));
+    }
+
+    function renderEmotionBadges(emotions){
+      const parts = [];
+      for (const e of EMO){
+        const v = Number(emotions?.[e.key] ?? 0);
+        if (v <= 0) continue;
+        parts.push(`
+          <span class="badge">
+            <span class="dot" style="background:${rgbToCss(e.color,1)}"></span>
+            ${escapeHtml(e.label)}: ${v}
+          </span>
+        `);
+      }
+      if (!parts.length) return `<div class="emo-badges"><span class="badge">Sin emociones registradas</span></div>`;
+      return `<div class="emo-badges">${parts.join("")}</div>`;
+    }
+
+    function showMemoryModal(memory) {
+      const emoHtml = renderEmotionBadges(memory.emociones || {});
+      modalContent.innerHTML = `
+        <p><strong>Ubicación:</strong> ${escapeHtml(memory.ubicacion || 'Sin ubicación')}</p>
+        <p><strong>Momento:</strong> ${escapeHtml(memory.momento || 'Sin fecha')}</p>
+        <p><strong>Vista:</strong> ${escapeHtml(memory.vista || 'Nada')}</p>
+        <p><strong>Oído:</strong> ${escapeHtml(memory.oido || 'Nada')}</p>
+        <p><strong>Sentimos:</strong> ${escapeHtml(memory.sentimos || 'Nada')}</p>
+        <p><strong>Olemos:</strong> ${escapeHtml(memory.olemos || 'Nada')}</p>
+        <p><strong>Sabor:</strong> ${escapeHtml(memory.sabor || 'Nada')}</p>
+        <p><strong>Palpamos:</strong> ${escapeHtml(memory.palpamos || 'Nada')}</p>
+        <p><strong>Pensamos:</strong> ${escapeHtml(memory.pensamos || 'Nada')}</p>
+        ${emoHtml}
+      `;
+      modal.style.display = 'flex';
+    }
+
+    closeModal.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+    // ----------------------------
+    // Canvas + physics
+    // ----------------------------
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width  = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener("resize", resizeCanvas);
+
+    function distance2D(x1,y1,x2,y2){
+      const dx=x2-x1, dy=y2-y1;
+      return Math.sqrt(dx*dx + dy*dy);
+    }
+
+    // Tokenization
+    function tokenize(text){
+      return (text || "")
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\p{L}\p{N}\s]+/gu, " ")
+        .split(/\s+/)
+        .filter(w => w.length >= 3);
+    }
+
+    function memoryTokens(memory){
+      return new Set(tokenize(Object.values(memory).join(" ")));
+    }
+
+    // Search state
+    const searchInput = document.getElementById("search");
+    let searchTerms = [];
+    searchInput.addEventListener("input", () => {
+      const raw = searchInput.value.trim().toLowerCase();
+      searchTerms = raw ? raw.split(/\s+/).filter(t => t.length >= 2) : [];
+
+      // Wake/unlock so they can re-cluster immediately
+      particles.forEach(p => {
+        p.fija = false;
+        p.estableFrames = 0;
+        p.vx *= 0.2;
+        p.vy *= 0.2;
+      });
+    });
+
+    function matchCount(tokens, terms){
+      if (!terms.length) return 0;
+      let c = 0;
+      for (const t of terms){
+        for (const w of tokens){
+          if (w.includes(t)) { c++; break; }
+        }
+      }
+      return c;
+    }
+
+    // Particles
+    let memories = [];
+    let particles = [];
+
+    class Particle{
+      constructor(x,y,a, memory){
+        this.x = x; this.y = y;
+
+        this.v = 0.45;
+        this.vx = Math.cos(a)*this.v;
+        this.vy = Math.sin(a)*this.v;
+
+        this.ax = 0; this.ay = 0;
+        this.data = memory;
+        this.tokens = memoryTokens(memory);
+
+        this.fija = false;
+        this.estableFrames = 0;
+
+        this.r = 18 + Math.random()*10;
+
+        // bubble tint derived from emotions
+        const emo = bubbleColorFromEmotions(memory.emociones || {});
+        this.tint = emo.rgb;          // main mixture color
+        this.domColor = emo.domColor; // dominant emotion accent
+      }
+
+      score(){ return matchCount(this.tokens, searchTerms); }
+
+      interactions(width,height){
+        if (this.fija){ this.ax=0; this.ay=0; return; }
+
+        const searching = searchTerms.length > 0;
+        const myScore = this.score();
+        const amActive = searching && myScore > 0;
+
+        const distMin        = 62;
+        const distRepelMid   = 260;
+        const distRepelOuter = 520;
+
+        const kRepelClose = 0.11;
+        const kRepelMid   = 0.0018;
+        const kRepelOuter = 0.00025;
+
+        const kAttractFar  = 0.00055;
+        const kAttractNear = 0.00125;
+        const distTarget   = 190;
+
+        const kCenterPull = 0.00095;
+        const center = { x: width * 0.5, y: height * 0.5 };
+
+        let fx=0, fy=0;
+
+        if (amActive) {
+          const dxC = center.x - this.x;
+          const dyC = center.y - this.y;
+          fx += dxC * kCenterPull;
+          fy += dyC * kCenterPull;
+        }
+
+        for (const p of particles){
+          if (p === this) continue;
+
+          const d = distance2D(this.x,this.y,p.x,p.y);
+          if (d === 0) continue;
+
+          const dx = p.x - this.x;
+          const dy = p.y - this.y;
+          const ux = dx / d;
+          const uy = dy / d;
+
+          if (d < distMin){
+            const intensity = (distMin - d) * kRepelClose;
+            fx -= ux * intensity;
+            fy -= uy * intensity;
+            continue;
+          }
+
+          if (d < distRepelMid){
+            const intensity = (distRepelMid - d) * kRepelMid;
+            fx -= ux * intensity;
+            fy -= uy * intensity;
+          } else if (d < distRepelOuter){
+            const intensity = (distRepelOuter - d) * kRepelOuter;
+            fx -= ux * intensity;
+            fy -= uy * intensity;
+          }
+
+          if (!searching) continue;
+
+          const otherScore = p.score();
+          const otherActive = otherScore > 0;
+
+          if (amActive && otherActive){
+            const weight = 0.75 + 0.20 * Math.min(6, Math.min(myScore, otherScore));
+            fx += ux * (kAttractFar * weight * d);
+            fy += uy * (kAttractFar * weight * d);
+
+            const delta = d - distTarget;
+            fx += ux * (delta * kAttractNear * weight);
+            fy += uy * (delta * kAttractNear * weight);
+          }
+        }
+
+        const maxForce = 0.11;
+        const mag = Math.sqrt(fx*fx + fy*fy);
+        if (mag > maxForce){
+          fx = fx/mag*maxForce;
+          fy = fy/mag*maxForce;
+        }
+
+        this.ax = fx;
+        this.ay = fy;
+      }
+
+      move(width,height){
+        if (this.fija) return;
+
+        this.vx += this.ax;
+        this.vy += this.ay;
+
+        const searching = searchTerms.length > 0;
+        const friction = searching ? 0.90 : 0.925;
+        this.vx *= friction;
+        this.vy *= friction;
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        const speed = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+        const force = Math.sqrt(this.ax*this.ax + this.ay*this.ay);
+        if (!searching && speed < 0.02 && force < 0.002){
+          this.estableFrames++;
+          if (this.estableFrames > 60){
+            this.fija = true;
+            this.vx=0; this.vy=0;
+          }
+        } else {
+          this.estableFrames = 0;
+        }
+
+        const pad = this.r + 10;
+        const rebound = -0.5;
+
+        if (this.x > width - pad){ this.x = width - pad; this.vx *= rebound; }
+        if (this.x < pad){ this.x = pad; this.vx *= rebound; }
+        if (this.y > height - pad){ this.y = height - pad; this.vy *= rebound; }
+        if (this.y < pad){ this.y = pad; this.vy *= rebound; }
+      }
+
+      drawBubble(){
+        const x = this.x, y = this.y, r = this.r;
+
+        // Shadow
+        ctx.save();
+        ctx.globalAlpha = 0.18;
+        ctx.beginPath();
+        ctx.ellipse(x + r*0.25, y + r*0.40, r*0.95, r*0.75, 0, 0, Math.PI*2);
+        ctx.fillStyle = "rgba(0,0,0,0.35)";
+        ctx.fill();
+        ctx.restore();
+
+        // Glass + tint: base glass gradient + colored glaze overlay
+        const glass = ctx.createRadialGradient(x - r*0.35, y - r*0.35, r*0.2, x, y, r);
+        glass.addColorStop(0, "rgba(255,255,255,0.75)");
+        glass.addColorStop(0.35, "rgba(255,255,255,0.20)");
+        glass.addColorStop(1, "rgba(255,255,255,0.10)");
+
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI*2);
+        ctx.fillStyle = glass;
+        ctx.fill();
+
+        // Tint overlay (emotion mixture)
+        ctx.save();
+        ctx.globalCompositeOperation = "source-atop";
+        ctx.globalAlpha = 0.38; // strength of emotion color
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI*2);
+        ctx.fillStyle = rgbToCss(this.tint, 1);
+        ctx.fill();
+        ctx.restore();
+
+        // Border (dominant emotion accent) + search highlight
+        const score = this.score();
+        const borderColor = score > 0 ? [255,235,59] : this.domColor;
+
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI*2);
+        ctx.lineWidth = score > 0 ? 2.6 : 1.6;
+        ctx.strokeStyle = rgbToCss(borderColor, score > 0 ? 0.95 : 0.65);
+        ctx.stroke();
+
+        // Glint
+        ctx.beginPath();
+        ctx.arc(x - r*0.25, y - r*0.25, r*0.25, 0, Math.PI*2);
+        ctx.fillStyle = "rgba(255,255,255,0.58)";
+        ctx.fill();
+
+        // Inner ring
+        ctx.beginPath();
+        ctx.arc(x, y, r*0.82, 0, Math.PI*2);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "rgba(255,255,255,0.30)";
+        ctx.stroke();
+      }
+
+      hitTest(mx,my){
+        const d = distance2D(mx,my,this.x,this.y);
+        return d <= this.r + 6;
+      }
+    }
+
+    function drawConnections(){
+      if (searchTerms.length === 0) return;
+
+      const maxLinkDist = 360;
+
+      for (let i=0;i<particles.length;i++){
+        const a = particles[i];
+        const sa = a.score();
+        if (sa <= 0) continue;
+
+        for (let j=i+1;j<particles.length;j++){
+          const b = particles[j];
+          const sb = b.score();
+          if (sb <= 0) continue;
+
+          const d = distance2D(a.x,a.y,b.x,b.y);
+          if (d > maxLinkDist) continue;
+
+          const relevance = Math.min(10, sa + sb);
+          const alpha = Math.max(0.05, 0.34 * (1 - d/maxLinkDist));
+          const w = 1 + Math.min(8, relevance * 0.35);
+
+          ctx.strokeStyle = `rgba(147,112,219,${alpha})`;
+          ctx.lineWidth = w;
+          ctx.lineCap = "round";
+
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    function loop(){
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      ctx.clearRect(0,0,w,h);
+
+      for (const p of particles) p.interactions(w,h);
+      for (const p of particles) p.move(w,h);
+
+      drawConnections();
+      for (const p of particles) p.drawBubble();
+
+      requestAnimationFrame(loop);
+    }
+
+    canvas.addEventListener("click", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+
+      for (let i = particles.length - 1; i >= 0; i--){
+        if (particles[i].hitTest(mx,my)){
+          showMemoryModal(particles[i].data);
+          return;
+        }
+      }
+    });
+
+    // ----------------------------
+    // Load + Save (same PHP endpoint)
+    // ----------------------------
+    const memoryForm = document.getElementById('memoryForm');
+
+    function loadMemories(){
+      return fetch("save_memories.php")
+        .then(r => r.json())
+        .then(list => {
+          memories = Array.isArray(list) ? list : [];
+          const rect = canvas.getBoundingClientRect();
+          particles = memories.map(m => new Particle(
+            Math.random() * (rect.width  - 80) + 40,
+            Math.random() * (rect.height - 80) + 40,
+            Math.random() * Math.PI * 2,
+            normalizeMemoryEmotions(m)
+          ));
+        });
+    }
+
+    function normalizeMemoryEmotions(m){
+      // Backward compatible:
+      // - if memory.emociones doesn't exist, create it with zeros
+      if (!m.emociones) {
+        m.emociones = {};
+        for (const e of EMO) m.emociones[e.key] = 0;
+      } else {
+        for (const e of EMO) {
+          if (m.emociones[e.key] === undefined) m.emociones[e.key] = 0;
+          m.emociones[e.key] = Number(m.emociones[e.key] || 0);
+        }
+      }
+      return m;
+    }
+
+    memoryForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const emotions = readEmotionsFromForm();
+
+      const memory = normalizeMemoryEmotions({
+        vista: document.getElementById('vista').value,
+        momento: document.getElementById('momento').value,
+        oido: document.getElementById('oido').value,
+        sentimos: document.getElementById('sentimos').value,
+        olemos: document.getElementById('olemos').value,
+        sabor: document.getElementById('sabor').value,
+        palpamos: document.getElementById('palpamos').value,
+        pensamos: document.getElementById('pensamos').value,
+        ubicacion: document.getElementById('ubicacion').value,
+        emociones: emotions
+      });
+
+      fetch("save_memories.php", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify(memory)
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (!data || !data.success) return;
+
+        memories.push(memory);
+
+        const rect = canvas.getBoundingClientRect();
+        particles.push(new Particle(
+          Math.random() * (rect.width  - 80) + 40,
+          Math.random() * (rect.height - 80) + 40,
+          Math.random() * Math.PI * 2,
+          memory
+        ));
+
+        particles.forEach(p => { p.fija = false; p.estableFrames = 0; });
+        memoryForm.reset();
+        resetEmotions();
+      })
+      .catch(err => console.error("Error al guardar:", err));
+    });
+
+    // ----------------------------
+    // Boot
+    // ----------------------------
+    document.addEventListener("DOMContentLoaded", () => {
+      setupEmotionUI();
+      resizeCanvas();
+      loadMemories()
+        .then(() => requestAnimationFrame(loop))
+        .catch(err => console.error("Error al cargar recuerdos:", err));
+    });
+  </script>
+</body>
+</html>
+
