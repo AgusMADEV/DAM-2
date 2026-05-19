@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <title>Animación en CSS</title>
+    <meta charset="utf-8" />
+    <style>
+    body{display:flex;flex-direction:column;align-items:center;}
+      /* Namespace: solo títulos transformados */
+      h1.jocarsatitulo2>span:first-child{
+        color:darkred;
+      }
+      h1.jocarsatitulo2>span:last-child{
+        color:grey;
+      }
+      h1.jocarsatitulo2{
+        font-family:ubuntu;
+        display:flex;
+        align-items:center;
+        gap:10px;
+      }
+
+      /* Ventana que recorta (ancho lo pone JS) */
+      h1.jocarsatitulo2 .clip{
+        position:relative;
+        overflow:hidden;
+        display:inline-block;
+        white-space:nowrap;
+        vertical-align:middle;
+        /* width: ... se setea desde JS */
+      }
+
+      /* Elemento que se mueve */
+      h1.jocarsatitulo2 .move{
+        display:inline-block;
+        will-change:transform;
+      }
+
+      h1.jocarsatitulo2 .separador{
+        width:3px;
+        height:40px;
+        background:black;
+        animation:barra 1s;
+        animation-delay:var(--d-barra, 0s);
+        animation-fill-mode:backwards;
+        flex:0 0 auto;
+        border-radius:100px;
+      }
+
+      @keyframes barra{
+        0%{height:0px;}
+        100%{height:40px;}
+      }
+
+      /* Animaciones (se aplican al .move dentro de cada clip) */
+      h1.jocarsatitulo2 .empresa .move{
+        transform:translateX(100%);
+        animation:mueveempresa 3s;
+        animation-delay:var(--d-empresa, 0s);
+        animation-fill-mode:forwards;
+      }
+
+      @keyframes mueveempresa{
+        0%{transform:translateX(100%);}
+        100%{transform:translateX(0);}
+      }
+
+      h1.jocarsatitulo2 .producto .move{
+        transform:translateX(-100%);
+        animation:mueveproducto 3s;
+        animation-delay:var(--d-producto, 0s);
+        animation-fill-mode:forwards;
+      }
+
+      @keyframes mueveproducto{
+        0%{transform:translateX(-100%);}
+        100%{transform:translateX(0);}
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>jocarsa | formación</h1>
+    <h1>jocarsa | ventas</h1>
+    <h1>jocarsa | educación</h1>
+    <h1>jocarsa | gestión</h1>
+
+    <script>
+      // Duraciones (deben coincidir con CSS)
+      const DUR_BARRA   = 1; // s
+      const DUR_EMPRESA = 3; // s
+      const DUR_PRODUCTO= 3; // s
+
+      // (Opcional) pausas entre fases dentro de cada título
+      const GAP_AFTER_BARRA   = 0.2; // s
+      const GAP_AFTER_EMPRESA = 0.2; // s
+
+      function buildAnimatedTitle(h1){
+        if(!h1.textContent.includes(" | ")) return null;
+
+        // 1) añadir clase al h1
+        h1.classList.add("jocarsatitulo2");
+
+        const [empresa, producto] = h1.textContent.split(" | ");
+        h1.textContent = "";
+
+        // Empresa: clip -> move
+        const clipEmpresa = document.createElement("span");
+        clipEmpresa.className = "clip empresa";
+
+        const moveEmpresa = document.createElement("span");
+        moveEmpresa.className = "move";
+        moveEmpresa.textContent = empresa;
+
+        clipEmpresa.appendChild(moveEmpresa);
+        h1.appendChild(clipEmpresa);
+
+        // Separador
+        const separador = document.createElement("span");
+        separador.className = "separador";
+        h1.appendChild(separador);
+
+        // Producto: clip -> move
+        const clipProducto = document.createElement("span");
+        clipProducto.className = "clip producto";
+
+        const moveProducto = document.createElement("span");
+        moveProducto.className = "move";
+        moveProducto.textContent = producto;
+
+        clipProducto.appendChild(moveProducto);
+        h1.appendChild(clipProducto);
+
+        return { h1, clipEmpresa, moveEmpresa, clipProducto, moveProducto };
+      }
+
+      function measureAndSetClipWidth(clip, move){
+        const w = Math.ceil(move.scrollWidth || move.getBoundingClientRect().width);
+        clip.style.width = w + "px";
+      }
+
+      function setDelaysForTitle(h1, baseDelaySeconds){
+        // 3) delays por variables CSS (cascada)
+        const dBarra   = baseDelaySeconds;
+        const dEmpresa = dBarra + DUR_BARRA + GAP_AFTER_BARRA;
+        const dProducto= dEmpresa + DUR_EMPRESA + GAP_AFTER_EMPRESA;
+
+        h1.style.setProperty("--d-barra",   dBarra   + "s");
+        h1.style.setProperty("--d-empresa", dEmpresa + "s");
+        h1.style.setProperty("--d-producto",dProducto+ "s");
+
+        // Devuelve el tiempo total consumido por este título, para encadenar el siguiente
+        const total = (DUR_BARRA + GAP_AFTER_BARRA) + (DUR_EMPRESA + GAP_AFTER_EMPRESA) + DUR_PRODUCTO;
+        return total;
+      }
+
+      async function init(){
+        const items = [];
+        document.querySelectorAll("h1").forEach(h1 => {
+          const refs = buildAnimatedTitle(h1);
+          if(refs) items.push(refs);
+        });
+
+        // Espera fuentes (evita medir con fallback)
+        if (document.fonts && document.fonts.ready) {
+          try { await document.fonts.ready; } catch(e){}
+        }
+
+        // Medición estable
+        const recalcWidths = () => {
+          items.forEach(({clipEmpresa, moveEmpresa, clipProducto, moveProducto}) => {
+            clipEmpresa.style.width = "";
+            clipProducto.style.width = "";
+            measureAndSetClipWidth(clipEmpresa, moveEmpresa);
+            measureAndSetClipWidth(clipProducto, moveProducto);
+          });
+        };
+
+        requestAnimationFrame(recalcWidths);
+        window.addEventListener("resize", recalcWidths);
+
+        // 3) Cascada: un h1 tras otro
+        let t = 0; // delay acumulado en segundos
+        items.forEach(({h1}) => {
+          const spent = setDelaysForTitle(h1, t);
+          t += spent; // siguiente empieza cuando termina este
+        });
+      }
+
+      init();
+    </script>
+  </body>
+</html>
+

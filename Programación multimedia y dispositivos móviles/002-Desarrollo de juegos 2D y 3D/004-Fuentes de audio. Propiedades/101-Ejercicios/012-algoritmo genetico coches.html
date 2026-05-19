@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GA Lane Driver — 3 lanes, ego fixed center</title>
+  <style>
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#05070c;color:#e8eefc}
+    #wrap{position:fixed;inset:0;display:flex;gap:12px;padding:12px}
+    #left{flex:1;display:flex}
+    canvas{width:100%;height:100%;display:block;border-radius:14px;background:radial-gradient(circle at 30% 20%,#121a2a 0%,#070a12 55%,#03040a 100%);box-shadow:0 18px 60px rgba(0,0,0,.55)}
+    #right{width:340px;display:flex;flex-direction:column;gap:10px}
+    .card{
+      border-radius:14px;
+      background:linear-gradient(135deg,rgba(10,14,24,.92),rgba(6,8,14,.92));
+      border:1px solid rgba(120,160,255,.22);
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+      padding:10px 12px;
+    }
+    #info{white-space:pre-line;font-size:12px;line-height:1.35}
+    #info b{color:#9cc4ff}
+    #controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    button{
+      border:1px solid rgba(160,190,255,.25);
+      background:rgba(20,26,40,.75);
+      color:#eaf2ff;
+      padding:8px 10px;border-radius:10px;cursor:pointer;
+    }
+    button:hover{background:rgba(28,36,54,.85)}
+    label{font-size:12px;color:#bcd2ff;display:flex;gap:8px;align-items:center}
+    input[type="range"]{width:160px}
+    .hint{opacity:.8;font-size:11px;line-height:1.3}
+  </style>
+</head>
+<body>
+<div id="wrap">
+  <div id="left"><canvas id="c"></canvas></div>
+  <div id="right">
+    <div class="card">
+      <div id="controls">
+        <button id="reset">Reset</button>
+        <button id="pause">Pause</button>
+        <label>Traffic <input id="traffic" type="range" min="0" max="1" step="0.01" value="0.55"></label>
+        <label>Rollouts <input id="rollouts" type="range" min="20" max="240" step="1" value="90"></label>
+      </div>
+      <div class="hint">
+        Ego car stays fixed at screen center (Y). World scrolls. AI chooses lane changes + accel/brake.
+        Each frame it runs multiple simulated futures (rollouts) with mutated parameters, picks best survival plan, applies first action.
+      </div>
+    </div>
+    <div class="card" id="info"></div>
+    <div class="card hint">
+      Keys (optional): <b>A/D</b> force lane change, <b>W/S</b> throttle/brake (overrides AI while pressed).
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  // ========= Canvas sizing =========
+  const canvas = document.getElementById("c");
+  const ctx = canvas.getContext("2d", { alpha:false });
+  function resize(){
+    const r = canvas.getBoundingClientRect();
+    canvas.width  = Math.max(1, Math.floor(r.width  * devicePixelRatio));
+    canvas.height = Math.max(1, Math.floor(r.height * devicePixelRatio));
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  // ========= UI =========
+  const info = document.getElementById("info");
+  const trafficSlider = document.getElementById("traffic");
+  const rolloutsSlider = document.getElementById("rollouts");
+  const resetBtn = document.getElementById("reset");
+  const pauseBtn = document.getElementById("pause");
+
+  // ========= World / Road =========
+  const LANES = 3;
+  const ROAD_PAD = 60;
+  const LANE_LINE_W = 2;
+
+  // Ego fixed at screen Y center.
+  function laneX(lane, W){
+    const roadW = W - ROAD_PAD*2;
+    const laneW = roadW / LANES;
+    return ROAD_PAD + laneW*(lane + 0.5);
+  }
+
+  // ========= Car geometry =========
+  const EGO = {
+    w: 28,
+    h: 48,
+    y: 0,          // fixed to mid screen each frame
+    x: 0,
+    lane: 1,
+    lanePos: 1,    // continuous lane coordinate 0..2
+    vx: 0,
+    heading: 0,    // visual tilt
+    speed: 26,     // forward speed (world units per second)
+    accel: 0
+  };
+
+  // traffic cars in world coordinates relative to ego:
+  // we store their yRel where yRel>0 means ahead of ego, yRel<0 behind.
+  let cars = [];
+  let tScroll = 0;
+
+  // ========= Helpers =========
+  const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+  const lerp = (a,b,t)=>a+(b-a)*t;
+  const rand = (a,b)=>a+Math.random()*(b-a);
+  const randi = (a,b)=>Math.floor(rand(a,b+1));
+  function aabbOverlap(ax,ay,aw,ah, bx,by,bw,bh){
+    return Math.abs(ax-bx) < (aw+bw)*0.5 && Math.abs(ay-by) < (ah+bh)*0.5;
+  }
+
+  // ========= Traffic model =========
+  // car speed is absolute world speed; ego speed subtracts to get relative y motion.
+  function spawnCar(W){
+    // spawn ahead most of time, sometimes behind to create merges
+    const ahead = Math.random() < 0.82;
+    const lane = randi(0, LANES-1);
+    const absSpeed = rand(10, 42); // some slower/faster than ego
+    const w = rand(24, 32);
+    const h = rand(42, 58);
+
+    // distance in "meters" (screen-ish units)
+    const yRel = ahead ? rand(180, 880) : -rand(180, 520);
+
+    cars.push({
+      lane,
+      x: laneX(lane, W) + rand(-2,2),
+      yRel,
+      w, h,
+      speed: absSpeed,
+      hue: rand(10, 220),
+    });
+  }
+
+  function maintainTraffic(W, H, density){
+    // target count based on density and view size
+    const target = Math.floor(8 + density*22);
+    while (cars.length < target) spawnCar(W);
+  }
+
+  function updateTraffic(dt, W){
+    // cars move relative to ego
+    for (let i=cars.length-1;i>=0;i--){
+      const c = cars[i];
+      const rel = (c.speed - EGO.speed); // if c faster than ego -> increases yRel (pulls away)
+      c.yRel += rel * dt;
+
+      // small lane jitter correction to lane center
+      const cx = laneX(c.lane, W);
+      c.x += (cx - c.x) * (dt*2.2);
+
+      // remove far away cars
+      if (c.yRel > 1200 || c.yRel < -900) cars.splice(i,1);
+    }
+  }
+
+  // ========= GA / Rollouts =========
+  // Genes: behavior parameters. Each frame: create candidates by mutating current best.
+  const defaultGenes = {
+    // sensing
+    horizon: 1.55,            // seconds to look ahead
+    sideHorizon: 1.1,         // seconds to consider adjacent lanes
+    safeTimeHeadway: 1.00,    // desired headway to car ahead in same lane (seconds)
+    safeGap: 46,              // minimum gap distance in front/back (world units)
+    // lane change
+    laneChangeBias: 0.00,     // -1 left preference, +1 right preference
+    laneChangeCooldown: 0.55, // seconds
+    laneCommit: 0.85,         // how strongly commit to a lane once chosen
+    // control
+    maxAccel: 12.0,
+    maxBrake: 20.0,
+    targetSpeed: 30.0,
+    // scoring weights
+    wCrash: 5000,
+    wNear: 25,
+    wSpeed: 2.0,
+    wLaneChange: 6.0,
+  };
+
+  let bestGenes = {...defaultGenes};
+  let bestScoreEMA = 0;
+  let gen = 1;
+
+  // planning state
+  let cooldown = 0;
+  let desiredLane = 1;     // where the planner wants to go (0..2)
+  let lastAction = { steer:0, throttle:0 };
+
+  function mutateGenes(g){
+    // small multiplicative / additive noise
+    const m = (v, f, lo, hi) => clamp(v * (1 + rand(-f,f)), lo, hi);
+    const a = (v, s, lo, hi) => clamp(v + rand(-s,s), lo, hi);
+    const out = {...g};
+    out.horizon = m(out.horizon, 0.22, 0.6, 2.8);
+    out.sideHorizon = m(out.sideHorizon, 0.22, 0.4, 2.2);
+    out.safeTimeHeadway = m(out.safeTimeHeadway, 0.28, 0.5, 2.2);
+    out.safeGap = m(out.safeGap, 0.25, 22, 120);
+
+    out.laneChangeBias = a(out.laneChangeBias, 0.18, -1, 1);
+    out.laneChangeCooldown = m(out.laneChangeCooldown, 0.30, 0.12, 1.8);
+    out.laneCommit = m(out.laneCommit, 0.25, 0.2, 1.4);
+
+    out.maxAccel = m(out.maxAccel, 0.25, 6, 24);
+    out.maxBrake = m(out.maxBrake, 0.25, 10, 40);
+    out.targetSpeed = m(out.targetSpeed, 0.18, 14, 46);
+
+    out.wCrash = m(out.wCrash, 0.10, 2000, 12000);
+    out.wNear = m(out.wNear, 0.25, 5, 120);
+    out.wSpeed = m(out.wSpeed, 0.25, 0.5, 6);
+    out.wLaneChange = m(out.wLaneChange, 0.25, 0.5, 30);
+
+    return out;
+  }
+
+  function snapshotState(W){
+    // minimal state to rollout
+    return {
+      ego: {
+        lanePos: EGO.lanePos,
+        lane: Math.round(EGO.lanePos),
+        speed: EGO.speed,
+      },
+      cars: cars.map(c => ({
+        lane:c.lane, yRel:c.yRel, speed:c.speed, w:c.w, h:c.h
+      })),
+      cooldown,
+      desiredLane,
+    };
+  }
+
+  function findClosestInLane(state, lane){
+    let ahead = null, behind = null;
+    let minAhead = Infinity, minBehind = Infinity;
+    for (const c of state.cars){
+      if (c.lane !== lane) continue;
+      if (c.yRel >= 0 && c.yRel < minAhead){ minAhead = c.yRel; ahead = c; }
+      if (c.yRel < 0 && -c.yRel < minBehind){ minBehind = -c.yRel; behind = c; }
+    }
+    return { ahead, behind, minAhead, minBehind };
+  }
+
+  function stepPolicy(state, genes, dt){
+    // Decide desired lane and throttle based on predicted occupancy
+    const egoLane = clamp(Math.round(state.ego.lanePos),0,LANES-1);
+
+    // lane desirability score: prefer lanes with larger forward gap and safe back gap
+    const laneScores = [];
+    for (let lane=0; lane<LANES; lane++){
+      const {ahead, behind, minAhead, minBehind} = findClosestInLane(state, lane);
+
+      // estimate where those cars will be after horizon
+      const T = (lane === egoLane) ? genes.horizon : genes.sideHorizon;
+
+      // forward gap after T (relative to ego): yRel evolves by (carSpeed - egoSpeed)*T
+      let gapF = 9999;
+      if (ahead){
+        const yFuture = ahead.yRel + (ahead.speed - state.ego.speed)*T;
+        gapF = yFuture;
+      }
+      let gapB = 9999;
+      if (behind){
+        const yFuture = behind.yRel + (behind.speed - state.ego.speed)*T; // behind is negative
+        gapB = -yFuture; // positive distance behind
+      }
+
+      // headway requirement grows with ego speed
+      const wantF = Math.max(genes.safeGap, genes.safeTimeHeadway * state.ego.speed);
+      const wantB = Math.max(genes.safeGap*0.8, 0.6*genes.safeTimeHeadway * state.ego.speed);
+
+      // penalties if unsafe
+      let score = 0;
+      score += clamp((gapF - wantF), -400, 800);
+      score += 0.55 * clamp((gapB - wantB), -400, 800);
+
+      // bias (left/right) and small preference for staying near current desired lane
+      const bias = (lane - 1) * genes.laneChangeBias * 70;
+      score += bias;
+
+      const stick = -Math.abs(lane - state.desiredLane) * 18 * genes.laneCommit;
+      score += stick;
+
+      laneScores.push(score);
+    }
+
+    // choose best lane if cooldown allows
+    let bestLane = 0;
+    for (let i=1;i<LANES;i++) if (laneScores[i] > laneScores[bestLane]) bestLane = i;
+
+    if (state.cooldown <= 0){
+      state.desiredLane = bestLane;
+    }
+
+    // throttle/brake based on same-lane forward gap
+    const curLane = clamp(Math.round(state.ego.lanePos),0,LANES-1);
+    const {ahead} = findClosestInLane(state, curLane);
+    let throttle = 0; // -1 brake .. +1 accel
+    const targetV = genes.targetSpeed;
+
+    let hazard = 0;
+    if (ahead){
+      const gap = ahead.yRel; // >=0
+      const relV = state.ego.speed - ahead.speed; // positive = closing
+      const want = Math.max(genes.safeGap, genes.safeTimeHeadway * state.ego.speed);
+
+      if (gap < want) hazard = clamp((want - gap)/want, 0, 1.2);
+      if (relV > 0 && gap < want*1.4) hazard = Math.max(hazard, clamp(relV/20,0,1));
+
+      // if too close: brake
+      throttle = -hazard;
+    } else {
+      // no car ahead: go towards target speed
+      throttle = clamp((targetV - state.ego.speed)/10, -0.4, 1.0);
+    }
+
+    // if changing lane, slightly ease throttle (avoid aggressive merges)
+    if (Math.abs(state.desiredLane - state.ego.lanePos) > 0.15) throttle -= 0.10;
+
+    // apply dt physics (in rollout space)
+    const accel = (throttle >= 0) ? (throttle * genes.maxAccel) : (throttle * genes.maxBrake);
+    state.ego.speed = clamp(state.ego.speed + accel*dt, 6, 60);
+
+    // lateral move toward desired lane
+    const laneDelta = state.desiredLane - state.ego.lanePos;
+    const lateralRate = 1.85; // laneUnits per second at full
+    const steer = clamp(laneDelta * 2.2, -1, 1);
+    state.ego.lanePos = clamp(state.ego.lanePos + steer * lateralRate * dt, 0, LANES-1);
+
+    // cooldown handling
+    if (state.cooldown > 0) state.cooldown -= dt;
+    // if we changed lane (crossed near center), reset cooldown
+    const newLane = clamp(Math.round(state.ego.lanePos),0,LANES-1);
+    if (newLane !== curLane){
+      state.cooldown = genes.laneChangeCooldown;
+    }
+
+    return { steer, throttle };
+  }
+
+  function rolloutOnce(baseState, genes, dt, steps){
+    // clone state shallowly
+    const state = {
+      ego: {...baseState.ego},
+      cars: baseState.cars.map(c=>({...c})),
+      cooldown: baseState.cooldown,
+      desiredLane: baseState.desiredLane
+    };
+
+    let score = 0;
+    let crashed = false;
+    let laneChanges = 0;
+    let lastLane = clamp(Math.round(state.ego.lanePos),0,LANES-1);
+
+    for (let s=0;s<steps;s++){
+      const action = stepPolicy(state, genes, dt);
+
+      // advance traffic relative y
+      for (const c of state.cars){
+        c.yRel += (c.speed - state.ego.speed) * dt;
+      }
+
+      // scoring: speed progress (want higher speed, but not if unsafe)
+      score += genes.wSpeed * (state.ego.speed/30);
+
+      // near-miss penalty and crash detection (in ego frame)
+      const egoX = state.ego.lanePos; // lane units
+      const egoLane = clamp(Math.round(egoX),0,LANES-1);
+
+      // lane change count
+      if (egoLane !== lastLane){ laneChanges++; lastLane = egoLane; }
+
+      for (const c of state.cars){
+        // approximate x by lane index; collision if same lane and yRel small
+        if (c.lane !== egoLane) continue;
+
+        // AABB in ego frame: ego at y=0, cars at y=yRel
+        const overlap = aabbOverlap(
+          0, 0, EGO.w, EGO.h,
+          0, c.yRel, c.w, c.h
+        );
+
+        if (overlap){
+          crashed = true;
+          score -= genes.wCrash;
+          break;
+        } else {
+          // near miss when too close
+          const gap = Math.abs(c.yRel) - (EGO.h+c.h)*0.5;
+          if (gap < 70){
+            const p = clamp((70 - gap)/70, 0, 1);
+            score -= genes.wNear * p;
+          }
+        }
+      }
+      if (crashed) break;
+    }
+
+    // penalize unnecessary lane changes
+    score -= genes.wLaneChange * laneChanges;
+
+    return { score, crashed };
+  }
+
+  function planWithRollouts(W, dtReal){
+    const base = snapshotState(W);
+
+    const N = parseInt(rolloutsSlider.value, 10);
+    const steps = 26;               // forward steps
+    const dt = 0.06;                // rollout dt (~1.56s horizon)
+    // keep horizon loosely coupled to genes.horizon; steps/dt give upper bound, genes uses its own T.
+
+    let best = null;
+    let bestGenesLocal = null;
+
+    // include current bestGenes as candidate 0 (no mutation)
+    for (let i=0;i<N;i++){
+      const g = (i === 0) ? bestGenes : mutateGenes(bestGenes);
+      const r = rolloutOnce(base, g, dt, steps);
+
+      if (!best || r.score > best.score){
+        best = r;
+        bestGenesLocal = g;
+      }
+    }
+
+    // update bestGenes smoothly (don’t jump violently)
+    // if we found improvement, adopt it; else keep current
+    if (bestGenesLocal){
+      bestGenes = bestGenesLocal;
+      bestScoreEMA = lerp(bestScoreEMA, best.score, 0.15);
+      gen++;
+    }
+
+    // Now produce the actual first action from bestGenes on the real state:
+    const real = snapshotState(W);
+    const action = stepPolicy(real, bestGenes, dtReal);
+
+    // commit desiredLane/cooldown predicted by policy step to real controller state
+    desiredLane = real.desiredLane;
+    cooldown = real.cooldown;
+
+    return action;
+  }
+
+  // ========= Rendering =========
+  function drawRoad(W,H){
+    // asphalt
+    ctx.save();
+    ctx.fillStyle = "rgba(8,10,16,1)";
+    ctx.fillRect(0,0,W,H);
+
+    // road region
+    const x0 = ROAD_PAD;
+    const roadW = W - ROAD_PAD*2;
+    ctx.fillStyle = "rgba(10,14,24,1)";
+    ctx.fillRect(x0,0,roadW,H);
+
+    // subtle vignette
+    const vg = ctx.createRadialGradient(W*0.55,H*0.5, 50, W*0.55,H*0.5, Math.max(W,H));
+    vg.addColorStop(0,"rgba(0,0,0,0)");
+    vg.addColorStop(1,"rgba(0,0,0,0.55)");
+    ctx.fillStyle = vg;
+    ctx.fillRect(0,0,W,H);
+
+    // lane lines
+    const laneW = roadW / LANES;
+    const dash = 18;
+    const gap = 14;
+
+    for (let i=1;i<LANES;i++){
+      const x = x0 + laneW*i;
+      ctx.strokeStyle = "rgba(200,220,255,0.22)";
+      ctx.lineWidth = LANE_LINE_W;
+      ctx.setLineDash([dash,gap]);
+      ctx.beginPath();
+      ctx.moveTo(x,0);
+      ctx.lineTo(x,H);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // road borders
+    ctx.strokeStyle = "rgba(120,160,255,0.25)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x0+0.5,0.5,roadW-1,H-1);
+
+    // faint moving scan lines
+    tScroll += 0.8;
+    ctx.globalAlpha = 0.12;
+    ctx.strokeStyle = "rgba(80,190,255,0.22)";
+    ctx.lineWidth = 1;
+    for (let y = (-tScroll%60); y < H; y += 60){
+      ctx.beginPath();
+      ctx.moveTo(x0,y);
+      ctx.lineTo(x0+roadW,y);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawCar(x,y,w,h, hue, accentAlpha=1){
+    ctx.save();
+    ctx.translate(x,y);
+
+    // shadow
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle = "rgba(0,0,0,0.7)";
+    ctx.beginPath();
+    ctx.roundRect(-w*0.48, -h*0.46, w*0.96, h*0.92, 8);
+    ctx.fill();
+
+    ctx.globalAlpha = 1;
+    // body
+    const g = ctx.createLinearGradient(0,-h*0.5, 0, h*0.5);
+    g.addColorStop(0, `hsla(${hue}, 80%, 60%, ${accentAlpha})`);
+    g.addColorStop(1, `hsla(${hue}, 70%, 30%, ${accentAlpha})`);
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.roundRect(-w*0.5, -h*0.5, w, h, 10);
+    ctx.fill();
+
+    // windshield
+    ctx.fillStyle = `rgba(220,240,255,${0.18*accentAlpha})`;
+    ctx.beginPath();
+    ctx.roundRect(-w*0.34, -h*0.34, w*0.68, h*0.32, 8);
+    ctx.fill();
+
+    // tail / head lights
+    ctx.fillStyle = `rgba(255,120,120,${0.55*accentAlpha})`;
+    ctx.fillRect(-w*0.42, h*0.28, w*0.18, h*0.12);
+    ctx.fillRect( w*0.24, h*0.28, w*0.18, h*0.12);
+
+    ctx.fillStyle = `rgba(255,245,200,${0.55*accentAlpha})`;
+    ctx.fillRect(-w*0.42, -h*0.40, w*0.18, h*0.12);
+    ctx.fillRect( w*0.24, -h*0.40, w*0.18, h*0.12);
+
+    // outline
+    ctx.strokeStyle = "rgba(0,0,0,0.6)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function drawSensors(W,H){
+    // simple forward sensor fan + adjacent lane windows
+    const roadW = W - ROAD_PAD*2;
+    const laneW = roadW / LANES;
+    const egoX = laneX(Math.round(EGO.lanePos), W);
+    const egoY = H*0.5;
+
+    const T = bestGenes.horizon;
+    const dist = clamp(EGO.speed * T, 120, 520);
+
+    ctx.save();
+    // forward cone
+    ctx.globalAlpha = 0.10;
+    const grad = ctx.createRadialGradient(egoX,egoY, 0, egoX,egoY, dist);
+    grad.addColorStop(0, "rgba(100,180,255,0.25)");
+    grad.addColorStop(1, "rgba(100,180,255,0)");
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(egoX,egoY);
+    ctx.arc(egoX,egoY, dist, -Math.PI*0.42, -Math.PI*0.58, true);
+    ctx.closePath();
+    ctx.fill();
+
+    // lane windows
+    ctx.globalAlpha = 0.10;
+    for (let lane=0; lane<LANES; lane++){
+      const lx = laneX(lane, W);
+      const winW = laneW*0.92;
+      const winH = dist*0.85;
+      ctx.fillStyle = (lane === Math.round(EGO.lanePos)) ? "rgba(120,220,255,0.18)" : "rgba(120,220,255,0.10)";
+      ctx.fillRect(lx - winW/2, egoY - winH, winW, winH);
+    }
+    ctx.restore();
+  }
+
+  function drawHUD(W,H, action){
+    const egoX = lerp(EGO.x, laneX(EGO.lanePos, W), 1);
+    const egoY = H*0.5;
+
+    // ego glow
+    ctx.save();
+    const glowR = 34;
+    const gg = ctx.createRadialGradient(egoX,egoY, 0, egoX,egoY, glowR*2.5);
+    gg.addColorStop(0,"rgba(120,220,255,0.35)");
+    gg.addColorStop(1,"rgba(120,220,255,0)");
+    ctx.fillStyle = gg;
+    ctx.beginPath(); ctx.arc(egoX,egoY, glowR*2.5, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+
+    // ego car (tilt slightly toward steering)
+    ctx.save();
+    ctx.translate(egoX, egoY);
+    ctx.rotate(action.steer * 0.22);
+    drawCar(0,0,EGO.w,EGO.h, 200, 1);
+    ctx.restore();
+
+    // desired lane marker
+    const dx = laneX(desiredLane, W);
+    ctx.save();
+    ctx.globalAlpha = 0.22;
+    ctx.strokeStyle = "rgba(180,240,255,0.7)";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8,8]);
+    ctx.beginPath();
+    ctx.moveTo(dx, egoY-140);
+    ctx.lineTo(dx, egoY+140);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  function drawTraffic(W,H){
+    const egoY = H*0.5;
+    for (const c of cars){
+      const x = laneX(c.lane, W);
+      const y = egoY - c.yRel; // ahead (yRel>0) appears above ego
+      if (y < -120 || y > H+120) continue;
+
+      // glow based on closeness
+      const d = Math.abs(c.yRel);
+      const a = clamp(1 - d/260, 0, 1);
+
+      ctx.save();
+      if (a > 0){
+        const halo = ctx.createRadialGradient(x,y, 0, x,y, 90);
+        halo.addColorStop(0, `rgba(255,120,120,${0.16*a})`);
+        halo.addColorStop(1, "rgba(255,120,120,0)");
+        ctx.fillStyle = halo;
+        ctx.beginPath(); ctx.arc(x,y, 90, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.restore();
+
+      drawCar(x,y,c.w,c.h,c.hue, 1);
+    }
+  }
+
+  // ========= Manual override (optional) =========
+  const keys = new Set();
+  window.addEventListener("keydown", e=>keys.add(e.key.toLowerCase()));
+  window.addEventListener("keyup", e=>keys.delete(e.key.toLowerCase()));
+
+  function manualAction(){
+    let steer = 0, throttle = 0;
+    if (keys.has("a")) steer -= 1;
+    if (keys.has("d")) steer += 1;
+    if (keys.has("w")) throttle += 1;
+    if (keys.has("s")) throttle -= 1;
+    if (steer !== 0 || throttle !== 0){
+      steer = clamp(steer, -1, 1);
+      throttle = clamp(throttle, -1, 1);
+      return { steer, throttle, manual:true };
+    }
+    return null;
+  }
+
+  // ========= Collision + scoring in real sim =========
+  let aliveTime = 0;
+  let nearCount = 0;
+  let crashes = 0;
+
+  function checkRealCollision(W,H){
+    const egoLane = clamp(Math.round(EGO.lanePos),0,LANES-1);
+    for (const c of cars){
+      if (c.lane !== egoLane) continue;
+      // ego frame collision: ego at y=0, car at yRel
+      if (aabbOverlap(0,0,EGO.w,EGO.h, 0,c.yRel,c.w,c.h)) return true;
+      const gap = Math.abs(c.yRel) - (EGO.h+c.h)*0.5;
+      if (gap < 40) nearCount++;
+    }
+    return false;
+  }
+
+  // ========= Main loop =========
+  let paused = false;
+  pauseBtn.onclick = () => { paused = !paused; pauseBtn.textContent = paused ? "Resume" : "Pause"; };
+  resetBtn.onclick = () => resetAll();
+
+  function resetAll(){
+    cars = [];
+    EGO.lane = 1;
+    EGO.lanePos = 1;
+    EGO.speed = 26;
+    cooldown = 0;
+    desiredLane = 1;
+    bestGenes = {...defaultGenes};
+    bestScoreEMA = 0;
+    gen = 1;
+    aliveTime = 0;
+    nearCount = 0;
+    crashes = 0;
+  }
+
+  resetAll();
+
+  function updateInfoPanel(){
+    const g = bestGenes;
+    info.innerHTML =
+`<b>Gen:</b> ${gen}
+<b>Traffic:</b> ${(parseFloat(trafficSlider.value)).toFixed(2)}   <b>Rollouts/frame:</b> ${parseInt(rolloutsSlider.value,10)}
+<b>Ego:</b> speed=${EGO.speed.toFixed(1)}  lanePos=${EGO.lanePos.toFixed(2)}  desiredLane=${desiredLane}  cooldown=${cooldown.toFixed(2)}s
+
+<b>Best genes (current winner):</b>
+horizon=${g.horizon.toFixed(2)}s  sideHorizon=${g.sideHorizon.toFixed(2)}s
+safeTimeHeadway=${g.safeTimeHeadway.toFixed(2)}  safeGap=${g.safeGap.toFixed(0)}
+laneChangeBias=${g.laneChangeBias.toFixed(2)}  laneChangeCooldown=${g.laneChangeCooldown.toFixed(2)}s  laneCommit=${g.laneCommit.toFixed(2)}
+targetSpeed=${g.targetSpeed.toFixed(1)}  maxAccel=${g.maxAccel.toFixed(1)}  maxBrake=${g.maxBrake.toFixed(1)}
+
+<b>Run stats:</b>
+aliveTime=${aliveTime.toFixed(1)}s  near=${nearCount}  crashes=${crashes}
+<b>Best rollout score (EMA):</b> ${bestScoreEMA.toFixed(1)}`;
+  }
+
+  function applyAction(action, dt){
+    // update desired lane from steer if manual
+    if (action.manual){
+      if (action.steer < -0.2) desiredLane = clamp(desiredLane-1,0,LANES-1);
+      if (action.steer >  0.2) desiredLane = clamp(desiredLane+1,0,LANES-1);
+      // throttle directly
+      const accel = (action.throttle >= 0) ? (action.throttle * bestGenes.maxAccel) : (action.throttle * bestGenes.maxBrake);
+      EGO.speed = clamp(EGO.speed + accel*dt, 6, 60);
+    } else {
+      // AI: uses action already computed via policy in planWithRollouts
+      const accel = (action.throttle >= 0) ? (action.throttle * bestGenes.maxAccel) : (action.throttle * bestGenes.maxBrake);
+      EGO.speed = clamp(EGO.speed + accel*dt, 6, 60);
+    }
+
+    // lateral move toward desired lane (smooth lane change, with slight heading)
+    const laneDelta = desiredLane - EGO.lanePos;
+    const steer = clamp(laneDelta * 2.2, -1, 1);
+    const lateralRate = 1.85;
+    EGO.lanePos = clamp(EGO.lanePos + steer * lateralRate * dt, 0, LANES-1);
+    EGO.heading = lerp(EGO.heading, steer*0.22, 0.16);
+
+    if (cooldown > 0) cooldown -= dt;
+    const curLane = clamp(Math.round(EGO.lanePos),0,LANES-1);
+    if (curLane !== EGO.lane){
+      EGO.lane = curLane;
+      cooldown = bestGenes.laneChangeCooldown;
+    }
+
+    lastAction = action;
+  }
+
+  let lastT = performance.now();
+  function frame(now){
+    const dt = clamp((now - lastT)/1000, 0, 0.05);
+    lastT = now;
+
+    const W = canvas.getBoundingClientRect().width;
+    const H = canvas.getBoundingClientRect().height;
+
+    if (!paused){
+      maintainTraffic(W, H, parseFloat(trafficSlider.value));
+      updateTraffic(dt, W);
+
+      // plan: run multiple rollouts and pick best
+      const manual = manualAction();
+      let action;
+      if (manual){
+        action = manual;
+      } else {
+        action = planWithRollouts(W, dt);
+      }
+
+      applyAction(action, dt);
+
+      aliveTime += dt;
+
+      // crash check
+      if (checkRealCollision(W,H)){
+        crashes++;
+        // “reset episode” but keep best genes (they evolved); this mimics survival selection
+        cars = [];
+        EGO.lane = 1;
+        EGO.lanePos = 1;
+        EGO.speed = 26;
+        cooldown = 0;
+        desiredLane = 1;
+        aliveTime = 0;
+        nearCount = 0;
+      }
+    }
+
+    // draw
+    drawRoad(W,H);
+    drawSensors(W,H);
+    drawTraffic(W,H);
+    drawHUD(W,H, lastAction);
+
+    // ego crosshair + center line (visibility)
+    ctx.save();
+    ctx.globalAlpha = 0.35;
+    ctx.strokeStyle = "rgba(255,255,255,0.55)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(W*0.5-10,H*0.5);
+    ctx.lineTo(W*0.5+10,H*0.5);
+    ctx.moveTo(W*0.5,H*0.5-10);
+    ctx.lineTo(W*0.5,H*0.5+10);
+    ctx.stroke();
+    ctx.restore();
+
+    updateInfoPanel();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
+

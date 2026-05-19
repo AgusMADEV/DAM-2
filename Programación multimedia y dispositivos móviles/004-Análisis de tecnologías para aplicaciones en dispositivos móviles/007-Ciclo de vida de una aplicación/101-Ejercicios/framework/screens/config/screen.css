@@ -1,0 +1,59 @@
+.config {
+  background: #34a853;
+  height: 100%;
+  color: #fff;
+}
+
+.config h1 {
+  margin-bottom: 20px;
+}
+
+.opcion-config {
+  margin-bottom: 20px;
+}
+
+.opcion-config label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.opcion-config input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.opcion-config input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.boton-guardar {
+  background: white;
+  color: #34a853;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+/* FIX: was position: fixed */
+.boton-navegacion {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  color: #333;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10;
+}
+

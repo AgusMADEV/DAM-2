@@ -1,0 +1,534 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Actividad EVAL - Sistema de Partículas con Interacciones</title>
+    <style>
+      body,html{
+        margin:0;
+        padding:0;
+        background:#f5f5f5;
+        font-family: Arial, sans-serif;
+      }
+      #info-panel {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(255,255,255,0.9);
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        font-size: 14px;
+        max-width: 300px;
+      }
+      #info-panel h3 {
+        margin-top: 0;
+        color: #333;
+      }
+      #info-panel p {
+        margin: 5px 0;
+        color: #666;
+      }
+      .control-btn {
+        margin: 5px;
+        padding: 8px 15px;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+      .control-btn:hover {
+        background: #45a049;
+      }
+      .control-btn.reset {
+        background: #f44336;
+      }
+      .control-btn.reset:hover {
+        background: #da190b;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Panel de información y controles -->
+    <div id="info-panel">
+      <h3>🎯 Sistema de Partículas</h3>
+      <p><strong>Partículas:</strong> <span id="total-particulas">0</span></p>
+      <p><strong>Fijas:</strong> <span id="particulas-fijas">0</span></p>
+      <p><strong>En movimiento:</strong> <span id="particulas-movimiento">0</span></p>
+      <div style="margin-top: 10px;">
+        <button class="control-btn" onclick="togglePause()">⏯ Pausar/Reanudar</button>
+        <button class="control-btn reset" onclick="reiniciar()">🔄 Reiniciar</button>
+      </div>
+      <p style="font-size: 11px; margin-top: 10px; color: #999;">
+        Las partículas con el mismo texto se atraen entre sí y forman grupos. 
+        Partículas diferentes se repelen.
+      </p>
+    </div>
+
+    <canvas></canvas>
+    
+    <script>
+      /*
+       * ==========================================
+       * FUNCIONES AUXILIARES
+       * ==========================================
+       */
+
+      /**
+       * Calcula la distancia euclidiana entre dos puntos en 2D
+       * Esta función es fundamental para determinar la proximidad entre partículas
+       * 
+       * @param {number} x1 - Coordenada X del primer punto
+       * @param {number} y1 - Coordenada Y del primer punto
+       * @param {number} x2 - Coordenada X del segundo punto
+       * @param {number} y2 - Coordenada Y del segundo punto
+       * @returns {number} - La distancia entre los dos puntos
+       */
+      function distance2D(x1, y1, x2, y2) {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        // Teorema de Pitágoras: d = sqrt(dx² + dy²)
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+
+      /*
+       * ==========================================
+       * CONFIGURACIÓN DEL CANVAS
+       * ==========================================
+       */
+      let anchura = window.innerWidth;
+      let altura = window.innerHeight;
+      let lienzo = document.querySelector("canvas");
+      let contexto = lienzo.getContext("2d");
+      lienzo.width = anchura;
+      lienzo.height = altura;
+      
+      // Configuración del texto para que se centre correctamente
+      contexto.textAlign = "center";
+      contexto.textBaseline = "middle";
+
+      /*
+       * ==========================================
+       * DATOS DE LAS PARTÍCULAS
+       * ==========================================
+       */
+      // Array con los nombres que se asignarán aleatoriamente a las partículas
+      // Partículas con el mismo nombre se agruparán
+      let nombres = ['Juan','Julia','Jorge','Jaime','Jose','Julian'];
+
+      // Variables de control del sistema
+      let pausado = false;
+
+      /*
+       * ==========================================
+       * CLASE PARTICULA
+       * ==========================================
+       * Representa cada partícula en el sistema con sus propiedades físicas
+       * y comportamientos de interacción
+       */
+      class Particula{
+        /**
+         * Constructor de la partícula
+         * @param {number} x - Posición inicial X
+         * @param {number} y - Posición inicial Y
+         * @param {number} a - Ángulo inicial de movimiento (en radianes)
+         */
+        constructor(x,y,a){
+          // === PROPIEDADES DE POSICIÓN ===
+          this.x = x;  // Posición en el eje X
+          this.y = y;  // Posición en el eje Y
+          
+          // === PROPIEDADES DE VELOCIDAD ===
+          this.v = 0.5;  // Magnitud de velocidad base inicial
+          
+          // Descomposición de la velocidad en componentes X e Y
+          // usando trigonometría (vectores)
+          this.vx = Math.cos(a) * this.v;  // Componente horizontal
+          this.vy = Math.sin(a) * this.v;  // Componente vertical
+
+          // === PROPIEDADES DE ACELERACIÓN ===
+          // La aceleración representa las fuerzas acumuladas que actúan sobre la partícula
+          this.ax = 0;  // Aceleración en X (resultado de fuerzas horizontales)
+          this.ay = 0;  // Aceleración en Y (resultado de fuerzas verticales)
+
+          // === PROPIEDADES DE IDENTIDAD ===
+          // Asigna aleatoriamente un nombre del array
+          this.texto = nombres[Math.floor(Math.random()*nombres.length)];
+
+          // === CONTROL DE ESTABILIDAD ===
+          // Sistema para detectar cuándo una partícula ha encontrado su posición de equilibrio
+          this.fija = false;           // Indica si la partícula está en estado estable
+          this.estableFrames = 0;      // Contador de frames consecutivos en estado estable
+        }
+
+        /**
+         * MÉTODO: dibuja()
+         * Renderiza la partícula en el canvas con forma de pastilla
+         * Concepto: Representación visual del objeto
+         */
+        dibuja(){
+          // Dimensiones de la "pastilla"
+          let anchopastilla = 20;
+          let altopastilla = 10;
+          
+          // Dibuja un rectángulo con bordes redondeados (forma de pastilla)
+          contexto.beginPath();
+          // Línea superior
+          contexto.moveTo(this.x-anchopastilla,this.y-altopastilla);
+          contexto.lineTo(this.x+anchopastilla,this.y-altopastilla);
+          // Semicírculo derecho
+          contexto.arc(this.x+anchopastilla,this.y,altopastilla,0-Math.PI/2,Math.PI-Math.PI/2);
+          // Línea inferior
+          contexto.lineTo(this.x-anchopastilla,this.y+10);
+          // Semicírculo izquierdo
+          contexto.arc(this.x-anchopastilla,this.y,altopastilla,Math.PI-Math.PI/2,0-Math.PI/2);
+          
+          // Estilos de relleno y borde
+          contexto.fillStyle = this.fija ? "#e8f5e9" : "white";  // Verde claro si está fija
+          contexto.strokeStyle = this.fija ? "#4CAF50" : "black";
+          contexto.lineWidth = this.fija ? 2 : 1;
+          contexto.fill();
+          contexto.stroke();
+          
+          // Dibuja el texto identificador
+          contexto.fillStyle = "black";
+          contexto.fillText(this.texto,this.x,this.y);
+        }
+
+        /**
+         * MÉTODO: lineas()
+         * Dibuja líneas de conexión entre partículas cercanas
+         * Concepto: Visualización de la red de proximidad
+         */
+        lineas(){
+          for(let i = 0;i<particulas.length;i++){
+            const p = particulas[i];
+            if (p === this) continue;  // No conectar consigo misma
+            
+            // Calcula distancia a la otra partícula
+            const d = distance2D(this.x, this.y, p.x, p.y);
+            
+            // Solo dibuja líneas si están dentro del rango visual
+            if(d < 160){
+              // Intensidad de la línea basada en si son del mismo grupo
+              let opacidad = (p.texto === this.texto) ? 0.6 : 0.2;
+              let color = (p.texto === this.texto) ? "100,200,100" : "128,128,128";
+              
+              contexto.strokeStyle = `rgba(${color},${opacidad})`;
+              contexto.lineWidth = (p.texto === this.texto) ? 1.5 : 0.5;
+              contexto.beginPath();
+              contexto.moveTo(this.x,this.y);
+              contexto.lineTo(p.x, p.y);
+              contexto.stroke();
+            }
+          }
+        }
+
+        /**
+         * MÉTODO: interacciones(particulas)
+         * ALGORITMO PRINCIPAL DE AGRUPAMIENTO Y REPULSIÓN
+         * 
+         * Este método implementa un sistema de fuerzas basado en la física computacional:
+         * 1. Atracción entre partículas del mismo tipo (fuerza tipo muelle)
+         * 2. Repulsión entre partículas diferentes (fuerza inversamente proporcional)
+         * 3. Repulsión fuerte a corta distancia para evitar solapamiento
+         * 
+         * Concepto: Simulación física basada en interacciones de N-cuerpos
+         * 
+         * @param {Array} particulas - Array con todas las partículas del sistema
+         */
+        interacciones(particulas) {
+          // Las partículas fijas no calculan fuerzas (optimización)
+          if (this.fija) {
+            this.ax = 0;
+            this.ay = 0;
+            return;
+          }
+
+          // === PARÁMETROS DE INTERACCIÓN ===
+          // Estos valores controlan el comportamiento del sistema
+          
+          // Rango global: considera todas las partículas en pantalla
+          let rangoGlobal = Math.sqrt(anchura*anchura + altura*altura);
+
+          // Distancias de referencia (en píxeles)
+          let distanciaObjetivo = 120;         // Distancia ideal entre partículas iguales
+          let distanciaMinima = 80;            // Distancia mínima de seguridad
+          let distanciaRepulsionDistinto = 200; // Hasta dónde repelen las diferentes
+
+          // Constantes de fuerza (ajustan la intensidad de cada interacción)
+          let kAtraccionIgual = 0.0012;       // Constante del "muelle" entre iguales
+          let kRepulsionDistinto = 0.001;     // Repulsión suave entre distintos
+          let kRepulsionCorta = 0.06;         // Repulsión fuerte a distancia muy corta
+
+          // === ACUMULADORES DE FUERZA ===
+          let fx = 0;  // Fuerza total en X
+          let fy = 0;  // Fuerza total en Y
+
+          // === CÁLCULO DE FUERZAS ===
+          // Itera sobre todas las demás partículas
+          for (let p of particulas) {
+            if (p === this) continue;  // Ignorar a sí misma
+
+            // Calcula distancia y vector direccional
+            let d = distance2D(this.x, this.y, p.x, p.y);
+            if (d === 0 || d > rangoGlobal) continue;
+
+            // Vector unitario que apunta de esta partícula hacia p
+            let dx = p.x - this.x;
+            let dy = p.y - this.y;
+            let ux = dx / d;  // Componente X del vector unitario
+            let uy = dy / d;  // Componente Y del vector unitario
+
+            // --- REPULSIÓN DE SEGURIDAD ---
+            // Evita que las partículas se superpongan sin importar su tipo
+            if (d < distanciaMinima) {
+              let intensidad = (distanciaMinima - d) * kRepulsionCorta;
+              fx -= ux * intensidad;  // Fuerza en dirección opuesta (repulsión)
+              fy -= uy * intensidad;
+              continue;  // No aplica otras fuerzas
+            }
+
+            // --- INTERACCIONES ESPECÍFICAS POR TIPO ---
+            if (p.texto === this.texto) {
+              // ** MISMO TIPO: Atracción tipo muelle **
+              // La fuerza de un muelle es F = k * (x - x0)
+              // donde x es la distancia actual y x0 es la distancia de equilibrio
+              let delta = d - distanciaObjetivo;
+              // Si delta > 0: están lejos → atrae (fx positivo, hacia p)
+              // Si delta < 0: están cerca → repele (fx negativo, alejar de p)
+              fx += ux * delta * kAtraccionIgual;
+              fy += uy * delta * kAtraccionIgual;
+            } else {
+              // ** TIPO DIFERENTE: Repulsión suave a distancia media **
+              if (d < distanciaRepulsionDistinto) {
+                let intensidad = (distanciaRepulsionDistinto - d) * kRepulsionDistinto;
+                fx -= ux * intensidad;  // Repulsión (signo negativo)
+                fy -= uy * intensidad;
+              }
+            }
+          }
+
+          // === LIMITACIÓN DE FUERZA ===
+          // Evita inestabilidades numéricas limitando la fuerza máxima
+          const maxForce = 0.05;
+          let fmag = Math.sqrt(fx*fx + fy*fy);
+          if (fmag > maxForce) {
+            fx = fx / fmag * maxForce;
+            fy = fy / fmag * maxForce;
+          }
+
+          // Asigna las fuerzas calculadas como aceleración
+          this.ax = fx;
+          this.ay = fy;
+        }
+
+        /**
+         * MÉTODO: mueve()
+         * Actualiza la posición de la partícula basándose en su velocidad y aceleración
+         * 
+         * Implementa el método de integración de Euler:
+         * 1. v(t+1) = v(t) + a(t) * dt    (velocidad se actualiza con aceleración)
+         * 2. x(t+1) = x(t) + v(t+1) * dt  (posición se actualiza con velocidad)
+         * 
+         * Concepto: Integración numérica de ecuaciones de movimiento
+         */
+        mueve(){
+          if (this.fija) return;  // Las partículas fijas no se mueven
+
+          // === INTEGRACIÓN: ACELERACIÓN → VELOCIDAD ===
+          // Segunda Ley de Newton: F = m*a, asumiendo m=1, a=F
+          this.vx += this.ax;
+          this.vy += this.ay;
+
+          // === APLICAR FRICCIÓN ===
+          // Simula resistencia del medio, hace que el sistema tienda al reposo
+          const friccion = 0.93;  // 0.93 = pierde 7% de velocidad por frame
+          this.vx *= friccion;
+          this.vy *= friccion;
+
+          // === INTEGRACIÓN: VELOCIDAD → POSICIÓN ===
+          this.x += this.vx;
+          this.y += this.vy;
+
+          // === DETECCIÓN DE ESTABILIDAD ===
+          // Calcula magnitudes de velocidad y fuerza
+          const speed = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+          const fuerza = Math.sqrt(this.ax*this.ax + this.ay*this.ay);
+
+          // Si tanto velocidad como fuerza son muy pequeñas...
+          if (speed < 0.02 && fuerza < 0.002) {
+            this.estableFrames++;
+            // Después de 60 frames estables (aprox. 1 segundo), fijar la partícula
+            if (this.estableFrames > 60) {
+              this.fija = true;
+              this.vx = 0;
+              this.vy = 0;
+            }
+          } else {
+            // Si hay movimiento significativo, resetear contador
+            this.estableFrames = 0;
+          }
+        }
+
+        /**
+         * MÉTODO: rebote()
+         * Gestiona las colisiones con los bordes del canvas
+         * 
+         * Implementa rebote inelástico (con pérdida de energía)
+         * Concepto: Conservación parcial del momento en colisiones
+         */
+        rebote(){
+          if (this.fija) return;  // Las partículas fijas no rebotan
+
+          // Factor de rebote (coeficiente de restitución)
+          // -0.5 significa que invierte la dirección y reduce la velocidad a la mitad
+          const reboteFactor = -0.5;
+
+          // === COLISIONES CON PAREDES VERTICALES ===
+          if (this.x > anchura) {
+            this.x = anchura;         // Reposicionar en el borde
+            this.vx *= reboteFactor;  // Invertir y amortiguar velocidad X
+          }
+          if (this.x < 0) {
+            this.x = 0;
+            this.vx *= reboteFactor;
+          }
+
+          // === COLISIONES CON PAREDES HORIZONTALES ===
+          if (this.y > altura) {
+            this.y = altura;
+            this.vy *= reboteFactor;  // Invertir y amortiguar velocidad Y
+          }
+          if (this.y < 0) {
+            this.y = 0;
+            this.vy *= reboteFactor;
+          }
+        }
+      }
+
+      /*
+       * ==========================================
+       * INICIALIZACIÓN DEL SISTEMA
+       * ==========================================
+       */
+      let particulas = [];
+      let numeroparticulas = 250;
+
+      /**
+       * Crea las partículas iniciales con posiciones y ángulos aleatorios
+       */
+      function inicializarParticulas() {
+        particulas = [];
+        for(let i = 0; i < numeroparticulas; i++){
+          particulas.push(
+            new Particula(
+              Math.random() * anchura,      // Posición X aleatoria
+              Math.random() * altura,       // Posición Y aleatoria
+              Math.random() * Math.PI * 2   // Ángulo aleatorio (0 a 2π)
+            )
+          );
+        }
+      }
+
+      /**
+       * Actualiza las estadísticas mostradas en el panel de información
+       */
+      function actualizarEstadisticas() {
+        let fijas = particulas.filter(p => p.fija).length;
+        let movimiento = particulas.length - fijas;
+        
+        document.getElementById('total-particulas').textContent = particulas.length;
+        document.getElementById('particulas-fijas').textContent = fijas;
+        document.getElementById('particulas-movimiento').textContent = movimiento;
+      }
+
+      /*
+       * ==========================================
+       * BUCLE PRINCIPAL DE ANIMACIÓN
+       * ==========================================
+       * Este bucle se ejecuta aproximadamente 60 veces por segundo
+       * gracias a requestAnimationFrame
+       */
+      function bucle(){
+        if (!pausado) {
+          // Limpia el canvas para el siguiente frame
+          contexto.clearRect(0, 0, anchura, altura);
+
+          // === FASE 1: CÁLCULO DE FUERZAS ===
+          // Todas las partículas calculan las fuerzas que actúan sobre ellas
+          for (let i = 0; i < particulas.length; i++) {
+            particulas[i].interacciones(particulas);
+          }
+
+          // === FASE 2: ACTUALIZACIÓN DE POSICIONES ===
+          // Aplica las fuerzas para actualizar velocidades y posiciones
+          for (let i = 0; i < particulas.length; i++) {
+            particulas[i].mueve();
+            particulas[i].rebote();
+          }
+
+          // === FASE 3: RENDERIZADO ===
+          // Primero dibuja las conexiones (fondo)
+          for (let i = 0; i < particulas.length; i++) {
+            particulas[i].lineas();
+          }
+          // Luego dibuja las partículas (primer plano)
+          for (let i = 0; i < particulas.length; i++) {
+            particulas[i].dibuja();
+          }
+
+          // Actualiza estadísticas cada 10 frames (optimización)
+          if (Math.random() < 0.1) {
+            actualizarEstadisticas();
+          }
+        }
+
+        // Solicita el siguiente frame de animación
+        requestAnimationFrame(bucle);
+      }
+
+      /*
+       * ==========================================
+       * FUNCIONES DE CONTROL
+       * ==========================================
+       */
+      function togglePause() {
+        pausado = !pausado;
+      }
+
+      function reiniciar() {
+        inicializarParticulas();
+        pausado = false;
+      }
+
+      // Manejo de redimensionamiento de ventana
+      window.addEventListener('resize', function() {
+        anchura = window.innerWidth;
+        altura = window.innerHeight;
+        lienzo.width = anchura;
+        lienzo.height = altura;
+      });
+
+      /*
+       * ==========================================
+       * INICIO DE LA APLICACIÓN
+       * ==========================================
+       */
+      inicializarParticulas();
+      actualizarEstadisticas();
+      requestAnimationFrame(bucle);
+
+      // Log inicial en consola
+      console.log('%c🎯 Sistema de Partículas Iniciado', 'color: #4CAF50; font-size: 16px; font-weight: bold;');
+      console.log(`Total de partículas: ${numeroparticulas}`);
+      console.log(`Grupos diferentes: ${nombres.length}`);
+      console.log('Observa cómo las partículas se agrupan por nombre...');
+    </script>
+  </body>
+</html>

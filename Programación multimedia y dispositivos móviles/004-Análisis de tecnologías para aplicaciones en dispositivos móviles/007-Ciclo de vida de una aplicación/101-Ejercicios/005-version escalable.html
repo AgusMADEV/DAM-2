@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <title>Mobile Web App</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Arial', sans-serif;
+      }
+
+      body, html {
+        width: 100%;
+        height: 100%;
+        background: #f5f5f5;
+        overflow: hidden;
+      }
+
+      .container {
+        width: 200%;
+        height: 200%;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        position: relative;
+        left: 0;
+        top: 0;
+        transition: all 0.5s ease;
+      }
+
+      .screen {
+        width: 100%;
+        height: 100%;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+      }
+
+      #main-screen {
+        background: #4285f4;
+      }
+
+      #sub-screen {
+        background: #ea4335;
+      }
+
+      #config-screen {
+        background: #34a853;
+      }
+
+      .button {
+        padding: 12px 24px;
+        margin: 10px;
+        border: none;
+        border-radius: 25px;
+        background: white;
+        color: #333;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: all 0.3s;
+      }
+
+      .button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      }
+
+      .button:active {
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Main Screen -->
+      <div id="main-screen" class="screen">
+        <h1>Main Screen</h1>
+        <button class="button go-to-subscreen">Go to Subscreen</button>
+        <button class="button go-to-config">Go to Config</button>
+      </div>
+
+      <!-- Sub Screen -->
+      <div id="sub-screen" class="screen">
+        <h1>Sub Screen</h1>
+        <button class="button go-to-main">Back to Main</button>
+      </div>
+
+      <!-- Config Screen -->
+      <div id="config-screen" class="screen">
+        <h1>Config Screen</h1>
+        <button class="button go-to-main">Back to Main</button>
+      </div>
+    </div>
+
+    <script>
+      const container = document.querySelector('.container');
+      const buttons = {
+        goToSubscreen: document.querySelector('.go-to-subscreen'),
+        goToMain: document.querySelectorAll('.go-to-main'),
+        goToConfig: document.querySelector('.go-to-config'),
+      };
+
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+
+      buttons.goToSubscreen.onclick = () => {
+        container.style.left = `-${screenWidth}px`;
+      };
+
+      buttons.goToConfig.onclick = () => {
+        container.style.top = `-${screenHeight}px`;
+      };
+
+      buttons.goToMain.forEach(button => {
+        button.onclick = () => {
+          container.style.left = '0';
+          container.style.top = '0';
+        };
+      });
+    </script>
+  </body>
+</html>
+

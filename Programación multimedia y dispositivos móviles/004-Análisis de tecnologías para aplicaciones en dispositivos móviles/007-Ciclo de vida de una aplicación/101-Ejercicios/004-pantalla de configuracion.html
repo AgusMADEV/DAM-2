@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <title>Aplicación móvil</title>
+    <meta charset="utf-8">
+    <style>
+      body,html{padding:0px;margin:0px;width:100%;height:100%;background:grey;overflow:hidden;}
+      #contenedor_maestro{width:200%;height:200%;display:grid;left:0px;top:0px;transition:all 1s;position:relative;grid-template-columns:repeat(2,100fr);}
+      #pantalla{background:blue;}
+      #subpantalla{background:red;}
+      #pantallaconfiguracion{background:green;}
+
+    </style>
+  </head>
+  <body>
+    <div id="contenedor_maestro">
+      <div id="pantalla">
+        <button id="asubpantalla">Vamos a la subpantalla
+        </buton>
+        <button id="aconfiguracion">Vamos a la configuracion
+        </buton>
+      </div>
+      <div id="subpantalla">
+        <button id="apantalla">Vamos a la pantalla
+        </buton>
+      </div>
+      <div id="pantallaconfiguracion">
+       <button id="volver">Volver a la pantalla principal
+       </button>
+      </div>
+    </div>
+    <script>
+      let anchura = window.innerWidth
+      let altura = window.innerHeight
+      let boton = document.querySelector("#asubpantalla")
+      let contenedor = document.querySelector("#contenedor_maestro")
+      boton.onclick = function(){
+      console.log("hola")
+        contenedor.style.left = (0-anchura)+"px"
+        
+      }
+      let boton2 = document.querySelector("#apantalla")
+      boton2.onclick = function(){
+        contenedor.style.left = (0)+"px"
+        
+      }
+      let boton3 = document.querySelector("#aconfiguracion")
+      boton3.onclick = function(){
+        contenedor.style.top = (0-altura)+"px"
+        
+      }
+      let boton4 = document.querySelector("#volver")
+      boton4.onclick = function(){
+        contenedor.style.top = (0)+"px"
+        
+      }
+    </script>
+  </body>
+</html>

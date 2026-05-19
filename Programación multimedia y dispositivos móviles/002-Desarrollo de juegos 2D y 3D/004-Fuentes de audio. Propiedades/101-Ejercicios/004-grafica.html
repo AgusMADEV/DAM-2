@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulación de robots tipo Roomba (evolutivos)</title>
+    <style>
+        body {
+            margin: 0;
+            background: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #eee;
+            font-family: sans-serif;
+        }
+        #container {
+            position: relative;
+        }
+        canvas {
+            background: #111;
+            border: 1px solid #555;
+            display: block;
+        }
+        #info {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            background: rgba(0,0,0,0.6);
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 4px;
+            white-space: pre-line;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+    <canvas id="sim" width="800" height="600"></canvas>
+    <div id="info"></div>
+</div>
+
+<script>
+/* ---------- Configuración básica ---------- */
+const canvas = document.getElementById("sim");
+const ctx = canvas.getContext("2d");
+const infoDiv = document.getElementById("info");
+
+const walls = [];
+
+const GOAL_RADIUS = 35;
+const GOAL_X = canvas.width - 80;
+const GOAL_Y = canvas.height - 80;
+
+const NUM_ROBOTS = 100;
+let generation = 1;
+
+// Tiempos (en segundos) para el robot más rápido de cada generación
+let generationTimes = [];
+let generationStartTime = performance.now();
+
+// "Genes" del mejor robot hasta el momento
+let bestGenes = null;
+
+// Genes por defecto (primera generación)
+const defaultGenes = {
+    radius: 10,
+    speed: 1.8,
+    sensorLength: 100,
+    sensorAngles: [-0.6, -0.25, 0, 0.25, 0.6],
+    turnCooldownMax: 20,
+    baseTurnAngle: 0.4,
+    randomTurnRange: 1.0
+};
+
+let robots = [];
+
+/* ---------- Laberinto ---------- */
+
+function createMaze() {
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // Bordes exteriores
+    walls.push({x: 0, y: 0, w: W, h: 20});
+    walls.push({x: 0, y: H - 20, w: W, h: 20});
+    walls.push({x: 0, y: 0, w: 20, h: H});
+    walls.push({x: W - 20, y: 0, w: 20, h: H});
+
+    // Paredes internas (laberinto simple)
+    walls.push({x: 150, y: 80, w: 20,  h: 350});
+    walls.push({x: 300, y: 200, w: 250, h: 20});
+    walls.push({x: 450, y: 80, w: 20,  h: 150});
+    walls.push({x: 550, y: 280, w: 20,  h: 250});
+    walls.push({x: 220, y: 420, w: 280, h: 20});
+}
+
+function drawWalls() {
+    ctx.fillStyle = "#444";
+    for (const w of walls) {
+        ctx.fillRect(w.x, w.y, w.w, w.h);
+    }
+}
+
+function drawGoal() {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(GOAL_X, GOAL_Y, GOAL_RADIUS, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(50, 180, 50, 0.3)";
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#00ff88";
+    ctx.stroke();
+
+    ctx.font = "14px sans-serif";
+    ctx.fillStyle = "#00ff88";
+    ctx.textAlign = "center";
+    ctx.fillText("META", GOAL_X, GOAL_Y + 4);
+    ctx.restore();
+}
+
+/* ---------- Utilidades geométricas ---------- */
+
+function segmentIntersection(p0, p1, p2, p3) {
+    const s1x = p1.x - p0.x;
+    const s1y = p1.y - p0.y;
+    const s2x = p3.x - p2.x;
+    const s2y = p3.y - p2.y;
+
+    const denom = (-s2x * s1y + s1x * s2y);
+    if (denom === 0) return null; // Paralelo o colineal
+
+    const s = (-s1y * (p0.x - p2.x) + s1x * (p0.y - p2.y)) / denom;
+    const t = ( s2x * (p0.y - p2.y) - s2y * (p0.x - p2.x)) / denom;
+
+    if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+        return {
+            x: p0.x + (t * s1x),
+            y: p0.y + (t * s1y),
+            t: t,
+            u: s
+        };
+    }
+    return null;
+}
+
+function circleIntersectsRect(cx, cy, radius, rect) {
+    const closestX = Math.max(rect.x, Math.min(cx, rect.x + rect.w));
+    const closestY = Math.max(rect.y, Math.min(cy, rect.y + rect.h));
+    const dx = cx - closestX;
+    const dy = cy - closestY;
+    return (dx * dx + dy * dy) < (radius * radius);
+}
+
+/* ---------- Clase Robot ---------- */
+
+class Robot {
+    constructor(x, y, genes) {
+        const g = genes || defaultGenes;
+
+        this.x = x;
+        this.y = y;
+        this.radius = g.radius;
+        this.angle = Math.random() * Math.PI * 2; // orientación inicial aleatoria
+        this.speed = g.speed;
+
+        this.sensorLength = g.sensorLength;
+        this.sensorAngles = g.sensorAngles.slice();
+
+        this.sensorHits = [];
+
+        this.turnCooldown = 0;
+        this.turnCooldownMax = g.turnCooldownMax;
+        this.baseTurnAngle = g.baseTurnAngle;
+        this.randomTurnRange = g.randomTurnRange;
+    }
+
+    update() {
+        const hits = this.checkSensors();
+
+        const anyHit = hits.some(h => h.hit);
+        if (anyHit && this.turnCooldown === 0) {
+            const direction = Math.random() < 0.5 ? -1 : 1;
+            const angleChange =
+                (this.baseTurnAngle + Math.random() * this.randomTurnRange) * direction;
+            this.angle += angleChange;
+            this.turnCooldown = this.turnCooldownMax;
+        }
+
+        if (this.turnCooldown > 0) {
+            this.turnCooldown--;
+        }
+
+        const newX = this.x + Math.cos(this.angle) * this.speed;
+        const newY = this.y + Math.sin(this.angle) * this.speed;
+
+        let collided = false;
+        for (const w of walls) {
+            if (circleIntersectsRect(newX, newY, this.radius, w)) {
+                collided = true;
+                break;
+            }
+        }
+
+        if (!collided) {
+            this.x = newX;
+            this.y = newY;
+        } else {
+            const backX = this.x - Math.cos(this.angle) * this.speed * 2;
+            const backY = this.y - Math.sin(this.angle) * this.speed * 2;
+            this.x = backX;
+            this.y = backY;
+            this.angle += (Math.random() - 0.5) * Math.PI;
+            this.turnCooldown = this.turnCooldownMax;
+        }
+    }
+
+    checkSensors() {
+        this.sensorHits = [];
+
+        for (const relAngle of this.sensorAngles) {
+            const sensorDir = this.angle + relAngle;
+
+            const start = { x: this.x, y: this.y };
+            const end = {
+                x: this.x + Math.cos(sensorDir) * this.sensorLength,
+                y: this.y + Math.sin(sensorDir) * this.sensorLength
+            };
+
+            let closestHit = null;
+            let closestT = Infinity;
+
+            for (const w of walls) {
+                const edges = [
+                    { a: { x: w.x,         y: w.y },         b: { x: w.x + w.w, y: w.y } },
+                    { a: { x: w.x,         y: w.y + w.h },   b: { x: w.x + w.w, y: w.y + w.h } },
+                    { a: { x: w.x,         y: w.y },         b: { x: w.x,       y: w.y + w.h } },
+                    { a: { x: w.x + w.w,   y: w.y },         b: { x: w.x + w.w, y: w.y + w.h } }
+                ];
+
+                for (const edge of edges) {
+                    const result = segmentIntersection(start, end, edge.a, edge.b);
+                    if (result && result.t < closestT) {
+                        closestT = result.t;
+                        closestHit = { x: result.x, y: result.y };
+                    }
+                }
+            }
+
+            if (closestHit) {
+                this.sensorHits.push({
+                    angle: sensorDir,
+                    hit: true,
+                    from: start,
+                    to: closestHit
+                });
+            } else {
+                this.sensorHits.push({
+                    angle: sensorDir,
+                    hit: false,
+                    from: start,
+                    to: end
+                });
+            }
+        }
+
+        return this.sensorHits;
+    }
+
+    hasReachedGoal() {
+        const dx = this.x - GOAL_X;
+        const dy = this.y - GOAL_Y;
+        const dist2 = dx * dx + dy * dy;
+        return dist2 < (GOAL_RADIUS * GOAL_RADIUS);
+    }
+
+    draw(ctx) {
+        for (const s of this.sensorHits) {
+            ctx.beginPath();
+            ctx.moveTo(s.from.x, s.from.y);
+            ctx.lineTo(s.to.x, s.to.y);
+            ctx.strokeStyle = s.hit ? "#ff5555" : "#55ff55";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+
+        ctx.beginPath();
+        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = "#dddddd";
+        ctx.fill();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = "#333333";
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(this.radius, 0);
+        ctx.strokeStyle = "#00aaff";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.restore();
+    }
+}
+
+/* ---------- Evolución ---------- */
+
+function mutateValue(value, factor, minVal, maxVal) {
+    const delta = (Math.random() * 2 - 1) * factor;
+    let v = value * (1 + delta);
+    if (minVal !== undefined) v = Math.max(minVal, v);
+    if (maxVal !== undefined) v = Math.min(maxVal, v);
+    return v;
+}
+
+function mutateGenes(parent) {
+    const g = {
+        radius: parent.radius,
+        speed: mutateValue(parent.speed, 0.2, 0.5, 4.0),
+        sensorLength: mutateValue(parent.sensorLength, 0.2, 40, 200),
+        turnCooldownMax: Math.round(mutateValue(parent.turnCooldownMax, 0.3, 5, 60)),
+        baseTurnAngle: mutateValue(parent.baseTurnAngle, 0.3, 0.1, 1.0),
+        randomTurnRange: mutateValue(parent.randomTurnRange, 0.3, 0.2, 2.0),
+        sensorAngles: parent.sensorAngles.slice()
+    };
+
+    for (let i = 0; i < g.sensorAngles.length; i++) {
+        g.sensorAngles[i] += (Math.random() * 2 - 1) * 0.1;
+    }
+
+    g.sensorAngles.sort((a, b) => a - b);
+    return g;
+}
+
+function extractGenesFromRobot(robot) {
+    return {
+        radius: robot.radius,
+        speed: robot.speed,
+        sensorLength: robot.sensorLength,
+        sensorAngles: robot.sensorAngles.slice(),
+        turnCooldownMax: robot.turnCooldownMax,
+        baseTurnAngle: robot.baseTurnAngle,
+        randomTurnRange: robot.randomTurnRange
+    };
+}
+
+/* ---------- Gestión de simulación ---------- */
+
+function resetSimulation() {
+    robots = [];
+    const parentGenes = bestGenes || defaultGenes;
+
+    for (let i = 0; i < NUM_ROBOTS; i++) {
+        const genes = bestGenes ? mutateGenes(parentGenes) : parentGenes;
+
+        // Zona segura arriba a la izquierda
+        const startX = 40 + Math.random() * 80;
+        const startY = 40 + Math.random() * 80;
+
+        robots.push(new Robot(startX, startY, genes));
+    }
+
+    generationStartTime = performance.now();
+}
+
+function updateInfo() {
+    let text = `Generación: ${generation}
+Robots: ${NUM_ROBOTS}`;
+
+    if (bestGenes) {
+        const lastTime = generationTimes[generationTimes.length - 1];
+        text += `
+
+Mejores genes (ganador generación anterior):
+- velocidad: ${bestGenes.speed.toFixed(2)}
+- longitud de sensores: ${bestGenes.sensorLength.toFixed(1)}
+- enfriamiento giro: ${bestGenes.turnCooldownMax}
+- ángulo base de giro: ${bestGenes.baseTurnAngle.toFixed(2)}
+- rango giro aleatorio: ${bestGenes.randomTurnRange.toFixed(2)}
+
+Tiempo última generación: ${lastTime.toFixed(2)} s`;
+    } else {
+        text += `
+
+Mejores genes: ninguno todavía (evolucionando...)`;
+    }
+
+    infoDiv.textContent = text;
+}
+
+/* ---------- Gráfico de barras ---------- */
+
+function drawChart() {
+    if (generationTimes.length === 0) return;
+
+    const chartWidth = 260;
+    const chartHeight = 150;
+    const chartX = canvas.width - chartWidth - 10;
+    const chartY = canvas.height - chartHeight - 10;
+
+    ctx.save();
+    ctx.fillStyle = "rgba(0,0,0,0.7)";
+    ctx.fillRect(chartX, chartY, chartWidth, chartHeight);
+
+    ctx.strokeStyle = "#aaaaaa";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(chartX, chartY, chartWidth, chartHeight);
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "11px sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("Tiempo hasta la meta (s)", chartX + 6, chartY + 14);
+
+    const maxBars = 30;
+    const data = generationTimes.slice(-maxBars);
+    const maxTime = Math.max(...data);
+    const minTime = Math.min(...data);
+
+    const innerX = chartX + 30;
+    const innerY = chartY + 25;
+    const innerWidth = chartWidth - 40;
+    const innerHeight = chartHeight - 35;
+
+    ctx.strokeStyle = "#888";
+    ctx.beginPath();
+    ctx.moveTo(innerX, innerY);
+    ctx.lineTo(innerX, innerY + innerHeight);
+    ctx.lineTo(innerX + innerWidth, innerY + innerHeight);
+    ctx.stroke();
+
+    ctx.fillStyle = "#aaaaaa";
+    ctx.textAlign = "right";
+    ctx.fillText(maxTime.toFixed(1), innerX - 4, innerY + 8);
+    ctx.fillText(minTime.toFixed(1), innerX - 4, innerY + innerHeight);
+
+    const barCount = data.length;
+    const barGap = 2;
+    const barWidth = Math.max(3, (innerWidth - barGap * (barCount - 1)) / barCount);
+
+    ctx.textAlign = "center";
+
+    for (let i = 0; i < barCount; i++) {
+        const t = data[i];
+        const norm = t / maxTime;
+        const barH = norm * innerHeight;
+        const x = innerX + i * (barWidth + barGap);
+        const y = innerY + innerHeight - barH;
+
+        ctx.fillStyle = "#00aaee";
+        ctx.fillRect(x, y, barWidth, barH);
+
+        if ((i + 1) % 5 === 0 || i === barCount - 1) {
+            const genIndex = generationTimes.length - data.length + i + 1;
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "9px sans-serif";
+            ctx.fillText(genIndex, x + barWidth / 2, innerY + innerHeight + 10);
+        }
+    }
+
+    ctx.restore();
+}
+
+/* ---------- Bucle principal ---------- */
+
+createMaze();
+resetSimulation();
+
+function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawWalls();
+    drawGoal();
+
+    let winner = null;
+
+    for (const r of robots) {
+        r.update();
+        r.draw(ctx);
+
+        if (!winner && r.hasReachedGoal()) {
+            winner = r;
+        }
+    }
+
+    if (winner) {
+        const now = performance.now();
+        const elapsedSeconds = (now - generationStartTime) / 1000.0;
+
+        generationTimes.push(elapsedSeconds);
+        bestGenes = extractGenesFromRobot(winner);
+        generation++;
+        resetSimulation();
+        updateInfo();
+    }
+
+    drawChart();
+    requestAnimationFrame(loop);
+}
+
+updateInfo();
+loop();
+</script>
+</body>
+</html>
+

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sintetizador de Partículas Gravitacionales</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>🌌 Sintetizador de Partículas Gravitacionales</h1>
+        <div class="header-controls">
+            <button id="startAudio">🔊 Activar Audio</button>
+            <button id="clearAll">🗑️ Limpiar Todo</button>
+            <button id="toggleGravity">🌍 Gravedad: ON</button>
+        </div>
+    </header>
+
+    <div id="container">
+        <canvas id="canvas"></canvas>
+        
+        <div id="stats">
+            Partículas: <span id="particleCount">0</span><br>
+            Colisiones: <span id="collisionCount">0</span><br>
+            Notas tocadas: <span id="notesPlayed">0</span><br>
+            FPS: <span id="fps">60</span>
+        </div>
+
+        <div id="controls">
+            <div class="control-group">
+                <h3>🎨 Modo de Creación</h3>
+                <select id="creationMode">
+                    <option value="single">Partícula Individual</option>
+                    <option value="burst">Explosión (5 partículas)</option>
+                    <option value="fountain">Fuente Continua</option>
+                    <option value="orbital">Sistema Orbital</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <h3>🎵 Nota Musical</h3>
+                <div class="note-buttons" id="noteSelector">
+                    <!-- Se genera dinámicamente -->
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>🎹 Tipo de Oscilador</h3>
+                <select id="waveType">
+                    <option value="sine">Sine (Suave)</option>
+                    <option value="triangle">Triangle (Cálido)</option>
+                    <option value="sawtooth">Sawtooth (Brillante)</option>
+                    <option value="square">Square (Electrónico)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <h3>⚙️ Propiedades Físicas</h3>
+                <div class="control-item">
+                    <label>
+                        Radio: <span class="value-display" id="radiusValue">15</span>px
+                    </label>
+                    <input type="range" id="particleRadius" min="5" max="40" value="15">
+                </div>
+                <div class="control-item">
+                    <label>
+                        Velocidad: <span class="value-display" id="velocityValue">5</span>
+                    </label>
+                    <input type="range" id="initialVelocity" min="1" max="15" value="5">
+                </div>
+                <div class="control-item">
+                    <label>
+                        Masa: <span class="value-display" id="massValue">1.0</span>
+                    </label>
+                    <input type="range" id="particleMass" min="0.5" max="5" step="0.1" value="1.0">
+                </div>
+                <div class="control-item">
+                    <label>
+                        Gravedad: <span class="value-display" id="gravityValue">0.2</span>
+                    </label>
+                    <input type="range" id="gravityStrength" min="0" max="1" step="0.1" value="0.2">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>🎚️ Audio</h3>
+                <div class="control-item">
+                    <label>
+                        Volumen Principal: <span class="value-display" id="volumeValue">70</span>%
+                    </label>
+                    <input type="range" id="masterVolume" min="0" max="100" value="70">
+                </div>
+                <div class="control-item">
+                    <label>
+                        Duración Nota: <span class="value-display" id="durationValue">200</span>ms
+                    </label>
+                    <input type="range" id="noteDuration" min="50" max="1000" step="50" value="200">
+                </div>
+                <div class="control-item">
+                    <label>
+                        Reverb: <span class="value-display" id="reverbValue">30</span>%
+                    </label>
+                    <input type="range" id="reverbAmount" min="0" max="100" value="30">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>🎹 Secuenciador 16-Step</h3>
+                <div class="sequencer-controls">
+                    <button id="btnPlaySeq" class="seq-btn">▶️ Play</button>
+                    <button id="btnStopSeq" class="seq-btn">⏸️ Stop</button>
+                    <button id="btnClearSeq" class="seq-btn">🗑️ Clear</button>
+                </div>
+                <div class="control-item">
+                    <label>
+                        BPM: <span class="value-display" id="bpmValue">120</span>
+                    </label>
+                    <input type="range" id="bpmSlider" min="60" max="220" value="120">
+                </div>
+                <div id="sequencerGrid" class="sequencer-grid">
+                    <!-- Grid generado dinámicamente -->
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>💾 Composiciones Guardadas</h3>
+                <div class="save-controls">
+                    <input type="text" id="saveTitle" class="save-input" placeholder="Título de la composición...">
+                    <textarea id="saveDescription" class="save-input" rows="2" placeholder="Descripción (opcional)"></textarea>
+                    <button id="btnSaveComposition" class="seq-btn btn-save">💾 Guardar Composición</button>
+                    <button id="btnRefreshList" class="seq-btn">🔄 Actualizar Lista</button>
+                </div>
+                <div id="compositionList" class="composition-list">
+                    <div class="compositions-empty">Cargando composiciones...</div>
+                </div>
+            </div>
+
+            <div class="help-text">
+                💡 <strong>Cómo usar:</strong><br>
+                • Click para crear partículas<br>
+                • Las partículas rebotan y colisionan<br>
+                • Cada colisión genera una nota<br>
+                • Experimenta con diferentes modos
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

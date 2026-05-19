@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Geolocation + OpenStreetMap + Markers + Car displacement</title>
+
+  <!-- Leaflet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <style>
+    html, body { height: 100%; margin: 0; }
+    #map { height: 100%; width: 100%; }
+    .panel{
+      position: fixed;
+      left: 12px;
+      top: 12px;
+      z-index: 9999;
+      background: rgba(255,255,255,.95);
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+      max-width: 360px;
+    }
+    .row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    button{
+      border: 1px solid #cbd5e1;
+      background: white;
+      border-radius: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    button:hover{ background:#f8fafc; }
+    .muted{ color:#475569; font-size: 12px; margin-top: 6px;}
+    .status{ font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <div class="status" id="status">Loading…</div>
+    <div class="muted" id="coords">—</div>
+    <div class="row">
+      <button id="btnLocate">Re-locate me</button>
+      <button id="btnAddMarker">Add marker here</button>
+      <button id="btnStartCar">Start car demo</button>
+      <button id="btnStopCar">Stop</button>
+      <button id="btnClear">Clear markers</button>
+    </div>
+    <div class="muted">
+      Tip: click on the map to add a marker (also works).
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <script>
+    // =========================
+    // Map init (OSM tiles)
+    // =========================
+    const map = L.map('map', { zoomControl: true });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // A layer group to manage markers
+    const markersLayer = L.layerGroup().addTo(map);
+
+    let myMarker = null;
+    let myAccuracyCircle = null;
+    let lastMyLatLng = null;
+
+    const statusEl = document.getElementById('status');
+    const coordsEl = document.getElementById('coords');
+
+    // =========================
+    // Geolocation (simplest)
+    // =========================
+    function locateMe() {
+      statusEl.textContent = 'Requesting geolocation permission…';
+      coordsEl.textContent = '—';
+
+      if (!('geolocation' in navigator)) {
+        statusEl.textContent = 'Geolocation not supported in this browser.';
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude, accuracy } = pos.coords;
+          lastMyLatLng = L.latLng(latitude, longitude);
+
+          statusEl.textContent = 'You are here:';
+          coordsEl.textContent = `lat ${latitude.toFixed(6)}, lon ${longitude.toFixed(6)} (±${Math.round(accuracy)}m)`;
+
+          // Center map
+          map.setView(lastMyLatLng, 16);
+
+          // Marker for your location
+          if (myMarker) myMarker.remove();
+          myMarker = L.marker(lastMyLatLng).addTo(map).bindPopup('My current location').openPopup();
+
+          // Accuracy circle
+          if (myAccuracyCircle) myAccuracyCircle.remove();
+          myAccuracyCircle = L.circle(lastMyLatLng, { radius: accuracy }).addTo(map);
+
+          // Example markers (optional) — just to show how to add markers programmatically
+          addExampleMarkersOnce();
+        },
+        (err) => {
+          statusEl.textContent = 'Could not get your location.';
+          coordsEl.textContent = `${err.message}`;
+          // fallback view
+          map.setView([40.4168, -3.7038], 6); // Spain-ish
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+
+    // =========================
+    // Markers
+    // =========================
+    function addMarker(latlng, text = 'Marker') {
+      return L.marker(latlng).addTo(markersLayer).bindPopup(text);
+    }
+
+    function clearMarkers() {
+      markersLayer.clearLayers();
+      // re-add my marker/circle if needed
+      if (myMarker) myMarker.addTo(map);
+      if (myAccuracyCircle) myAccuracyCircle.addTo(map);
+    }
+
+    let exampleMarkersAdded = false;
+    function addExampleMarkersOnce() {
+      if (exampleMarkersAdded || !lastMyLatLng) return;
+      exampleMarkersAdded = true;
+
+      // Add a couple of nearby markers for demonstration
+      const p1 = L.latLng(lastMyLatLng.lat + 0.002, lastMyLatLng.lng + 0.002);
+      const p2 = L.latLng(lastMyLatLng.lat - 0.002, lastMyLatLng.lng - 0.001);
+
+      addMarker(p1, 'Example marker A');
+      addMarker(p2, 'Example marker B');
+    }
+
+    // Click on map -> add marker
+    map.on('click', (e) => {
+      addMarker(e.latlng, `Marker at ${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)}`).openPopup();
+    });
+
+    // Button: add marker at current location
+    document.getElementById('btnAddMarker').addEventListener('click', () => {
+      if (!lastMyLatLng) return alert('No location yet. Click "Re-locate me" first.');
+      addMarker(lastMyLatLng, 'Marker at my location').openPopup();
+    });
+
+    document.getElementById('btnLocate').addEventListener('click', locateMe);
+    document.getElementById('btnClear').addEventListener('click', clearMarkers);
+
+    // =========================
+    // Car displacement demo
+    // - define two points
+    // - draw route line (simple straight line)
+    // - move a "car" marker along the line
+    // =========================
+    let carTimer = null;
+    let carMarker = null;
+    let routeLine = null;
+
+    // Simple "car" icon (emoji-like marker via DivIcon)
+    const carIcon = L.divIcon({
+      className: '',
+      html: '<div style="font-size:22px; transform: translate(-8px,-16px);">🚗</div>',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    });
+
+    function stopCarDemo() {
+      if (carTimer) { clearInterval(carTimer); carTimer = null; }
+      if (carMarker) { carMarker.remove(); carMarker = null; }
+      if (routeLine) { routeLine.remove(); routeLine = null; }
+    }
+
+    function startCarDemo() {
+      stopCarDemo();
+
+      // If we have geolocation, base the demo near you; otherwise use a fixed place
+      const base = lastMyLatLng || L.latLng(40.4168, -3.7038);
+
+      // Two points (A -> B)
+      const A = L.latLng(base.lat + 0.0035, base.lng - 0.0040);
+      const B = L.latLng(base.lat - 0.0020, base.lng + 0.0030);
+
+      // Mark A and B
+      const mA = addMarker(A, 'Point A (start)');
+      const mB = addMarker(B, 'Point B (end)');
+
+      // Draw a simple polyline route between A and B
+      const route = [A, B];
+      routeLine = L.polyline(route, { weight: 5 }).addTo(map);
+
+      // Fit view to route
+      map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
+
+      // Create car marker at A
+      carMarker = L.marker(A, { icon: carIcon }).addTo(map).bindPopup('Car').openPopup();
+
+      // Animate movement along the line (linear interpolation)
+      const steps = 160;        // more steps = smoother
+      const intervalMs = 30;    // lower = faster
+      let t = 0;
+
+      carTimer = setInterval(() => {
+        t += 1;
+        const alpha = t / steps;
+        if (alpha >= 1) {
+          carMarker.setLatLng(B);
+          carMarker.bindPopup('Arrived at B').openPopup();
+          stopCarDemo(); // stop when arrived (comment this line if you want it to loop)
+          return;
+        }
+        const lat = A.lat + (B.lat - A.lat) * alpha;
+        const lng = A.lng + (B.lng - A.lng) * alpha;
+        carMarker.setLatLng([lat, lng]);
+      }, intervalMs);
+
+      // Optional: show displacement info in UI
+      const distM = map.distance(A, B);
+      statusEl.textContent = 'Car demo running…';
+      coordsEl.textContent = `A→B straight-line distance: ${Math.round(distM)} m`;
+      mA.openPopup();
+    }
+
+    document.getElementById('btnStartCar').addEventListener('click', startCarDemo);
+    document.getElementById('btnStopCar').addEventListener('click', stopCarDemo);
+
+    // Start
+    locateMe();
+  </script>
+</body>
+</html>
+

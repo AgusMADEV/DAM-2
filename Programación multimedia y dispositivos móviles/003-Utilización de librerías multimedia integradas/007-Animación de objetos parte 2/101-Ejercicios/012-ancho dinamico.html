@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <title>Animación en CSS</title>
+    <meta charset="utf-8" />
+    <style>
+      h1{font-family:ubuntu; display:flex; align-items:center; gap:10px;}
+
+      /* Ventana que recorta (ancho lo pone JS) */
+      .clip{
+        position:relative;
+        overflow:hidden;
+        display:inline-block;
+        white-space:nowrap;
+        vertical-align:middle;
+        /* width: ... se setea desde JS */
+      }
+
+      /* Elemento que se mueve */
+      .move{
+        display:inline-block;
+        will-change:transform;
+      }
+
+      .separador{
+        width:3px;height:40px;background:black;
+        animation:barra 1s;
+        animation-delay:5s;
+        animation-fill-mode:backwards;
+        flex:0 0 auto;
+      }
+      @keyframes barra{
+        0%{height:0px;}
+        100%{height:40px;}
+      }
+
+      /* Animaciones (se aplican al .move dentro de cada clip) */
+      .empresa .move{
+        transform:translateX(100%);
+        animation:mueveempresa 3s;
+        animation-delay:7s;
+        animation-fill-mode:forwards;
+      }
+      @keyframes mueveempresa{
+        0%{transform:translateX(100%);}
+        100%{transform:translateX(0);}
+      }
+
+      .producto .move{
+        transform:translateX(-100%);
+        animation:mueveproducto 3s;
+        animation-delay:10s;
+        animation-fill-mode:forwards;
+      }
+      @keyframes mueveproducto{
+        0%{transform:translateX(-100%);}
+        100%{transform:translateX(0);}
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>jocarsa | formación</h1>
+    <h1>jocarsa | ventas</h1>
+    <h1>jocarsa | educación</h1>
+    <h1>jocarsa | gestión</h1>
+
+    <script>
+      function buildAnimatedTitle(h1){
+        if(!h1.textContent.includes(" | ")) return;
+
+        const [empresa, producto] = h1.textContent.split(" | ");
+        h1.textContent = "";
+
+        // Empresa: clip -> move
+        const clipEmpresa = document.createElement("span");
+        clipEmpresa.className = "clip empresa";
+
+        const moveEmpresa = document.createElement("span");
+        moveEmpresa.className = "move";
+        moveEmpresa.textContent = empresa;
+
+        clipEmpresa.appendChild(moveEmpresa);
+        h1.appendChild(clipEmpresa);
+
+        // Separador
+        const separador = document.createElement("span");
+        separador.className = "separador";
+        h1.appendChild(separador);
+
+        // Producto: clip -> move
+        const clipProducto = document.createElement("span");
+        clipProducto.className = "clip producto";
+
+        const moveProducto = document.createElement("span");
+        moveProducto.className = "move";
+        moveProducto.textContent = producto;
+
+        clipProducto.appendChild(moveProducto);
+        h1.appendChild(clipProducto);
+
+        // Guardamos referencias para medir
+        return { clipEmpresa, moveEmpresa, clipProducto, moveProducto };
+      }
+
+      function measureAndSetClipWidth(clip, move){
+        // Asegura que el ancho medido sea el real del texto
+        // scrollWidth suele ser robusto con inline-block + nowrap
+        const w = Math.ceil(move.scrollWidth || move.getBoundingClientRect().width);
+        clip.style.width = (w) + "px";
+      }
+
+      async function init(){
+        const items = [];
+        document.querySelectorAll("h1").forEach(h1 => {
+          const refs = buildAnimatedTitle(h1);
+          if(refs) items.push(refs);
+        });
+
+        // Espera a que las fuentes estén listas (evita medir con fallback)
+        if (document.fonts && document.fonts.ready) {
+          try { await document.fonts.ready; } catch(e){}
+        }
+
+        // Medimos en el siguiente frame para asegurar layout estable
+        requestAnimationFrame(() => {
+          items.forEach(({clipEmpresa, moveEmpresa, clipProducto, moveProducto}) => {
+            measureAndSetClipWidth(clipEmpresa, moveEmpresa);
+            measureAndSetClipWidth(clipProducto, moveProducto);
+          });
+        });
+
+        // Opcional: si cambia el tamaño de ventana, recalcula (por si cambian métricas)
+        window.addEventListener("resize", () => {
+          items.forEach(({clipEmpresa, moveEmpresa, clipProducto, moveProducto}) => {
+            clipEmpresa.style.width = ""; // limpia
+            clipProducto.style.width = "";
+            measureAndSetClipWidth(clipEmpresa, moveEmpresa);
+            measureAndSetClipWidth(clipProducto, moveProducto);
+          });
+        });
+      }
+
+      init();
+    </script>
+  </body>
+</html>
+

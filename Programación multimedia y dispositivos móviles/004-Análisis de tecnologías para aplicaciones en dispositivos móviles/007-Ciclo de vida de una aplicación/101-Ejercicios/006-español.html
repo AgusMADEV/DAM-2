@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <title>Aplicación Móvil</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Arial', sans-serif;
+      }
+
+      body, html {
+        width: 100%;
+        height: 100%;
+        background: #f5f5f5;
+        overflow: hidden;
+      }
+
+      .contenedor {
+        width: 200%;
+        height: 200%;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        position: relative;
+        left: 0;
+        top: 0;
+        transition: all 0.5s ease;
+      }
+
+      .pantalla {
+        width: 100%;
+        height: 100%;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+      }
+
+      #pantalla-principal {
+        background: #4285f4;
+      }
+
+      #subpantalla {
+        background: #ea4335;
+      }
+
+      #pantalla-configuracion {
+        background: #34a853;
+      }
+
+      .boton {
+        padding: 12px 24px;
+        margin: 10px;
+        border: none;
+        border-radius: 25px;
+        background: white;
+        color: #333;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: all 0.3s;
+      }
+
+      .boton:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      }
+
+      .boton:active {
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="contenedor">
+      <!-- Pantalla Principal -->
+      <div id="pantalla-principal" class="pantalla">
+        <h1>Pantalla Principal</h1>
+        <button class="boton ir-subpantalla">Ir a Subpantalla</button>
+        <button class="boton ir-configuracion">Ir a Configuración</button>
+      </div>
+
+      <!-- Subpantalla -->
+      <div id="subpantalla" class="pantalla">
+        <h1>Subpantalla</h1>
+        <button class="boton ir-principal">Volver a Principal</button>
+      </div>
+
+      <!-- Pantalla de Configuración -->
+      <div id="pantalla-configuracion" class="pantalla">
+        <h1>Configuración</h1>
+        <button class="boton ir-principal">Volver a Principal</button>
+      </div>
+    </div>
+
+    <script>
+      const contenedor = document.querySelector('.contenedor');
+      const botones = {
+        irSubpantalla: document.querySelector('.ir-subpantalla'),
+        irPrincipal: document.querySelectorAll('.ir-principal'),
+        irConfiguracion: document.querySelector('.ir-configuracion'),
+      };
+
+      const anchoPantalla = window.innerWidth;
+      const altoPantalla = window.innerHeight;
+
+      botones.irSubpantalla.onclick = () => {
+        contenedor.style.left = `-${anchoPantalla}px`;
+      };
+
+      botones.irConfiguracion.onclick = () => {
+        contenedor.style.top = `-${altoPantalla}px`;
+      };
+
+      botones.irPrincipal.forEach(boton => {
+        boton.onclick = () => {
+          contenedor.style.left = '0';
+          contenedor.style.top = '0';
+        };
+      });
+    </script>
+  </body>
+</html>
+

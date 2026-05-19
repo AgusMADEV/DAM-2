@@ -1,0 +1,7 @@
+import bpy
+# Antes de empezar lo elimino todo
+bpy.ops.object.select_all(action='SELECT')
+bpy.ops.object.delete(use_global=False, confirm=False)
+
+for x in range(0,100,3):
+    bpy.ops.mesh.primitive_cube_add(size=2, enter_editmode=False, align='WORLD', location=(x, 0, 0), scale=(1, 1, 1))

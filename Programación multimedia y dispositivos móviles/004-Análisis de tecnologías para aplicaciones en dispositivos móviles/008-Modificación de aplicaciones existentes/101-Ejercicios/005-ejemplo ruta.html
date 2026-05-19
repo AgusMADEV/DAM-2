@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OSM + Geolocation + Street Routing + Car Animation</title>
+
+  <!-- Leaflet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <style>
+    html, body { height: 100%; margin: 0; }
+    #map { height: 100%; width: 100%; }
+    .panel{
+      position: absolute;
+      z-index: 1000;
+      left: 12px;
+      top: 12px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.12);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      max-width: 360px;
+    }
+    .row{ display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    button{
+      border: 1px solid #e5e7eb;
+      background: #0ea5a4; /* teal-ish */
+      color: white;
+      border-radius: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button.secondary{
+      background: #fff;
+      color: #0f172a;
+    }
+    button:disabled{ opacity: .6; cursor: not-allowed; }
+    .muted{ color:#64748b; font-size: 12px; margin-top: 6px; line-height: 1.35; }
+    .kv{ font-size: 12px; margin-top: 8px; color:#0f172a; }
+    .kv b{ font-weight: 700; }
+    .badge{
+      display:inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #f1f5f9;
+      font-size: 12px;
+      color:#0f172a;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <div class="panel">
+    <div class="row">
+      <button id="btnLocate">Use my location</button>
+      <button id="btnRoute" class="secondary">Route + animate</button>
+      <button id="btnStop" class="secondary" disabled>Stop</button>
+    </div>
+    <div class="muted">
+      Drag <span class="badge">Start</span> and <span class="badge">End</span> markers, then click <b>Route + animate</b>.
+      Routing uses OSRM (street-based driving route).
+    </div>
+    <div class="kv" id="status"><b>Status:</b> waiting…</div>
+  </div>
+
+  <script>
+    // -------------------------
+    // Helpers
+    // -------------------------
+    const $ = (id) => document.getElementById(id);
+
+    function haversineMeters(a, b) {
+      // a,b: [lat, lng]
+      const R = 6371000;
+      const toRad = (x) => x * Math.PI / 180;
+      const dLat = toRad(b[0] - a[0]);
+      const dLng = toRad(b[1] - a[1]);
+      const lat1 = toRad(a[0]);
+      const lat2 = toRad(b[0]);
+
+      const s = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
+      return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)));
+    }
+
+    function setStatus(msg) {
+      $("status").innerHTML = "<b>Status:</b> " + msg;
+    }
+
+    // -------------------------
+    // Map init
+    // -------------------------
+    const map = L.map("map", { zoomControl: true }).setView([39.4699, -0.3763], 13); // default: Valencia-ish
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Simple "car" icon (emoji) using a divIcon
+    const carIcon = L.divIcon({
+      className: "",
+      html: '<div style="font-size:22px; transform: translate(-50%,-50%);">🚗</div>',
+      iconSize: [0, 0] // we handle size via HTML
+    });
+
+    // Start/End markers (draggable)
+    let startMarker = L.marker([39.4699, -0.3763], { draggable: true }).addTo(map).bindPopup("Start");
+    let endMarker   = L.marker([39.4740, -0.3660], { draggable: true }).addTo(map).bindPopup("End");
+
+    // Route polyline + car marker
+    let routeLine = null;
+    let carMarker = null;
+
+    // Animation state
+    let animTimer = null;
+    let routeCoords = []; // array of [lat,lng]
+    let routeCumDist = []; // cumulative meters
+    let routeTotal = 0;
+
+    function clearRoute() {
+      if (routeLine) { map.removeLayer(routeLine); routeLine = null; }
+      if (carMarker) { map.removeLayer(carMarker); carMarker = null; }
+      routeCoords = [];
+      routeCumDist = [];
+      routeTotal = 0;
+    }
+
+    function stopAnimation() {
+      if (animTimer) {
+        cancelAnimationFrame(animTimer);
+        animTimer = null;
+      }
+      $("btnStop").disabled = true;
+      setStatus("stopped");
+    }
+
+    function buildCumulativeDistances(coords) {
+      const cum = [0];
+      let total = 0;
+      for (let i = 1; i < coords.length; i++) {
+        total += haversineMeters(coords[i-1], coords[i]);
+        cum.push(total);
+      }
+      return { cum, total };
+    }
+
+    function pointAtDistance(coords, cum, dist) {
+      // Return interpolated [lat,lng] at distance "dist" along the route
+      if (!coords.length) return null;
+      if (dist <= 0) return coords[0];
+      if (dist >= cum[cum.length - 1]) return coords[coords.length - 1];
+
+      // Find segment (linear scan is fine for demo; could binary search)
+      let i = 1;
+      while (i < cum.length && cum[i] < dist) i++;
+
+      const d0 = cum[i-1], d1 = cum[i];
+      const t = (dist - d0) / Math.max(1e-9, (d1 - d0));
+      const a = coords[i-1], b = coords[i];
+      return [
+        a[0] + (b[0] - a[0]) * t,
+        a[1] + (b[1] - a[1]) * t
+      ];
+    }
+
+    async function fetchRouteOSRM(startLatLng, endLatLng) {
+      // OSRM expects lon,lat in the URL
+      const s = `${startLatLng.lng},${startLatLng.lat}`;
+      const e = `${endLatLng.lng},${endLatLng.lat}`;
+
+      // GeoJSON geometry for easy parsing
+      const url = `https://router.project-osrm.org/route/v1/driving/${s};${e}?overview=full&geometries=geojson&steps=false`;
+
+      setStatus("requesting route…");
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`OSRM HTTP ${res.status}`);
+
+      const data = await res.json();
+      if (!data.routes || !data.routes.length) throw new Error("No route returned");
+
+      // OSRM returns GeoJSON LineString coords as [lon,lat]
+      const line = data.routes[0].geometry.coordinates;
+      const coords = line.map(([lon, lat]) => [lat, lon]);
+
+      const durationSec = data.routes[0].duration; // seconds
+      const distanceM = data.routes[0].distance;   // meters
+      return { coords, durationSec, distanceM };
+    }
+
+    function animateCar(speedMps = 12) {
+      // speedMps: meters per second (e.g., 12 m/s ~ 43 km/h)
+      stopAnimation();
+
+      if (!routeCoords.length) {
+        setStatus("no route to animate");
+        return;
+      }
+
+      if (!carMarker) {
+        carMarker = L.marker(routeCoords[0], { icon: carIcon }).addTo(map);
+      } else {
+        carMarker.setLatLng(routeCoords[0]);
+      }
+
+      $("btnStop").disabled = false;
+      setStatus("animating…");
+
+      const t0 = performance.now();
+      const startDist = 0;
+
+      const tick = (now) => {
+        const elapsed = (now - t0) / 1000; // seconds
+        const dist = startDist + elapsed * speedMps;
+
+        const p = pointAtDistance(routeCoords, routeCumDist, dist);
+        if (p) carMarker.setLatLng(p);
+
+        if (dist >= routeTotal) {
+          setStatus("arrived ✅");
+          $("btnStop").disabled = true;
+          animTimer = null;
+          return;
+        }
+
+        animTimer = requestAnimationFrame(tick);
+      };
+
+      animTimer = requestAnimationFrame(tick);
+    }
+
+    async function routeAndAnimate() {
+      try {
+        stopAnimation();
+        clearRoute();
+
+        const s = startMarker.getLatLng();
+        const e = endMarker.getLatLng();
+
+        const { coords, durationSec, distanceM } = await fetchRouteOSRM(s, e);
+
+        routeCoords = coords;
+        const cd = buildCumulativeDistances(routeCoords);
+        routeCumDist = cd.cum;
+        routeTotal = cd.total;
+
+        routeLine = L.polyline(routeCoords, { weight: 5, opacity: 0.85 }).addTo(map);
+        map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
+
+        // Choose a reasonable animation speed based on route distance:
+        // - short routes: slower, long routes: faster (but still demo-friendly)
+        // clamp between 6 and 22 m/s (~22 to 79 km/h)
+        const autoSpeed = Math.max(6, Math.min(22, distanceM / 60)); // ~distance per minute
+        setStatus(`route ready — ${(distanceM/1000).toFixed(2)} km, ${(durationSec/60).toFixed(0)} min (OSRM). Speed ~ ${(autoSpeed*3.6).toFixed(0)} km/h`);
+        animateCar(autoSpeed);
+      } catch (err) {
+        console.error(err);
+        setStatus("error: " + (err && err.message ? err.message : "unknown"));
+      }
+    }
+
+    // -------------------------
+    // Geolocation
+    // -------------------------
+    function setStartFromGeolocation() {
+      if (!navigator.geolocation) {
+        setStatus("geolocation not supported by this browser");
+        return;
+      }
+      setStatus("getting your location…");
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+
+          startMarker.setLatLng([lat, lng]).bindPopup("Start (you)").openPopup();
+          map.setView([lat, lng], 16);
+
+          // Put an end point a bit away (rough offset) so you immediately see a route
+          const endLat = lat + 0.01;
+          const endLng = lng + 0.01;
+          endMarker.setLatLng([endLat, endLng]).bindPopup("End").closePopup();
+
+          setStatus("location set. Drag markers or click Route + animate.");
+        },
+        (err) => {
+          setStatus("geolocation error: " + err.message);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+
+    // -------------------------
+    // UI bindings
+    // -------------------------
+    $("btnLocate").addEventListener("click", () => {
+      stopAnimation();
+      clearRoute();
+      setStartFromGeolocation();
+    });
+
+    $("btnRoute").addEventListener("click", () => routeAndAnimate());
+
+    $("btnStop").addEventListener("click", () => stopAnimation());
+
+    // Re-route quickly if user drags markers (optional behavior)
+    let dragTimer = null;
+    function scheduleReroute() {
+      if (dragTimer) clearTimeout(dragTimer);
+      dragTimer = setTimeout(() => routeAndAnimate(), 400);
+    }
+    startMarker.on("dragend", scheduleReroute);
+    endMarker.on("dragend", scheduleReroute);
+
+    // Start with geolocation automatically (optional)
+    setStartFromGeolocation();
+  </script>
+</body>
+</html>
+

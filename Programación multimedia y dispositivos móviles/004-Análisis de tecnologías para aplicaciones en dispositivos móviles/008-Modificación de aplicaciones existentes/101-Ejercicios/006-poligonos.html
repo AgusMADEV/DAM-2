@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OSM Buildings (Overpass) — Valencia</title>
+
+  <!-- Leaflet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <style>
+    html, body { height: 100%; margin: 0; }
+    #map { height: 100%; width: 100%; }
+
+    .panel{
+      position: absolute;
+      z-index: 1000;
+      top: 12px; left: 12px;
+      background: rgba(255,255,255,.95);
+      border: 1px solid #e6e6e6;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      box-shadow: 0 10px 25px rgba(0,0,0,.08);
+      min-width: 320px;
+      max-width: 420px;
+    }
+    .row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .panel h1{ font-size: 14px; margin: 0 0 8px; font-weight: 700; }
+    button{
+      border: 1px solid #d7d7d7;
+      background: #fff;
+      padding: 8px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    button.primary{
+      border-color: #0f766e;
+      background: #0f766e;
+      color: #fff;
+    }
+    button:disabled{ opacity: .6; cursor: not-allowed; }
+    input[type="number"]{
+      width: 90px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #d7d7d7;
+      font-size: 12px;
+    }
+    .small{ font-size: 12px; color:#444; margin-top: 8px; line-height: 1.35; }
+    .status{ margin-top: 8px; font-size: 12px; color: #111; }
+    .muted{ color:#666; }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 11px;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      padding: 1px 6px;
+      border-radius: 7px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <div class="panel">
+    <h1>OSM building polygons (Overpass)</h1>
+
+    <div class="row">
+      <button class="primary" id="btnLoad">Load buildings (current view)</button>
+      <button id="btnClear">Clear</button>
+      <button id="btnLocate">My location</button>
+    </div>
+
+    <div class="row" style="margin-top:8px">
+      <label class="muted" for="maxB">Max buildings</label>
+      <input id="maxB" type="number" min="200" step="200" value="2000" />
+      <label class="muted" for="grid">Grid splits</label>
+      <input id="grid" type="number" min="1" max="6" step="1" value="2" />
+    </div>
+
+    <div class="small">
+      Tips to avoid <span class="kbd">504</span>: zoom in, reduce area, or increase <span class="kbd">Grid splits</span> (splits the view into smaller Overpass queries).
+      Uses multiple Overpass endpoints + retry/backoff.
+    </div>
+
+    <div class="status" id="status">Ready. Pan/zoom to Valencia center and press <b>Load buildings</b>.</div>
+  </div>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <script>
+    // ==========================
+    // Map setup (Valencia center)
+    // ==========================
+    const map = L.map('map', { preferCanvas: true });
+    map.setView([39.4699, -0.3763], 16);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 20,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Layer to hold building polygons
+    const buildingsLayer = L.featureGroup().addTo(map);
+
+    // Simple location marker
+    let myMarker = null;
+
+    // ==========================
+    // Overpass querying utilities
+    // ==========================
+    const OVERPASS_ENDPOINTS = [
+      "https://overpass-api.de/api/interpreter",
+      "https://overpass.kumi.systems/api/interpreter",
+      "https://overpass.nchc.org.tw/api/interpreter"
+    ];
+
+    function setStatus(msg) {
+      document.getElementById("status").textContent = msg;
+    }
+
+    function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+    function splitBoundsToGrid(bounds, splits) {
+      const s = clamp(parseInt(splits, 10) || 1, 1, 6);
+      const sw = bounds.getSouthWest();
+      const ne = bounds.getNorthEast();
+
+      const latMin = sw.lat, latMax = ne.lat;
+      const lonMin = sw.lng, lonMax = ne.lng;
+
+      const tiles = [];
+      const dLat = (latMax - latMin) / s;
+      const dLon = (lonMax - lonMin) / s;
+
+      for (let i = 0; i < s; i++) {
+        for (let j = 0; j < s; j++) {
+          const aLat = latMin + i * dLat;
+          const bLat = latMin + (i + 1) * dLat;
+          const aLon = lonMin + j * dLon;
+          const bLon = lonMin + (j + 1) * dLon;
+          tiles.push({ south: aLat, west: aLon, north: bLat, east: bLon });
+        }
+      }
+      return tiles;
+    }
+
+    // Overpass QL:
+    // - query buildings as ways/relations in bbox
+    // - output with geometry directly (no need for ">" recursion)
+    // - limit via (._;>;); is expensive; avoid it.
+    function buildOverpassQueryBBox(b, timeoutSec, maxBuildings) {
+      // bbox: south,west,north,east
+      // Use out:geom to get coordinates on each way/relation
+      // Use a hard limit by sorting? Overpass doesn't have a perfect "LIMIT",
+      // but we can reduce load by filtering: building=* and smaller bbox.
+      // "out geom" is heavier than "out body", but avoids extra fetch steps.
+      const t = clamp(timeoutSec, 15, 180);
+      const q = `
+[out:json][timeout:${t}];
+(
+  way["building"](${b.south},${b.west},${b.north},${b.east});
+  relation["building"](${b.south},${b.west},${b.north},${b.east});
+);
+out geom;
+      `.trim();
+
+      // maxBuildings is used client-side (we stop adding after it).
+      return q;
+    }
+
+    async function fetchOverpass(query, { signal, endpointIndex }) {
+      const url = OVERPASS_ENDPOINTS[endpointIndex % OVERPASS_ENDPOINTS.length];
+
+      // Use POST (more reliable than huge GET URLs)
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+        body: "data=" + encodeURIComponent(query),
+        signal
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        const err = new Error(`HTTP ${res.status}`);
+        err.httpStatus = res.status;
+        err.body = text.slice(0, 400);
+        throw err;
+      }
+
+      return await res.json();
+    }
+
+    function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+    // Retry strategy:
+    // - try multiple endpoints
+    // - exponential backoff on 429/504/5xx
+    async function fetchOverpassWithRetry(query, { signal, maxTries = 8 }) {
+      let lastErr = null;
+      for (let attempt = 0; attempt < maxTries; attempt++) {
+        const endpointIndex = attempt; // rotate endpoints
+        try {
+          return await fetchOverpass(query, { signal, endpointIndex });
+        } catch (e) {
+          lastErr = e;
+
+          // Abort means stop immediately
+          if (signal?.aborted) throw e;
+
+          const status = e.httpStatus || 0;
+          const retryable =
+            status === 429 || status === 504 || (status >= 500 && status <= 599) || status === 0;
+
+          if (!retryable) throw e;
+
+          const backoff = Math.min(8000, 500 * Math.pow(2, attempt));
+          setStatus(`Overpass busy (attempt ${attempt + 1}/${maxTries}). Retrying in ${Math.round(backoff/1000)}s…`);
+          await sleep(backoff);
+        }
+      }
+      throw lastErr || new Error("Overpass failed");
+    }
+
+    function ringToLatLngs(geom) {
+      // geom: [{lat, lon}, ...]
+      return geom.map(p => [p.lat, p.lon]);
+    }
+
+    // Convert Overpass elements to Leaflet layers (polygons/lines)
+    function addBuildingsFromOverpassJSON(osm, maxBuildings) {
+      let added = 0;
+
+      for (const el of (osm.elements || [])) {
+        if (added >= maxBuildings) break;
+
+        // We only handle geometries that come with "geometry" array
+        if (!el.geometry || !Array.isArray(el.geometry) || el.geometry.length < 3) continue;
+
+        // Ways are a ring or outline. Relations may be multipolygon; sometimes Overpass still provides one geometry.
+        // We’ll draw whatever geometry we get as a polygon if it closes, otherwise polyline.
+        const latlngs = ringToLatLngs(el.geometry);
+
+        const first = latlngs[0], last = latlngs[latlngs.length - 1];
+        const closed = first && last && (first[0] === last[0]) && (first[1] === last[1]);
+
+        const tags = el.tags || {};
+        const name = tags.name || tags["addr:housename"] || "";
+        const build = tags.building || "building";
+
+        if (closed) {
+          const poly = L.polygon(latlngs, {
+            weight: 1,
+            fillOpacity: 0.20
+          });
+          poly.bindPopup(
+            `<b>${escapeHtml(name || "(unnamed)")}</b><br>` +
+            `type: ${escapeHtml(build)}<br>` +
+            `osm: ${escapeHtml(el.type)} ${escapeHtml(String(el.id))}`
+          );
+          buildingsLayer.addLayer(poly);
+          added++;
+        } else {
+          const line = L.polyline(latlngs, { weight: 1, opacity: 0.8 });
+          buildingsLayer.addLayer(line);
+          added++;
+        }
+      }
+
+      return added;
+    }
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[c]));
+    }
+
+    // ==========================
+    // UI actions
+    // ==========================
+    let currentController = null;
+
+    async function loadBuildings() {
+      // Cancel any in-flight request
+      if (currentController) currentController.abort();
+      currentController = new AbortController();
+
+      const bounds = map.getBounds();
+      const gridSplits = clamp(parseInt(document.getElementById("grid").value, 10) || 1, 1, 6);
+      const maxBuildings = clamp(parseInt(document.getElementById("maxB").value, 10) || 2000, 200, 20000);
+
+      // Safety: discourage too-large areas
+      const approxArea = bounds.getNorthEast().distanceTo(bounds.getSouthEast()) *
+                         bounds.getNorthEast().distanceTo(bounds.getNorthWest());
+      // approxArea is m^2; if huge, warn
+      if (approxArea > 25_000_000) { // ~25 km^2
+        setStatus("Area too large. Zoom in to reduce timeouts (504).");
+        return;
+      }
+
+      setStatus(`Loading buildings… splitting view into ${gridSplits}×${gridSplits} tiles.`);
+      document.getElementById("btnLoad").disabled = true;
+
+      const tiles = splitBoundsToGrid(bounds, gridSplits);
+
+      let totalAdded = 0;
+      let totalTilesDone = 0;
+
+      // Clear previous
+      buildingsLayer.clearLayers();
+
+      try {
+        // Query each tile sequentially (simplest + polite for Overpass)
+        for (const tile of tiles) {
+          if (currentController.signal.aborted) break;
+
+          totalTilesDone++;
+          setStatus(`Querying tile ${totalTilesDone}/${tiles.length}… (added: ${totalAdded})`);
+
+          // Increase timeout slightly for smaller tiles; still keep bounded
+          const query = buildOverpassQueryBBox(tile, 60, maxBuildings);
+
+          const osm = await fetchOverpassWithRetry(query, {
+            signal: currentController.signal,
+            maxTries: 6
+          });
+
+          totalAdded += addBuildingsFromOverpassJSON(osm, maxBuildings - totalAdded);
+
+          // Small pause to reduce rate-limiting
+          await sleep(250);
+
+          if (totalAdded >= maxBuildings) break;
+        }
+
+        setStatus(`Done. Added ${totalAdded} building geometries. (If you need more: zoom in or increase Max buildings.)`);
+      } catch (e) {
+        if (currentController.signal.aborted) {
+          setStatus("Cancelled.");
+        } else {
+          const status = e.httpStatus ? `HTTP ${e.httpStatus}` : "Network/Overpass error";
+          setStatus(`Error: ${status}. Tip: zoom in and try again (504 usually means the area is too big).`);
+          console.error(e);
+        }
+      } finally {
+        document.getElementById("btnLoad").disabled = false;
+      }
+    }
+
+    function clearBuildings() {
+      if (currentController) currentController.abort();
+      buildingsLayer.clearLayers();
+      setStatus("Cleared.");
+    }
+
+    function locateMe() {
+      if (!navigator.geolocation) {
+        setStatus("Geolocation not supported by this browser.");
+        return;
+      }
+      setStatus("Locating…");
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+
+          if (myMarker) map.removeLayer(myMarker);
+          myMarker = L.circleMarker([lat, lon], { radius: 8, weight: 2, fillOpacity: 0.4 }).addTo(map);
+          myMarker.bindPopup("You are here").openPopup();
+
+          map.setView([lat, lon], Math.max(map.getZoom(), 17));
+          setStatus(`Location: ${lat.toFixed(6)}, ${lon.toFixed(6)}`);
+        },
+        (err) => setStatus("Location error: " + err.message),
+        { enableHighAccuracy: true, timeout: 12000, maximumAge: 10000 }
+      );
+    }
+
+    // ==========================
+    // Bind UI
+    // ==========================
+    document.getElementById("btnLoad").addEventListener("click", loadBuildings);
+    document.getElementById("btnClear").addEventListener("click", clearBuildings);
+    document.getElementById("btnLocate").addEventListener("click", locateMe);
+
+    // Optional: show current view bbox in console for debugging
+    map.on("moveend", () => {
+      const b = map.getBounds();
+      console.log("bbox:", b.getSouthWest(), b.getNorthEast());
+    });
+  </script>
+</body>
+</html>
+

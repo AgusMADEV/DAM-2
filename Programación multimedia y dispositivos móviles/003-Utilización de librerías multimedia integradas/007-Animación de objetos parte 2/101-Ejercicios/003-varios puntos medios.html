@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <title>Animación en CSS</title>
+    <style>
+      #elemento{
+        width:200px;
+        height:200px;
+        background:red;
+        position:relative;
+        animation:mueve 2s;
+        animation-iteration-count:infinite;
+      }
+      @keyframes mueve{
+        0%{left:0px;top:0px;}
+        25%{left:100px;top:0px;}
+        50%{left:100px;top:100px;}
+        75%{left:0px;top:100px;}
+        100%{left:0px;top:0px;}
+      }
+    </style>
+  </head>
+  <body>
+    <div id="elemento">
+    </div>
+  </body>
+</html>

@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#ff6b35" />
+    <title>FoodieHub Mobile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+    
+    <!-- App Shell -->
+    <div id="app">
+      <!-- TopBar -->
+      <header class="topbar">
+        <h1>🍳 FoodieHub</h1>
+        <div class="topbar-right">
+          <div id="statusDot" class="status-dot"></div>
+          <span id="sessionLabel">Sin sesión</span>
+          <button id="btnTheme" class="btn-theme" title="Cambiar tema">🌙</button>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main id="screens">
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- SCREEN: HOME                                    -->
+        <!-- ══════════════════════════════════════════════ -->
+        <section id="screen-home" class="screen active">
+          <h2>Bienvenido a FoodieHub</h2>
+          
+          <!-- User Registration -->
+          <div class="auth-card">
+            <h3>🧑‍🍳 Iniciar Sesión</h3>
+            <div class="register-row">
+              <input id="userName" type="text" placeholder="Tu nombre" />
+              <input id="userDni" type="text" placeholder="DNI" value="12345678X" />
+              <button id="btnRegister" class="btn-accent">Entrar</button>
+            </div>
+          </div>
+
+          <!-- Categories -->
+          <h3>Categorías</h3>
+          <div id="categoriesList" class="categories-grid"></div>
+
+          <!-- Featured Recipes -->
+          <h3>⭐ Recetas Destacadas</h3>
+          <div id="homeRecipes" class="card-list"></div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- SCREEN: EXPLORE                                 -->
+        <!-- ══════════════════════════════════════════════ -->
+        <section id="screen-explore" class="screen">
+          <h2>Explorar Recetas</h2>
+          
+          <!-- Search Bar -->
+          <div class="search-bar">
+            <input id="searchInput" type="text" placeholder="🔍 Buscar recetas..." />
+          </div>
+
+          <!-- Difficulty Chips -->
+          <div class="chips" id="difficultyChips">
+            <button class="active" data-difficulty="">Todas</button>
+            <button data-difficulty="Fácil">Fácil</button>
+            <button data-difficulty="Media">Media</button>
+            <button data-difficulty="Difícil">Difícil</button>
+          </div>
+
+          <!-- Recipes List -->
+          <div id="exploreRecipes" class="list"></div>
+        </section>
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- SCREEN: LIBRARY                                 -->
+        <!-- ══════════════════════════════════════════════ -->
+        <section id="screen-library" class="screen">
+          <h2>Mi Biblioteca</h2>
+
+          <!-- Utility Buttons -->
+          <div class="util-bar">
+            <button id="btnSeed">🌱 Cargar datos</button>
+            <button id="btnExport">📥 Exportar</button>
+            <button id="btnImport">📤 Importar</button>
+            <input type="file" id="importFile" accept=".json" style="display:none" />
+          </div>
+
+          <!-- Favorites -->
+          <h3>❤️ Recetas Favoritas</h3>
+          <div id="favoritesList" class="card-list"></div>
+
+          <!-- Stats -->
+          <h3>📊 Estadísticas</h3>
+          <div id="stats" class="kpis"></div>
+
+          <!-- Leaderboard -->
+          <h3>🏆 Ranking de Usuarios</h3>
+          <div id="leaders" class="list"></div>
+        </section>
+      </main>
+
+      <!-- ══════════════════════════════════════════════ -->
+      <!-- RECIPE DETAIL MODAL                             -->
+      <!-- ══════════════════════════════════════════════ -->
+      <div id="recipeModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 id="modalTitle">Receta</h2>
+            <button id="btnCloseModal" class="btn-close">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="recipe-hero">
+              <div id="modalEmoji" class="recipe-emoji">🍽️</div>
+              <div class="recipe-meta">
+                <span id="modalCategory" class="badge">Categoría</span>
+                <span id="modalDifficulty" class="badge">Dificultad</span>
+                <span id="modalTime" class="badge">⏱️ 30 min</span>
+              </div>
+            </div>
+            <p id="modalDescription" class="recipe-description"></p>
+            <h4>📝 Ingredientes</h4>
+            <ul id="modalIngredients" class="ingredients-list"></ul>
+            <div class="modal-actions">
+              <button id="btnModalFavorite" class="btn-accent">❤️ Favorito</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════ -->
+      <!-- TAB BAR                                         -->
+      <!-- ══════════════════════════════════════════════ -->
+      <footer class="tabbar">
+        <button data-target="home" class="tab active">
+          <span class="tab-icon">🏠</span>
+          <span>Inicio</span>
+        </button>
+        <button data-target="explore" class="tab">
+          <span class="tab-icon">🔍</span>
+          <span>Explorar</span>
+          <span id="badgeExplore" class="tab-badge" style="display:none">0</span>
+        </button>
+        <button data-target="library" class="tab">
+          <span class="tab-icon">📚</span>
+          <span>Biblioteca</span>
+          <span id="badgeLibrary" class="tab-badge" style="display:none">0</span>
+        </button>
+      </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>

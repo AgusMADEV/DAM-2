@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pentagrama · 4/4 · Editor + Auto-guardado</title>
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --panel:#ffffff;
+      --ink:#111;
+      --muted:#5b6270;
+      --line:#e6e8ef;
+      --shadow:0 10px 30px rgba(0,0,0,.08);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+      background:var(--bg);
+      color:var(--ink);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+    .app{
+      width:min(1200px, 100%);
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:22px;
+    }
+    .top{
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+    .title{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:280px;
+    }
+    .title h1{
+      margin:0;
+      font-size:18px;
+      letter-spacing:.2px;
+    }
+    .title p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+      max-width:52ch;
+    }
+    .controls{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    button, select{
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--ink);
+      border-radius:12px;
+      padding:10px 12px;
+      font-size:14px;
+      cursor:pointer;
+      transition:transform .05s ease, box-shadow .15s ease;
+      box-shadow:0 1px 0 rgba(0,0,0,.02);
+    }
+    button:hover, select:hover{box-shadow:0 8px 18px rgba(0,0,0,.06)}
+    button:active{transform:translateY(1px)}
+    .danger{border-color:#f0c7c7}
+    .danger:hover{box-shadow:0 8px 18px rgba(190,30,30,.10)}
+    .pill{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:12px;
+      color:var(--muted);
+      font-size:13px;
+      white-space:nowrap;
+    }
+    .stage{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 0 4px;
+    }
+    svg{
+      width:min(1100px, 100%);
+      height:auto;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+      user-select:none;
+      touch-action:none;
+    }
+    .footer{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12.5px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      align-items:center;
+    }
+    code{background:#f1f3f8;padding:2px 6px;border-radius:8px;color:#222}
+    .ok{color:#1a7f37}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="top">
+      <div class="title">
+        <h1>Pentagrama (Clave de Sol) · 4/4 · Editor con auto-guardado</h1>
+        <p>
+          Clic en vacío: crea nota (y suena). Arrastra una nota: reubica (suena al cambiar).
+          Modo borrar: pulsa <b>Borrar</b> y luego clic en notas para eliminarlas.
+          <span class="ok">Auto-guardado en LocalStorage.</span>
+        </p>
+      </div>
+
+      <div class="controls">
+        <button id="activar">Activar audio</button>
+        <button id="reproducir">Reproducir</button>
+        <button id="parar">Parar</button>
+
+        <button id="modoBorrar" class="danger" title="Activa/desactiva el modo borrar">Borrar</button>
+        <button id="limpiar" class="danger" title="Elimina todas las notas y borra el guardado">Limpiar todo</button>
+
+        <div class="pill">
+          <span>Figura:</span>
+          <select id="dur">
+            <option value="whole">Redonda</option>
+            <option value="half">Blanca</option>
+            <option value="quarter" selected>Negra</option>
+            <option value="eighth">Corchea</option>
+            <option value="sixteenth">Semicorchea</option>
+          </select>
+        </div>
+
+        <div class="pill">
+          <span>Tempo:</span>
+          <select id="bpm">
+            <option>60</option><option>80</option><option selected>100</option><option>120</option><option>140</option>
+          </select>
+          <span>bpm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <svg id="score" viewBox="0 0 1100 280" role="img" aria-label="Pentagrama con compases">
+        <!-- Dibujado por JS -->
+      </svg>
+    </div>
+
+    <div class="footer">
+      <span>Cuantización: <code>semicorcheas</code> (16 por compás). Agrupación visual: <code>corcheas</code> por pulso.</span>
+      <span>Polifonía: sí. Naturales (sin sostenidos/bemoles).</span>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // ============================================================
+  // LocalStorage
+  // ============================================================
+  const LS_KEY = "pentagrama_editor_v1";
+
+  // ============================================================
+  // Audio: más "piano" (seno + parciales seno + resonancia/decay + ataque suave)
+  // - Sigue siendo sintético, pero más cercano (envolvente + filtro + "caja" resonante).
+  // ============================================================
+  let ctx = null;
+  let master = null;
+  let stopAllScheduled = null;
+
+  function asegurarAudio() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state !== "running") ctx.resume();
+    if (!master) {
+      master = ctx.createGain();
+      master.gain.value = 0.9;
+      master.connect(ctx.destination);
+    }
+  }
+
+  function midiAHz(m){ return 440 * Math.pow(2, (m - 69) / 12); }
+
+  function vozPianoMas(midi, cuando, durSec, vel = 0.9) {
+    asegurarAudio();
+    const t0 = Math.max(cuando, ctx.currentTime + 0.005);
+    const f0 = midiAHz(midi);
+
+    // "Cuerpo" del piano: seno fundamental + 2 parciales seno (muy suaves)
+    const o1 = ctx.createOscillator(); o1.type = "sine"; o1.frequency.setValueAtTime(f0, t0);
+    const o2 = ctx.createOscillator(); o2.type = "sine"; o2.frequency.setValueAtTime(f0 * 2.0, t0);
+    const o3 = ctx.createOscillator(); o3.type = "sine"; o3.frequency.setValueAtTime(f0 * 3.0, t0);
+
+    // micro desafinación (muy pequeña)
+    o2.detune.setValueAtTime(-2.5, t0);
+    o3.detune.setValueAtTime(+2.0, t0);
+
+    const g1 = ctx.createGain(); g1.gain.value = 1.0;
+    const g2 = ctx.createGain(); g2.gain.value = 0.18;
+    const g3 = ctx.createGain(); g3.gain.value = 0.08;
+
+    const mix = ctx.createGain();
+    o1.connect(g1); g1.connect(mix);
+    o2.connect(g2); g2.connect(mix);
+    o3.connect(g3); g3.connect(mix);
+
+    // Simular "caja" con filtro pasa banda + paso bajo
+    const band = ctx.createBiquadFilter();
+    band.type = "bandpass";
+    band.frequency.setValueAtTime(Math.min(2200, Math.max(300, f0 * 2.2)), t0);
+    band.Q.setValueAtTime(0.9, t0);
+
+    const lp = ctx.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.frequency.setValueAtTime(Math.min(9000, Math.max(1200, f0 * 7)), t0);
+    lp.Q.setValueAtTime(0.6, t0);
+
+    // Envolvente: ataque rápido, caída larga tipo piano
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t0);
+
+    const attack = 0.0035;
+    // decay depende de la duración seleccionada, pero siempre con "cola"
+    const decay = Math.min(1.8, Math.max(0.45, durSec * 1.15));
+    const sustain = 0.0001; // piano real tiende a caer, no sostener
+    const release = 0.09;
+
+    g.gain.exponentialRampToValueAtTime(1.0 * vel, t0 + attack);
+    // caída exponencial "larga"
+    g.gain.exponentialRampToValueAtTime(0.12 * vel, t0 + attack + decay);
+
+    const relStart = t0 + Math.max(0.07, durSec - release);
+    g.gain.setValueAtTime(Math.max(0.02 * vel, 0.0002), relStart);
+    g.gain.exponentialRampToValueAtTime(sustain, relStart + release);
+
+    // "Martillo" leve: ruido extremadamente suave + muy corto
+    const noiseDur = 0.012;
+    const noiseBuf = ctx.createBuffer(1, Math.max(1, Math.floor(ctx.sampleRate * noiseDur)), ctx.sampleRate);
+    {
+      const data = noiseBuf.getChannelData(0);
+      for (let i = 0; i < data.length; i++) data[i] = (Math.random()*2-1) * (1 - i/data.length);
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuf;
+
+    const gNoise = ctx.createGain();
+    gNoise.gain.setValueAtTime(0.0001, t0);
+    gNoise.gain.exponentialRampToValueAtTime(0.035 * vel, t0 + 0.002);
+    gNoise.gain.exponentialRampToValueAtTime(0.0001, t0 + noiseDur);
+
+    // cadena
+    mix.connect(band);
+    band.connect(lp);
+    lp.connect(g);
+    g.connect(master);
+
+    noise.connect(gNoise);
+    gNoise.connect(master);
+
+    // start/stop
+    o1.start(t0); o2.start(t0); o3.start(t0);
+    noise.start(t0);
+    noise.stop(t0 + noiseDur + 0.01);
+
+    const tStop = relStart + release + 0.03;
+    o1.stop(tStop); o2.stop(tStop); o3.stop(tStop);
+
+    return { tStop };
+  }
+
+  // ============================================================
+  // Pentagrama + altura (diatónico)
+  // ============================================================
+  const svg = document.getElementById("score");
+  const W = 1100;
+  const marginL = 90;
+  const marginR = 30;
+  const staffTop = 85;
+  const spacing = 14;
+  const stepH = spacing / 2;
+  const staffBottomLineY = staffTop + 4 * spacing;
+
+  const LETRAS = ["C","D","E","F","G","A","B"];
+  const SEMI = {C:0, D:2, E:4, F:5, G:7, A:9, B:11};
+
+  function stepANota(step) {
+    let letra = "E", octava = 4;
+    let idx = LETRAS.indexOf(letra);
+    const dir = Math.sign(step);
+    for (let i=0; i<Math.abs(step); i++) {
+      idx += dir;
+      if (idx > 6) { idx = 0; octava += 1; }
+      if (idx < 0) { idx = 6; octava -= 1; }
+    }
+    letra = LETRAS[idx];
+    const midi = (octava + 1) * 12 + SEMI[letra];
+    return { letra, octava, midi };
+  }
+  function stepAY(step){ return staffBottomLineY - step * stepH; }
+  function yAStep(y){ return Math.round((staffBottomLineY - y) / stepH); }
+  function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+
+  // ============================================================
+  // Tiempo: 4/4, semicorcheas (16 por compás)
+  // Agrupación pedida: "grupos de corcheas" por pulso (2 corcheas por pulso = 4 semicorcheas)
+  // => dibujamos beams SOLO para corcheas/semicorcheas dentro del mismo pulso.
+  // ============================================================
+  const subdivPorPulso = 4; // 4 semicorcheas = 1 pulso
+  const pulsosPorCompas = 4;
+  const subdivPorCompas = subdivPorPulso * pulsosPorCompas; // 16
+  const gridPx = 20;
+
+  const usableW = (W - marginR) - marginL;
+  const compasesVisibles = Math.floor(usableW / (gridPx * subdivPorCompas));
+  const totalSubdivVisibles = compasesVisibles * subdivPorCompas;
+
+  function xASubdiv(x){ return Math.round((x - marginL) / gridPx); }
+  function subdivAX(sub){ return marginL + sub * gridPx; }
+
+  const durBeats = { whole:4, half:2, quarter:1, eighth:0.5, sixteenth:0.25 };
+  function beatsASeg(beats, bpm){ return (60/bpm) * beats; }
+
+  // ============================================================
+  // Notas: {id, sub, step, dur}
+  // ============================================================
+  let notas = [];
+  let nextId = 1;
+
+  // Modo borrar (botón)
+  let modoBorrar = false;
+
+  // ============================================================
+  // Guardado / carga
+  // ============================================================
+  function guardar() {
+    const payload = { notas, nextId };
+    try { localStorage.setItem(LS_KEY, JSON.stringify(payload)); } catch {}
+  }
+  function cargar() {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (Array.isArray(data.notas)) notas = data.notas;
+      if (typeof data.nextId === "number") nextId = data.nextId;
+    } catch {}
+  }
+  function borrarGuardado() {
+    try { localStorage.removeItem(LS_KEY); } catch {}
+  }
+
+  // ============================================================
+  // SVG helpers + render
+  // ============================================================
+  function limpiarSVG(){ while (svg.firstChild) svg.removeChild(svg.firstChild); }
+
+  function el(name, attrs={}) {
+    const n = document.createElementNS("http://www.w3.org/2000/svg", name);
+    for (const [k,v] of Object.entries(attrs)) n.setAttribute(k, String(v));
+    return n;
+  }
+
+  function dibujarPentagrama() {
+    for (let i=0; i<5; i++) {
+      const y = staffTop + i*spacing;
+      svg.appendChild(el("line",{x1:marginL,y1:y,x2:W-marginR,y2:y,stroke:"#111","stroke-width":1.4}));
+    }
+
+    const clave = el("text",{x:18,y:staffTop+4.2*spacing,"font-size":72,"font-family":"serif",fill:"#111"});
+    clave.textContent="𝄞";
+    svg.appendChild(clave);
+
+    const tsTop = el("text",{x:64,y:staffTop+1.9*spacing,"font-size":28,"font-family":"serif",fill:"#111"});
+    tsTop.textContent="4";
+    const tsBot = el("text",{x:64,y:staffTop+3.8*spacing,"font-size":28,"font-family":"serif",fill:"#111"});
+    tsBot.textContent="4";
+    svg.appendChild(tsTop); svg.appendChild(tsBot);
+
+    for (let sub=0; sub<=totalSubdivVisibles; sub++) {
+      const x = subdivAX(sub);
+      const esPulso = (sub % subdivPorPulso)===0;
+      svg.appendChild(el("line",{
+        x1:x,y1:staffTop-24,x2:x,y2:staffTop+4*spacing+24,
+        stroke:"#000","stroke-opacity":esPulso?0.06:0.03,"stroke-width":1
+      }));
+    }
+
+    for (let c=0; c<=compasesVisibles; c++) {
+      const x = subdivAX(c*subdivPorCompas);
+      svg.appendChild(el("line",{
+        x1:x,y1:staffTop-26,x2:x,y2:staffTop+4*spacing+26,
+        stroke:"#111","stroke-width":(c===0?2.2:1.8)
+      }));
+    }
+  }
+
+  function dibujarLineasAdicionales(x, step) {
+    const minStep=0,maxStep=8;
+    const ledgers=[];
+    if (step<minStep) for (let s=-2;s>=step;s-=2) ledgers.push(s);
+    if (step>maxStep) for (let s=10;s<=step;s+=2) ledgers.push(s);
+    for (const s of ledgers) {
+      const y = stepAY(s);
+      svg.appendChild(el("line",{x1:x-18,y1:y,x2:x+18,y2:y,stroke:"#111","stroke-width":1.4}));
+    }
+  }
+
+  // Dirección de plica: acorde -> media; nota suelta -> estándar (línea central = step 4)
+  function stemUpPara(step, stepsGrupo) {
+    if (stepsGrupo && stepsGrupo.length>1) {
+      const media = stepsGrupo.reduce((a,b)=>a+b,0)/stepsGrupo.length;
+      return media < 4;
+    }
+    return step < 4;
+  }
+
+  // ---- BEAMS / agrupación (corcheas y semicorcheas) por pulso ----
+  // Creamos beams por cada pulso: sub in [k..k+3]
+  // - corcheas: dibujamos beam si hay dos corcheas dentro del pulso en posiciones (k,k+2) (en semicorcheas)
+  // - semicorcheas: beam continuo si hay notas en (k,k+1,k+2,k+3) (las que existan); para simplificar, un beam base.
+  // Nota: esto es visual y no pretende cubrir todos los casos editoriales.
+  function dibujarBeams(notasOrdenadas, stemsInfoPorId) {
+    // index por pulso
+    const porPulso = new Map(); // pulsoIndex -> notes in that beat window (eighth/sixteenth only)
+    for (const n of notasOrdenadas) {
+      if (n.dur !== "eighth" && n.dur !== "sixteenth") continue;
+      const pulso = Math.floor(n.sub / subdivPorPulso); // 0.. (beats total-1)
+      if (!porPulso.has(pulso)) porPulso.set(pulso, []);
+      porPulso.get(pulso).push(n);
+    }
+
+    for (const [pulso, arr] of porPulso.entries()) {
+      // notes within this beat, sort by time
+      arr.sort((a,b)=>a.sub-b.sub);
+
+      // Determine beam direction: use average of note steps in the beat
+      const steps = arr.map(n=>n.step);
+      const stemUp = stemUpPara(4, steps) ? true : false; // re-use rule: average vs middle line
+      // But stemUpPara expects note step; we want by average:
+      const avg = steps.reduce((a,b)=>a+b,0)/steps.length;
+      const up = avg < 4;
+
+      // Build beam segments across notes:
+      // We'll connect consecutive eligible notes within the beat, with a single horizontal beam line.
+      if (arr.length < 2) continue;
+
+      // Compute a consistent beam Y level:
+      // For up stems, beam sits above highest stem end; for down, below lowest stem end.
+      const stemEnds = arr.map(n => stemsInfoPorId.get(n.id)?.yStemEnd).filter(v => typeof v === "number");
+      if (stemEnds.length !== arr.length) continue;
+
+      let yBeam = up ? Math.min(...stemEnds) : Math.max(...stemEnds);
+      // Slight offset so beam doesn't touch stem end
+      yBeam += up ? -6 : +6;
+
+      // Draw beam between first and last note of the beat-group (within that beat window)
+      const x1 = subdivAX(arr[0].sub) + (up ? 9 : -9);
+      const x2 = subdivAX(arr[arr.length-1].sub) + (up ? 9 : -9);
+
+      // beam thickness
+      const thick = 5;
+
+      // main beam as a rectangle (path)
+      const yTop = up ? yBeam : yBeam - thick;
+      const beam = el("rect", {
+        x: Math.min(x1,x2),
+        y: yTop,
+        width: Math.abs(x2-x1),
+        height: thick,
+        fill: "#111",
+        "fill-opacity": 1
+      });
+      svg.appendChild(beam);
+
+      // If there are semicorcheas, add a second beam (simple): only if any sixteenth exists
+      const hasSixteenth = arr.some(n => n.dur === "sixteenth");
+      if (hasSixteenth) {
+        const gap = 7;
+        const y2Top = up ? (yTop + thick + gap) : (yTop - thick - gap);
+        const beam2 = el("rect", {
+          x: Math.min(x1,x2),
+          y: y2Top,
+          width: Math.abs(x2-x1),
+          height: thick,
+          fill: "#111",
+          "fill-opacity": 1
+        });
+        svg.appendChild(beam2);
+      }
+    }
+  }
+
+  function dibujarNota(n, stepsGrupo, stemsInfoPorId) {
+    const x = subdivAX(n.sub);
+    const y = stepAY(n.step);
+
+    dibujarLineasAdicionales(x, n.step);
+
+    const esRedonda = n.dur==="whole";
+    const esBlanca  = n.dur==="half";
+    const esNegra   = n.dur==="quarter";
+    const esCorchea = n.dur==="eighth";
+    const esSemi    = n.dur==="sixteenth";
+
+    const rellena = esNegra || esCorchea || esSemi;
+
+    const g = el("g", { "data-note-id": n.id, cursor: modoBorrar ? "not-allowed" : "grab" });
+
+    const cabeza = el("ellipse",{
+      cx:x, cy:y, rx:10.5, ry:7.2,
+      fill: rellena ? "#111" : "#fff",
+      stroke:"#111","stroke-width":2,
+      transform:`rotate(-18 ${x} ${y})`
+    });
+
+    const { letra, octava } = stepANota(n.step);
+    const title = el("title");
+    title.textContent = `${letra}${octava} · ${n.dur}`;
+    cabeza.appendChild(title);
+
+    g.appendChild(cabeza);
+
+    // plica/flags: si hay beam (corchea/semicorchea) NO dibujamos bandera individual, el beam se dibuja aparte
+    if (!esRedonda) {
+      const stemUp = stemUpPara(n.step, stepsGrupo);
+      const xStem = stemUp ? (x + 9) : (x - 9);
+      const y1 = y;
+      const y2 = stemUp ? (y - 44) : (y + 44);
+
+      const stem = el("line",{
+        x1:xStem,y1:y1,x2:xStem,y2:y2,
+        stroke:"#111","stroke-width":2.2,"stroke-linecap":"round"
+      });
+      g.appendChild(stem);
+
+      // Guardar info para beams
+      stemsInfoPorId.set(n.id, { xStem, yStemEnd: y2, stemUp });
+
+      // banderas solo si NO vamos a agrupar (si está solo en el pulso, luego no habrá beam)
+      // -> lo resolvemos tras dibujar beams: aquí no ponemos bandera.
+      // (si quieres, podemos añadir flag para notas sueltas después; por simplicidad lo omitimos)
+    }
+
+    // borrar individual: modo borrar -> clic elimina; también clic derecho elimina
+    g.addEventListener("click", (e) => {
+      if (!modoBorrar) return;
+      e.stopPropagation();
+      notas = notas.filter(x => x.id !== n.id);
+      guardar();
+      render();
+    });
+    g.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      notas = notas.filter(x => x.id !== n.id);
+      guardar();
+      render();
+    });
+
+    svg.appendChild(g);
+  }
+
+  function dibujarBanderasSueltas(notasOrdenadas, stemsInfoPorId) {
+    // Si una corchea/semicorchea no quedó "beam-eada" (porque está sola en su pulso),
+    // dibujamos banderas individuales para que se vea correcto.
+    // (Heurística: contar por pulso cuántas hay. Si <2, poner banderas)
+    const porPulso = new Map();
+    for (const n of notasOrdenadas) {
+      if (n.dur !== "eighth" && n.dur !== "sixteenth") continue;
+      const pulso = Math.floor(n.sub / subdivPorPulso);
+      if (!porPulso.has(pulso)) porPulso.set(pulso, []);
+      porPulso.get(pulso).push(n);
+    }
+
+    function banderaPath(xStem, yEnd, up, i) {
+      const dy = i * 8;
+      const y0 = up ? (yEnd + dy) : (yEnd - dy);
+      return up
+        ? `M ${xStem} ${y0} Q ${xStem+10} ${y0+4} ${xStem+6} ${y0+14} Q ${xStem+2} ${y0+22} ${xStem+14} ${y0+26}`
+        : `M ${xStem} ${y0} Q ${xStem-10} ${y0-4} ${xStem-6} ${y0-14} Q ${xStem-2} ${y0-22} ${xStem-14} ${y0-26}`;
+    }
+
+    for (const [pulso, arr] of porPulso.entries()) {
+      if (arr.length >= 2) continue; // se supone que tendrá beam
+      const n = arr[0];
+      const info = stemsInfoPorId.get(n.id);
+      if (!info) continue;
+
+      const count = (n.dur === "sixteenth") ? 2 : 1;
+      for (let i=0; i<count; i++) {
+        svg.appendChild(el("path",{
+          d: banderaPath(info.xStem, info.yStemEnd, info.stemUp, i),
+          fill:"none", stroke:"#111", "stroke-width":2, "stroke-linecap":"round"
+        }));
+      }
+    }
+  }
+
+  function render() {
+    limpiarSVG();
+    dibujarPentagrama();
+
+    // grupo por subdiv para acordes -> dirección plica
+    const grupoPorSub = new Map();
+    for (const n of notas) {
+      if (!grupoPorSub.has(n.sub)) grupoPorSub.set(n.sub, []);
+      grupoPorSub.get(n.sub).push(n);
+    }
+
+    const ordenadas = [...notas].sort((a,b)=>a.sub-b.sub || a.step-b.step);
+
+    // Primero dibujamos notas y capturamos stems
+    const stemsInfoPorId = new Map();
+    for (const n of ordenadas) {
+      const grupo = grupoPorSub.get(n.sub) || [];
+      const steps = grupo.map(x=>x.step);
+      dibujarNota(n, steps, stemsInfoPorId);
+    }
+
+    // Luego dibujamos beams por pulso (agrupación en corcheas/semicorcheas)
+    dibujarBeams(ordenadas, stemsInfoPorId);
+
+    // Y por último, banderas para corcheas sueltas
+    dibujarBanderasSueltas(ordenadas, stemsInfoPorId);
+  }
+
+  // ============================================================
+  // Interacción: crear / arrastrar / sonido al mover
+  // ============================================================
+  function puntoSVG(evt) {
+    const pt = svg.createSVGPoint();
+    pt.x = evt.clientX;
+    pt.y = evt.clientY;
+    const m = svg.getScreenCTM().inverse();
+    return pt.matrixTransform(m);
+  }
+  function encontrarGrupoNota(target) {
+    if (!target) return null;
+    if (target.tagName === "g" && target.getAttribute("data-note-id")) return target;
+    if (target.closest) return target.closest("g[data-note-id]");
+    return null;
+  }
+
+  let drag = null; // {id, offSub, offStep, lastKey, lastT}
+  const PREVIEW_MIN_MS = 55;
+
+  function previsualizar(nota) {
+    const bpm = Number(document.getElementById("bpm").value);
+    const beats = durBeats[nota.dur] ?? 1;
+    // preview: suficientemente corto para arrastre, pero con cola
+    const sec = Math.min(1.2, Math.max(0.18, beatsASeg(beats, bpm) * 0.55));
+    const { midi } = stepANota(nota.step);
+    vozPianoMas(midi, ctx ? ctx.currentTime : 0, sec, 0.9);
+  }
+
+  svg.addEventListener("mousedown", (e) => {
+    const g = encontrarGrupoNota(e.target);
+    if (!g) return;
+
+    // si estamos en modo borrar, no arrastrar
+    if (modoBorrar) return;
+
+    const id = Number(g.getAttribute("data-note-id"));
+    const n = notas.find(nn => nn.id === id);
+    if (!n) return;
+
+    const p = puntoSVG(e);
+    const subMouse = xASubdiv(p.x);
+    const stepMouse = yAStep(p.y);
+
+    drag = {
+      id,
+      offSub: n.sub - subMouse,
+      offStep: n.step - stepMouse,
+      lastKey: `${n.sub}:${n.step}`,
+      lastT: performance.now()
+    };
+
+    g.setAttribute("cursor", "grabbing");
+  });
+
+  svg.addEventListener("mousemove", (e) => {
+    if (!drag) return;
+
+    const p = puntoSVG(e);
+    let sub = xASubdiv(p.x) + drag.offSub;
+    let step = yAStep(p.y) + drag.offStep;
+
+    sub = clamp(sub, 0, totalSubdivVisibles);
+    step = clamp(step, -2, 12);
+
+    sub = Math.round(sub);
+    step = Math.round(step);
+
+    const n = notas.find(nn => nn.id === drag.id);
+    if (!n) return;
+
+    const changed = (n.sub !== sub) || (n.step !== step);
+    if (changed) {
+      n.sub = sub;
+      n.step = step;
+      render();
+      guardar();
+
+      const key = `${n.sub}:${n.step}`;
+      const now = performance.now();
+      if (key !== drag.lastKey && (now - drag.lastT) >= PREVIEW_MIN_MS) {
+        drag.lastKey = key;
+        drag.lastT = now;
+        previsualizar(n);
+      }
+    }
+  });
+
+  window.addEventListener("mouseup", () => { drag = null; });
+
+  // Crear nota con clic en vacío
+  svg.addEventListener("click", (e) => {
+    const g = encontrarGrupoNota(e.target);
+    if (g) return;     // clic en nota: no crear
+    if (drag) return;  // arrastre: no crear
+
+    // modo borrar: clic en vacío no hace nada
+    if (modoBorrar) return;
+
+    const p = puntoSVG(e);
+
+    let sub = clamp(xASubdiv(p.x), 0, totalSubdivVisibles);
+    let step = clamp(yAStep(p.y), -2, 12);
+
+    const durSel = document.getElementById("dur").value;
+    const n = { id: nextId++, sub: Math.round(sub), step: Math.round(step), dur: durSel };
+    notas.push(n);
+
+    render();
+    guardar();
+    previsualizar(n);
+  });
+
+  // ============================================================
+  // Reproducción polifónica
+  // ============================================================
+  function reproducirTodo() {
+    if (!notas.length) return;
+    asegurarAudio();
+
+    const bpm = Number(document.getElementById("bpm").value);
+    const start = ctx.currentTime + 0.03;
+
+    const porSub = new Map();
+    for (const n of notas) {
+      if (!porSub.has(n.sub)) porSub.set(n.sub, []);
+      porSub.get(n.sub).push(n);
+    }
+
+    const subs = [...porSub.keys()].sort((a,b)=>a-b);
+    let lastStop = start;
+
+    for (const sub of subs) {
+      const beatsDesdeInicio = sub / subdivPorPulso;
+      const cuando = start + beatsASeg(beatsDesdeInicio, bpm);
+
+      for (const n of porSub.get(sub)) {
+        const beats = durBeats[n.dur] ?? 1;
+        const durSec = beatsASeg(beats, bpm);
+
+        const { midi } = stepANota(n.step);
+        const v = vozPianoMas(midi, cuando, durSec, 0.95);
+        lastStop = Math.max(lastStop, v.tStop);
+      }
+    }
+
+    stopAllScheduled = () => {
+      if (!ctx || !master) return;
+      const t = ctx.currentTime + 0.005;
+      master.gain.cancelScheduledValues(t);
+      master.gain.setValueAtTime(master.gain.value, t);
+      master.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
+      master.gain.setValueAtTime(0.9, t + 0.08);
+    };
+  }
+
+  // ============================================================
+  // UI botones
+  // ============================================================
+  const btnBorrar = document.getElementById("modoBorrar");
+  function actualizarUIBorrar() {
+    btnBorrar.textContent = modoBorrar ? "Borrar (activo)" : "Borrar";
+    btnBorrar.style.background = modoBorrar ? "#fff5f5" : "#fff";
+  }
+
+  document.getElementById("activar").addEventListener("click", asegurarAudio);
+
+  document.getElementById("reproducir").addEventListener("click", reproducirTodo);
+  document.getElementById("parar").addEventListener("click", () => { if (stopAllScheduled) stopAllScheduled(); });
+
+  document.getElementById("limpiar").addEventListener("click", () => {
+    notas = [];
+    nextId = 1;
+    borrarGuardado();
+    render();
+  });
+
+  btnBorrar.addEventListener("click", () => {
+    modoBorrar = !modoBorrar;
+    actualizarUIBorrar();
+    render();
+  });
+
+  // Guardar también si cambias tempo/figura (no es estrictamente necesario, pero consistente)
+  document.getElementById("dur").addEventListener("change", () => {});
+  document.getElementById("bpm").addEventListener("change", () => {});
+
+  // ============================================================
+  // Arranque: cargar y render
+  // ============================================================
+  cargar();
+  actualizarUIBorrar();
+  render();
+})();
+</script>
+</body>
+</html>
+

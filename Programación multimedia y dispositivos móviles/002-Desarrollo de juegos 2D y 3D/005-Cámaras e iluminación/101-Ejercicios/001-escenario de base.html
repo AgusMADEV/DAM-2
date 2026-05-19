@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+</head>
+<body>
+  <a-scene>
+    <!-- Camera positioned above and looking at the player -->
+    <a-entity id="camera-rig" position="0 0 0">
+      <a-camera position="0 5 3" rotation="-45 0 0"></a-camera>
+    </a-entity>
+
+    <!-- Player sphere -->
+    <a-sphere id="player" position="0 0.5 0" radius="0.5" color="#4CC3D9"></a-sphere>
+
+    <!-- Floor with grid texture -->
+    <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" 
+             src="grid.jpg" 
+             repeat="10 10"></a-plane>
+
+    <!-- Spotlight pointing at the player -->
+    <a-light type="spot" position="3 8 3" target="#player" intensity="1" angle="45"></a-light>
+
+    <!-- Ambient light -->
+    <a-light type="ambient" color="#ffffff" intensity="0.2"></a-light>
+
+    <!-- Sky -->
+    <a-sky color="#87CEEB"></a-sky>
+  </a-scene>
+</body>
+</html>

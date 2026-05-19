@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Staff Note Placer + Play</title>
+  <style>
+    body{font-family:system-ui;margin:24px}
+    .bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+    button{padding:10px 14px;border:1px solid #ccc;border-radius:10px;background:#fff;cursor:pointer}
+    button:active{transform:translateY(1px)}
+    .hint{opacity:.8;margin:0 0 12px}
+    .wrap{max-width:980px}
+    svg{width:100%;max-width:980px;height:auto;border:1px solid #e6e6e6;border-radius:14px;background:#fff}
+    .small{font-size:13px;opacity:.75}
+    code{background:#f3f3f3;padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="bar">
+      <button id="enable">Enable audio</button>
+      <button id="play">Play</button>
+      <button id="clear">Clear</button>
+      <span class="small">Click on the staff to place notes. Right-click a note to delete.</span>
+    </div>
+    <p class="hint">
+      Staff is G-clef (treble). Notes are <b>natural</b> only (no sharps/flats).
+      Playback order = left → right.
+    </p>
+
+    <svg id="score" viewBox="0 0 980 260" role="img" aria-label="Treble staff">
+      <!-- staff + notes drawn by JS -->
+    </svg>
+
+    <p class="small">
+      Tip: X is snapped to a grid (like beats). Y is snapped to lines/spaces.  
+      Range: about <code>C4</code> to <code>A5</code> with simple ledger lines.
+    </p>
+  </div>
+
+<script>
+(() => {
+  // =========================
+  // Audio: simple synth
+  // =========================
+  let ctx = null;
+  let master = null;
+
+  function ensureAudio() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state !== "running") ctx.resume();
+    if (!master) {
+      master = ctx.createGain();
+      master.gain.value = 0.8;
+      master.connect(ctx.destination);
+    }
+  }
+
+  function midiToFreq(m) {
+    return 440 * Math.pow(2, (m - 69) / 12);
+  }
+
+  function playMidi(midi, t0, dur = 0.38) {
+    ensureAudio();
+    const now = ctx.currentTime;
+    const t = Math.max(t0, now + 0.01);
+
+    const osc = ctx.createOscillator();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(midiToFreq(midi), t);
+
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+
+    // quick ADSR-ish
+    const attack = 0.01, decay = 0.06, sustain = 0.55, release = 0.14;
+
+    g.gain.exponentialRampToValueAtTime(1.0, t + attack);
+    g.gain.exponentialRampToValueAtTime(sustain, t + attack + decay);
+
+    // release near the end
+    const relStart = t + Math.max(0.05, dur - release);
+    g.gain.setValueAtTime(sustain, relStart);
+    g.gain.exponentialRampToValueAtTime(0.0001, relStart + release);
+
+    osc.connect(g);
+    g.connect(master);
+
+    osc.start(t);
+    osc.stop(relStart + release + 0.02);
+  }
+
+  // =========================
+  // Staff geometry + pitch mapping
+  // =========================
+  const svg = document.getElementById("score");
+
+  const W = 980, H = 260;
+  const marginL = 80;           // room for clef
+  const marginR = 30;
+  const staffTop = 70;
+  const spacing = 14;           // distance between staff lines
+  const stepH = spacing / 2;    // line<->space step
+  const staffBottomLineY = staffTop + 4 * spacing;
+
+  // Treble staff canonical: bottom line = E4 at step 0
+  // We'll support steps -2..12 (roughly C4..A5) with ledger lines.
+  // Each step is diatonic (natural notes only).
+  const LETTERS = ["C","D","E","F","G","A","B"];
+  const SEMI = {C:0, D:2, E:4, F:5, G:7, A:9, B:11};
+
+  function stepToNote(step) {
+    // step 0 = E4
+    let letter = "E";
+    let octave = 4;
+
+    let idx = LETTERS.indexOf(letter);
+    const dir = Math.sign(step);
+    for (let i = 0; i < Math.abs(step); i++) {
+      idx += dir;
+      if (idx > 6) { idx = 0; octave += 1; }      // B -> C
+      if (idx < 0) { idx = 6; octave -= 1; }      // C -> B
+    }
+    letter = LETTERS[idx];
+    const midi = (octave + 1) * 12 + SEMI[letter];
+    return { letter, octave, midi };
+  }
+
+  function stepToY(step) {
+    return staffBottomLineY - step * stepH;
+  }
+
+  function yToStep(y) {
+    return Math.round((staffBottomLineY - y) / stepH);
+  }
+
+  // =========================
+  // Notes model
+  // =========================
+  /** notes: {id, x, step} */
+  let notes = [];
+  let nextId = 1;
+
+  // grid snapping in x (feel free to tweak)
+  const grid = 26;
+
+  function snapX(x) {
+    return Math.round(x / grid) * grid;
+  }
+
+  function clamp(v, a, b) {
+    return Math.max(a, Math.min(b, v));
+  }
+
+  // =========================
+  // Rendering (SVG)
+  // =========================
+  function clearSVG() {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+  }
+
+  function el(name, attrs = {}) {
+    const n = document.createElementNS("http://www.w3.org/2000/svg", name);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, String(v));
+    return n;
+  }
+
+  function drawStaff() {
+    // staff lines
+    for (let i = 0; i < 5; i++) {
+      const y = staffTop + i * spacing;
+      svg.appendChild(el("line", {
+        x1: marginL, y1: y, x2: W - marginR, y2: y,
+        stroke: "#111", "stroke-width": 1.4
+      }));
+    }
+
+    // clef (Unicode treble clef; depends on font support)
+    const clef = el("text", {
+      x: 22, y: staffTop + 4.2 * spacing,
+      "font-size": 72,
+      "font-family": "serif",
+      fill: "#111"
+    });
+    clef.textContent = "𝄞";
+    svg.appendChild(clef);
+
+    // subtle beat/grid lines
+    for (let x = marginL; x <= W - marginR; x += grid) {
+      svg.appendChild(el("line", {
+        x1: x, y1: staffTop - 20,
+        x2: x, y2: staffTop + 4 * spacing + 20,
+        stroke: "#000", "stroke-opacity": 0.06, "stroke-width": 1
+      }));
+    }
+  }
+
+  function drawLedgerLines(x, step) {
+    // Staff range steps for lines: 0..8 (E4..F5)
+    // Lines are even steps: 0,2,4,6,8.
+    const minStep = 0;
+    const maxStep = 8;
+
+    const ledgers = [];
+
+    // Below staff: draw ledger lines at even steps: -2, -4, ...
+    if (step < minStep) {
+      for (let s = -2; s >= step; s -= 2) ledgers.push(s);
+    }
+
+    // Above staff: 10, 12, ...
+    if (step > maxStep) {
+      for (let s = 10; s <= step; s += 2) ledgers.push(s);
+    }
+
+    for (const s of ledgers) {
+      const y = stepToY(s);
+      svg.appendChild(el("line", {
+        x1: x - 18, y1: y,
+        x2: x + 18, y2: y,
+        stroke: "#111", "stroke-width": 1.4
+      }));
+    }
+  }
+
+  function drawNote(n) {
+    const y = stepToY(n.step);
+
+    // ledger lines (if needed)
+    drawLedgerLines(n.x, n.step);
+
+    // note head
+    const head = el("ellipse", {
+      cx: n.x, cy: y,
+      rx: 10.5, ry: 7.2,
+      fill: "#111",
+      transform: `rotate(-18 ${n.x} ${y})`,
+      "data-note-id": n.id
+    });
+
+    // stem direction: if note is on/above middle line (B4 step 4), stem down; else up.
+    const stemUp = n.step < 4;
+    const stem = el("line", {
+      x1: stemUp ? (n.x + 9) : (n.x - 9),
+      y1: y,
+      x2: stemUp ? (n.x + 9) : (n.x - 9),
+      y2: stemUp ? (y - 42) : (y + 42),
+      stroke: "#111", "stroke-width": 2,
+      "stroke-linecap": "round",
+      "data-note-id": n.id
+    });
+
+    // tooltip label
+    const { letter, octave } = stepToNote(n.step);
+    const title = el("title");
+    title.textContent = `${letter}${octave}`;
+    head.appendChild(title);
+
+    // interaction: right-click deletes
+    head.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      notes = notes.filter(x => x.id !== n.id);
+      render();
+    });
+    stem.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      notes = notes.filter(x => x.id !== n.id);
+      render();
+    });
+
+    svg.appendChild(stem);
+    svg.appendChild(head);
+  }
+
+  function drawNotes() {
+    const sorted = [...notes].sort((a,b) => a.x - b.x || a.step - b.step);
+    for (const n of sorted) drawNote(n);
+  }
+
+  function render() {
+    clearSVG();
+    drawStaff();
+    drawNotes();
+  }
+
+  // =========================
+  // Interaction: place notes by clicking the SVG
+  // =========================
+  function svgPoint(evt) {
+    const pt = svg.createSVGPoint();
+    pt.x = evt.clientX;
+    pt.y = evt.clientY;
+    const m = svg.getScreenCTM().inverse();
+    return pt.matrixTransform(m);
+  }
+
+  svg.addEventListener("click", (e) => {
+    // ignore clicks on existing note elements (so you can right-click them)
+    const target = e.target;
+    if (target && target.getAttribute && target.getAttribute("data-note-id")) return;
+
+    const p = svgPoint(e);
+    const xRaw = p.x;
+    const yRaw = p.y;
+
+    // keep inside usable score area
+    const x = clamp(snapX(xRaw), marginL + grid, W - marginR - grid);
+
+    // quantize to staff positions; clamp range
+    const step = clamp(yToStep(yRaw), -2, 12);
+
+    notes.push({ id: nextId++, x, step });
+    render();
+  });
+
+  // =========================
+  // Buttons
+  // =========================
+  document.getElementById("enable").addEventListener("click", ensureAudio);
+
+  document.getElementById("clear").addEventListener("click", () => {
+    notes = [];
+    render();
+  });
+
+  document.getElementById("play").addEventListener("click", () => {
+    if (!notes.length) return;
+    ensureAudio();
+
+    const seq = [...notes].sort((a,b) => a.x - b.x || a.step - b.step);
+    const start = ctx.currentTime + 0.03;
+    const dur = 0.40;
+
+    seq.forEach((n, i) => {
+      const { midi } = stepToNote(n.step);
+      playMidi(midi, start + i * dur, dur);
+    });
+  });
+
+  // first render
+  render();
+})();
+</script>
+</body>
+</html>
+

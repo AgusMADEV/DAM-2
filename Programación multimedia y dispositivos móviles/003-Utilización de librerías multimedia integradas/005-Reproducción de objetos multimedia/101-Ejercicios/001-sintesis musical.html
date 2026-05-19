@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>JS Synth Piano</title>
+  <style>
+    body{font-family:system-ui;margin:24px}
+    .hint{opacity:.8}
+    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    button{padding:10px 14px;border:1px solid #ccc;border-radius:8px;background:#fff;cursor:pointer}
+    button:active{transform:translateY(1px)}
+    code{background:#f3f3f3;padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <h1>JS Synth Piano</h1>
+  <p class="hint">
+    Click <button id="start">Enable Audio</button> then play:
+    <code>A S D F G H J K</code> (white) and <code>W E T Y U</code> (black).
+  </p>
+
+  <div class="row" id="status"></div>
+
+  <script>
+    // ---- Audio setup ----
+    let ctx = null;
+    const active = new Map(); // key -> {osc, gain}
+
+    function ensureAudio() {
+      if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if (ctx.state !== "running") ctx.resume();
+    }
+
+    // ---- Note mapping (C4 -> C5) ----
+    // White keys: A S D F G H J K
+    // Black keys: W E   T Y U
+    const keyToMidi = {
+      "a": 60, // C4
+      "w": 61, // C#4
+      "s": 62, // D4
+      "e": 63, // D#4
+      "d": 64, // E4
+      "f": 65, // F4
+      "t": 66, // F#4
+      "g": 67, // G4
+      "y": 68, // G#4
+      "h": 69, // A4
+      "u": 70, // A#4
+      "j": 71, // B4
+      "k": 72  // C5
+    };
+
+    function midiToFreq(m) {
+      return 440 * Math.pow(2, (m - 69) / 12);
+    }
+
+    // ---- Simple ADSR envelope ----
+    // Attack/Decay/Sustain/Release in seconds
+    const env = { attack: 0.01, decay: 0.08, sustain: 0.6, release: 0.18 };
+
+    // Master output
+    function makeMaster() {
+      const master = ctx.createGain();
+      master.gain.value = 0.8;
+      master.connect(ctx.destination);
+      return master;
+    }
+    let master = null;
+
+    function noteOn(key) {
+      const k = key.toLowerCase();
+      if (!(k in keyToMidi)) return;
+      if (active.has(k)) return; // already playing (key held)
+
+      ensureAudio();
+      if (!master) master = makeMaster();
+
+      const now = ctx.currentTime;
+      const freq = midiToFreq(keyToMidi[k]);
+
+      const osc = ctx.createOscillator();
+      osc.type = "sawtooth"; // try: "sine", "square", "triangle"
+      osc.frequency.setValueAtTime(freq, now);
+
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, now);
+
+      // ADSR: attack to 1, decay to sustain
+      g.gain.exponentialRampToValueAtTime(1.0, now + env.attack);
+      g.gain.exponentialRampToValueAtTime(env.sustain, now + env.attack + env.decay);
+
+      osc.connect(g);
+      g.connect(master);
+
+      osc.start(now);
+
+      active.set(k, { osc, gain: g });
+      renderStatus();
+    }
+
+    function noteOff(key) {
+      const k = key.toLowerCase();
+      const voice = active.get(k);
+      if (!voice || !ctx) return;
+
+      const now = ctx.currentTime;
+      // release
+      voice.gain.gain.cancelScheduledValues(now);
+      voice.gain.gain.setValueAtTime(Math.max(voice.gain.gain.value, 0.0001), now);
+      voice.gain.gain.exponentialRampToValueAtTime(0.0001, now + env.release);
+
+      // stop slightly after release
+      voice.osc.stop(now + env.release + 0.02);
+
+      active.delete(k);
+      renderStatus();
+    }
+
+    // ---- UI / controls ----
+    document.getElementById("start").addEventListener("click", ensureAudio);
+
+    window.addEventListener("keydown", (e) => {
+      if (e.repeat) return;
+      noteOn(e.key);
+    });
+
+    window.addEventListener("keyup", (e) => {
+      noteOff(e.key);
+    });
+
+    function renderStatus() {
+      const el = document.getElementById("status");
+      const keys = [...active.keys()].sort();
+      el.innerHTML = keys.length
+        ? keys.map(k => `<span>Playing: <code>${k.toUpperCase()}</code></span>`).join(" ")
+        : `<span>Playing: <code>none</code></span>`;
+    }
+    renderStatus();
+  </script>
+</body>
+</html>
+

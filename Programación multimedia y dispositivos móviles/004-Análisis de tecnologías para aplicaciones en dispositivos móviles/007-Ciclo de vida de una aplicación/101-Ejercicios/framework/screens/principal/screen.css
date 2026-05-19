@@ -1,0 +1,61 @@
+.principal {
+  background: #4285f4;
+  height: 100%;
+}
+
+.principal h1 {
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+.lista-albumes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.album {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.portada-album {
+  width: 60px;
+  height: 60px;
+  border-radius: 5px;
+  margin-right: 15px;
+  object-fit: cover;
+}
+
+.info-album h3 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  color: #fff;
+}
+
+.info-album p {
+  margin: 0;
+  color: #e0e0e0;
+  font-size: 14px;
+}
+
+/* FIX: was position: fixed */
+.boton-navegacion {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  color: #333;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10;
+}
+

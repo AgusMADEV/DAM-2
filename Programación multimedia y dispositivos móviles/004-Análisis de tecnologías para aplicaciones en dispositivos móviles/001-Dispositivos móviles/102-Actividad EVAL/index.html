@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Reproductor de Música</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header>
+      <button onclick="reproducirCancion(0)">J</button>
+      <button onclick="reproducirCancion(1)">Todos</button>
+      <button onclick="reproducirCancion(2)">Música</button>
+      <button onclick="reproducirCancion(3)">Podcasts</button>
+    </header>
+    <section id="favoritas">
+      <!-- Canciones favoritas aquí -->
+    </section>
+    <section id="reproductor">
+      <h3>Artista</h3>
+      <img src="josevicente.jpg" alt="Canción">
+      <audio id="audioPlayer" src="0802.mp3" controls></audio>
+    </section>
+    <script src="script.js"></script>
+  </body>
+</html>

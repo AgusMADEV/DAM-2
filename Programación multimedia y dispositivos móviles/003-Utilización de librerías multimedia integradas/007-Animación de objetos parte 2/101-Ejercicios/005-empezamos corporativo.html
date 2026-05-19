@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <title>Animación en CSS</title>
+    <meta charset="utf-8">
+    <style>
+     
+    </style>
+  </head>
+  <body>
+    <h1>jocarsa | formación</h1>
+    <script>
+      let titulos = document.querySelectorAll("h1")
+      titulos.forEach(function(titulo){
+        // Comprobar si tiene un pipe vertical
+        if(titulo.textContent.includes(" | ")){
+          let empresa = titulo.textContent.split(" | ")[0]
+          let producto = titulo.textContent.split(" | ")[1]
+          console.log(empresa,producto)
+          titulo.textContent = ""
+        }
+      })
+    </script>
+  </body>
+</html>

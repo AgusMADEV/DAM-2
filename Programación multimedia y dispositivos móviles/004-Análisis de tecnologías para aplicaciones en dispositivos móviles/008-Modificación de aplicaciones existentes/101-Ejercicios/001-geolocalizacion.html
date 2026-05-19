@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Geolocalización simple</title>
+</head>
+<body>
+
+<button onclick="getLocation()">Obtener ubicación</button>
+<p id="out"></p>
+
+<script>
+function getLocation() {
+  if (!navigator.geolocation) {
+    document.getElementById("out").textContent = "Geolocalización no soportada";
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      document.getElementById("out").textContent =
+        "Lat: " + pos.coords.latitude +
+        " | Lon: " + pos.coords.longitude;
+    },
+    () => {
+      document.getElementById("out").textContent = "Permiso denegado o error";
+    }
+  );
+}
+</script>
+
+</body>
+</html>
+

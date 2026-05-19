@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musical Bouncing Ball</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            border: 1px solid #333;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Set canvas size
+        canvas.width = 500;
+        canvas.height = 500;
+
+        // Musical notes (C major scale)
+        const notes = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4'];
+        const noteFrequencies = {
+            'C4': 261.63,
+            'D4': 293.66,
+            'E4': 329.63,
+            'F4': 349.23,
+            'G4': 392.00,
+            'A4': 440.00,
+            'B4': 493.88
+        };
+
+        // Colors for each note
+        const noteColors = {
+            'C4': '#FF5252',
+            'D4': '#FF4081',
+            'E4': '#E040FB',
+            'F4': '#7C4DFF',
+            'G4': '#536DFE',
+            'A4': '#448AFF',
+            'B4': '#40C4FF'
+        };
+
+        // Circle and ball properties
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = 200;
+        const ballRadius = 10;
+        let ballAngle = 0;
+        let ballSpeed = 0.02;
+        let ball = {
+            x: centerX + radius * Math.cos(ballAngle),
+            y: centerY + radius * Math.sin(ballAngle)
+        };
+
+        // Draw the circle divided into arcs
+        function drawCircle() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Draw arcs for each note
+            const arcAngle = (2 * Math.PI) / notes.length;
+            notes.forEach((note, i) => {
+                ctx.fillStyle = noteColors[note];
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, i * arcAngle, (i + 1) * arcAngle);
+                ctx.lineTo(centerX, centerY);
+                ctx.fill();
+            });
+        }
+
+        // Draw the ball
+        function drawBall() {
+            ctx.fillStyle = '#333';
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Update ball position
+        function updateBall() {
+            ballAngle += ballSpeed;
+            ball.x = centerX + (radius - ballRadius) * Math.cos(ballAngle);
+            ball.y = centerY + (radius - ballRadius) * Math.sin(ballAngle);
+        }
+
+        // Play a note
+        function playNote(note) {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'sine';
+            oscillator.frequency.value = noteFrequencies[note];
+            gainNode.gain.value = 0.1;
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.5);
+        }
+
+        // Check collision with arcs
+        function checkCollision() {
+            const arcAngle = (2 * Math.PI) / notes.length;
+            const ballAngleNormalized = (ballAngle + 2 * Math.PI) % (2 * Math.PI);
+            const arcIndex = Math.floor(ballAngleNormalized / arcAngle);
+            if (arcIndex >= 0 && arcIndex < notes.length) {
+                playNote(notes[arcIndex]);
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            drawCircle();
+            updateBall();
+            checkCollision();
+            drawBall();
+            requestAnimationFrame(animate);
+        }
+
+        // Start animation
+        animate();
+    </script>
+</body>
+</html>
+

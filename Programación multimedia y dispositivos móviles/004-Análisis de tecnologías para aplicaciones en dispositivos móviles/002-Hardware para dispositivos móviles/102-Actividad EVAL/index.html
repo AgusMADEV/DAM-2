@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <title>TAMEify - Plataforma de Música</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <style>
+      /* ===== ESTILOS GENERALES ===== */
+      body, html {
+        background: #121212;
+        color: white;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        padding: 5px;
+        margin: 0;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding-bottom: 80px;
+      }
+
+      /* ===== HEADER ===== */
+      header {
+        padding: 10px 0;
+      }
+
+      header button {
+        background: magenta;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 30px;
+        min-width: 40px;
+        font-weight: bold;
+        margin-right: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      header button:hover {
+        background: #d400d4;
+        transform: scale(1.05);
+      }
+
+      /* ===== LISTA DE FAVORITOS ===== */
+      #favoritas {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        padding: 10px 5px;
+      }
+
+      #favoritas article {
+        gap: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: #292929;
+        border-radius: 10px;
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      #favoritas article:hover {
+        background: #3a3a3a;
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(255, 0, 255, 0.3);
+      }
+
+      #favoritas article img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+
+      #favoritas article p {
+        font-weight: bold;
+        text-align: center;
+        margin: 10px 0 0 0;
+        font-size: 14px;
+      }
+
+      /* ===== PANTALLA DE LISTA ===== */
+      #pantalla_lista {
+        display: none;
+        padding: 10px;
+      }
+
+      #pantalla_lista img {
+        width: 100%;
+        max-height: 300px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 20px;
+      }
+
+      #pantalla_lista h3 {
+        font-size: 24px;
+        margin: 15px 0;
+      }
+
+      .cancion {
+        display: flex;
+        align-items: center;
+        background: #1e1e1e;
+        padding: 12px;
+        margin: 10px 0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .cancion:hover {
+        background: #2a2a2a;
+      }
+
+      .cancion .datostexto {
+        flex: 7;
+      }
+
+      .cancion .datostexto h4 {
+        margin: 0 0 5px 0;
+        font-size: 16px;
+      }
+
+      .cancion .datostexto p {
+        margin: 0;
+        color: #b3b3b3;
+        font-size: 14px;
+      }
+
+      .cancion > p {
+        flex: 1;
+        text-align: right;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      /* ===== REPRODUCTOR ===== */
+      #reproductor {
+        width: 91%;
+        background: linear-gradient(135deg, #541010, #8b1f1f);
+        height: 50px;
+        border-radius: 10px;
+        padding: 10px;
+        position: fixed;
+        bottom: 70px;
+        box-sizing: border-box;
+        transition: all 1s;
+        overflow: hidden;
+        cursor: pointer;
+        display: none;
+      }
+
+      #reproductor:hover {
+        background: linear-gradient(135deg, #6b1414, #a92525);
+      }
+
+      .pantallacompleta {
+        position: fixed !important;
+        top: 0px !important;
+        left: 0px !important;
+        width: 100% !important;
+        height: 100% !important;
+        z-index: 1000;
+      }
+
+      /* ===== FOOTER ===== */
+      footer {
+        display: flex;
+        position: fixed;
+        width: 100%;
+        bottom: 0px;
+        left: 0px;
+        background: #000;
+        padding: 5px 0;
+        border-top: 1px solid #333;
+      }
+
+      footer button {
+        width: 100%;
+        border: none;
+        background: transparent;
+        color: #b3b3b3;
+        cursor: pointer;
+        padding: 8px;
+        transition: all 0.2s;
+      }
+
+      footer button:hover {
+        color: white;
+      }
+
+      footer button .emoji {
+        font-size: 28px;
+        margin-bottom: 3px;
+      }
+
+      footer button p {
+        margin: 0;
+        font-size: 11px;
+      }
+
+      /* ===== BOTÓN VOLVER ===== */
+      .btn-volver {
+        background: #333 !important;
+        color: white !important;
+        padding: 10px 20px !important;
+        border-radius: 25px !important;
+        margin-bottom: 15px;
+        font-size: 14px;
+      }
+
+      .btn-volver:hover {
+        background: #444 !important;
+      }
+
+      /* ===== ESTADOS DE PANTALLAS ===== */
+      #pantalla_inicio {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      /* ===== LOADING ===== */
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #b3b3b3;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- CONTENEDOR DE PANTALLAS -->
+    <div id="pantallas">
+      
+      <!-- PANTALLA INICIO -->
+      <div id="pantalla_inicio">
+        <header>  
+          <button>J</button>
+          <button>Todos</button>
+          <button>Música</button>
+          <button>Podcasts</button>
+        </header>
+        
+        <h2>Tus Favoritos</h2>
+        
+        <!-- Contenedor de lista de favoritos -->
+        <section id="favoritas">
+          <div class="loading">Cargando tus favoritos...</div>
+        </section>
+      </div>
+
+      <!-- PANTALLA LISTA DE CANCIONES -->
+      <div id="pantalla_lista">
+        <button class="btn-volver" onclick="volverInicio()">← Volver</button>
+        
+        <img 
+          src=""
+          onerror="this.onerror=null; this.src='img/placeholder.png';"
+          alt="Miniatura de la lista"
+        >
+        
+        <h3>Lista de reproducción</h3>
+        
+        <!-- Ejemplos de canciones (estos serían dinámicos en una app real) -->
+        <article class="cancion">
+          <div class="datostexto">
+            <h4>Get Lucky</h4>
+            <p>Random Access Memories</p>
+          </div>
+          <p>⋮</p>
+        </article>
+        
+        <article class="cancion">
+          <div class="datostexto">
+            <h4>One More Time</h4>
+            <p>Discovery</p>
+          </div>
+          <p>⋮</p>
+        </article>
+        
+        <article class="cancion">
+          <div class="datostexto">
+            <h4>Harder, Better, Faster, Stronger</h4>
+            <p>Discovery</p>
+          </div>
+          <p>⋮</p>
+        </article>
+        
+        <article class="cancion">
+          <div class="datostexto">
+            <h4>Around the World</h4>
+            <p>Homework</p>
+          </div>
+          <p>⋮</p>
+        </article>
+        
+        <article class="cancion">
+          <div class="datostexto">
+            <h4>Instant Crush</h4>
+            <p>Random Access Memories</p>
+          </div>
+          <p>⋮</p>
+        </article>
+      </div>
+    </div>
+
+    <!-- REPRODUCTOR -->
+    <section id="reproductor">
+      <h3>Reproduciendo ahora...</h3>
+      <p>Artista - Canción</p>
+    </section>
+
+    <!-- FOOTER NAVEGACIÓN -->
+    <footer>
+      <button onclick="volverInicio()">
+        <div class="emoji">🏠</div>
+        <p>Inicio</p>
+      </button>
+      <button>
+        <div class="emoji">🔍</div>
+        <p>Buscar</p>
+      </button>
+      <button>
+        <div class="emoji">📚</div>
+        <p>Tu biblioteca</p>
+      </button>
+      <button>
+        <div class="emoji">➕</div>
+        <p>Crear</p>
+      </button>
+    </footer>
+
+    <!-- TEMPLATES -->
+    <div id="templates" style="display: none;">
+      <template id="elemento_lista">
+        <article>
+          <img 
+            src=""
+            onerror="this.onerror=null; this.src='img/placeholder.png';"
+            alt="Miniatura del artista"
+          >
+          <p></p>
+        </article>
+      </template>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+      // ===== VARIABLES GLOBALES =====
+      let datosFavoritos = null;
+      
+      // ===== FUNCIÓN PARA VOLVER A INICIO =====
+      function volverInicio() {
+        document.querySelector("#pantalla_inicio").style.display = "flex";
+        document.querySelector("#pantalla_lista").style.display = "none";
+      }
+
+      // ===== FUNCIÓN PARA MOSTRAR PANTALLA DE LISTA =====
+      function mostrarPantallaLista(artista) {
+        document.querySelector("#pantalla_inicio").style.display = "none";
+        document.querySelector("#pantalla_lista").style.display = "block";
+        
+        // Actualizar la imagen y título de la pantalla lista
+        const imgLista = document.querySelector("#pantalla_lista img");
+        const tituloLista = document.querySelector("#pantalla_lista h3");
+        
+        // Resetear el handler onerror antes de cambiar la imagen
+        imgLista.onerror = function() {
+          this.onerror = null;
+          this.src = 'img/placeholder.png';
+        };
+        
+        imgLista.setAttribute("src", artista.image);
+        tituloLista.textContent = `Canciones de ${artista.artist}`;
+      }
+
+      // ===== CARGA DE DATOS Y DESPLIEGUE =====
+      // Seleccionamos el contenedor donde vamos a añadir los favoritos
+      let contenedor = document.querySelector("#favoritas");
+      
+      // 1. CARGA DE DATOS usando fetch
+      fetch("api/favoritos.json")
+        .then(function(respuesta) {
+          // Verificamos que la respuesta sea correcta
+          if (!respuesta.ok) {
+            throw new Error('Error al cargar los datos');
+          }
+          return respuesta.json();
+        })
+        .then(function(datos) {
+          // Guardamos los datos en la variable global
+          datosFavoritos = datos;
+          
+          console.log("Datos cargados correctamente:", datosFavoritos);
+          
+          // Limpiamos el mensaje de carga
+          contenedor.innerHTML = '';
+          
+          // 2. DESPLIEGUE DE LISTA: Recorremos cada favorito
+          datos.favorites.forEach(function(dato) {
+            // Clonamos la plantilla
+            let plantilla = document.querySelector("#elemento_lista");
+            let instancia = plantilla.content.cloneNode(true);
+            
+            // Seleccionamos el artículo clonado
+            let articulo = instancia.querySelector("article");
+            
+            // Reemplazamos los valores con los datos de la API
+            articulo.querySelector("p").textContent = dato.artist;
+            articulo.querySelector("img").setAttribute("src", dato.image);
+            
+            // 3. MANEJO DE EVENTOS: Asignamos el click
+            articulo.onclick = function() {
+              console.log("Has hecho click en:", dato.artist);
+              mostrarPantallaLista(dato);
+            };
+            
+            // Añadimos el artículo al contenedor
+            contenedor.appendChild(instancia);
+          });
+          
+          console.log(`Se han cargado ${datos.favorites.length} artistas favoritos`);
+        })
+        .catch(function(error) {
+          // Manejo de errores
+          console.error("Error al cargar favoritos:", error);
+          contenedor.innerHTML = '<p style="color: red; text-align: center;">Error al cargar los favoritos. Por favor, recarga la página.</p>';
+        });
+
+      // ===== REPRODUCTOR (OPCIONAL) =====
+      let reproductor = document.querySelector("#reproductor");
+      reproductor.onclick = function() {
+        this.classList.toggle("pantallacompleta");
+      };
+    </script>
+  </body>
+</html>

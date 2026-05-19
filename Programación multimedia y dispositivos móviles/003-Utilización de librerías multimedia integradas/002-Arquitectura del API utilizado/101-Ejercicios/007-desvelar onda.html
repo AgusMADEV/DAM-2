@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Audio Player with Waveform</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        #contieneaudio {
+            width: 350px;
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        #graficos {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        #graficos button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(110, 142, 251, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        #graficos button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(110, 142, 251, 0.6);
+        }
+        
+        #graficos button:active {
+            transform: scale(0.98);
+        }
+        
+        #graficos img {
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .track-info {
+            margin-top: 5px;
+        }
+        
+        .track-title {
+            font-weight: 600;
+            font-size: 18px;
+            color: #333;
+        }
+        
+        .track-artist {
+            font-size: 14px;
+            color: #777;
+        }
+        
+        #controladores {
+            position: relative;
+            margin-top: 10px;
+            transform: translateY(-100px);
+    z-index: 100000;
+    opacity: 0.5;
+        }
+        
+        #controladores progress {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #e0e0e0;
+        }
+        
+        #controladores progress::-webkit-progress-bar {
+            background: #e0e0e0;
+            border-radius: 3px;
+        }
+        
+        #controladores progress::-webkit-progress-value {
+            background: linear-gradient(to right, #6e8efb, #a777e3);
+            border-radius: 3px;
+        }
+        
+        #controladores progress::-moz-progress-bar {
+            background: linear-gradient(to right, #6e8efb, #a777e3);
+            border-radius: 3px;
+        }
+        
+        #controladores input[type="range"] {
+            position: absolute;
+            top: 9px;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            margin: 0;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #777;
+        }
+        
+        .additional-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .volume-control input[type="range"] {
+            width: 80px;
+            height: 4px;
+            -webkit-appearance: none;
+            background: #e0e0e0;
+            border-radius: 2px;
+            outline: none;
+        }
+        
+        .volume-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #6e8efb;
+            cursor: pointer;
+        }
+        
+        .playback-rate {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+        
+        .playback-rate select {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 2px 5px;
+            font-size: 12px;
+            outline: none;
+        }
+        
+        /* Waveform visualization styles */
+        .waveform-container {
+            position: relative;
+            width: 100%;
+            height: 80px;
+            margin: 15px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #f5f5f5;
+        }
+        
+        .waveform-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #e0e0e0 0%, #f0f0f0 100%);
+            z-index: 1;
+        }
+        
+        .waveform-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 2;
+        }
+        
+        .waveform-progress-mask {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 3;
+            transition: width 0.1s linear;
+        }
+        
+        .waveform-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            z-index: 4;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="contieneaudio">
+        <div id="graficos">
+            <button id="playBtn">▶</button>
+            <div>
+                
+                <div class="track-info">
+                    <div class="track-title">0802</div>
+                    <div class="track-artist">José Vicente Carratalá Sanchis</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Waveform visualization -->
+        <div class="waveform-container">
+            <div class="waveform-background"></div>
+            <img src="0802.png" alt="Waveform" class="waveform-image">
+            <div class="waveform-progress-mask" id="waveformProgress"></div>
+            <div class="waveform-overlay"></div>
+        </div>
+        
+        <audio src="0802.mp3"></audio>
+        
+        <div id="controladores">
+            <progress value="0" max="1"></progress>
+            <input type="range" min="0" max="1" step="0.001" value="0">
+            <div class="time-display">
+                <span id="currentTime">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+        </div>
+        
+        <div class="additional-controls">
+            <div class="volume-control">
+                <span>🔊</span>
+                <input type="range" min="0" max="1" step="0.01" value="1" id="volumeControl">
+            </div>
+            <div class="playback-rate">
+                <span>Velocidad:</span>
+                <select id="playbackRate">
+                    <option value="0.5">0.5x</option>
+                    <option value="0.75">0.75x</option>
+                    <option value="1" selected>Normal</option>
+                    <option value="1.25">1.25x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Get DOM elements
+        const audio = document.querySelector("audio");
+        const playBtn = document.getElementById("playBtn");
+        const progressBar = document.querySelector("progress");
+        const seekBar = document.querySelector("#controladores input[type='range']");
+        const currentTimeEl = document.getElementById("currentTime");
+        const durationEl = document.getElementById("duration");
+        const volumeControl = document.getElementById("volumeControl");
+        const playbackRate = document.getElementById("playbackRate");
+        const waveformProgress = document.getElementById("waveformProgress");
+        
+        // Format time from seconds to MM:SS
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+        
+        // Update time display
+        function updateTimeDisplay() {
+            currentTimeEl.textContent = formatTime(audio.currentTime);
+            durationEl.textContent = formatTime(audio.duration || 0);
+        }
+        
+        // Update progress bar and waveform
+        function updateProgress() {
+            if (audio.duration) {
+                const progress = audio.currentTime / audio.duration;
+                progressBar.value = progress;
+                seekBar.value = progress;
+                // The mask shrinks from right to left as audio progresses
+                waveformProgress.style.width = `${100 - (progress * 100)}%`;
+            }
+            updateTimeDisplay();
+        }
+        
+        // Play/Pause functionality
+        let isPlaying = false;
+        
+        playBtn.addEventListener("click", function() {
+            if (isPlaying) {
+                audio.pause();
+                playBtn.textContent = "▶";
+            } else {
+                audio.play();
+                playBtn.textContent = "❚❚";
+            }
+            isPlaying = !isPlaying;
+        });
+        
+        // Seek functionality
+        seekBar.addEventListener("input", function() {
+            if (audio.duration) {
+                const progress = this.value;
+                audio.currentTime = progress * audio.duration;
+                waveformProgress.style.width = `${100 - (progress * 100)}%`;
+            }
+        });
+        
+        // Volume control
+        volumeControl.addEventListener("input", function() {
+            audio.volume = this.value;
+        });
+        
+        // Playback rate control
+        playbackRate.addEventListener("change", function() {
+            audio.playbackRate = parseFloat(this.value);
+        });
+        
+        // Update progress and time display periodically
+        audio.addEventListener("loadedmetadata", updateTimeDisplay);
+        audio.addEventListener("timeupdate", updateProgress);
+        audio.addEventListener("ended", function() {
+            isPlaying = false;
+            playBtn.textContent = "▶";
+        });
+        
+        // Initialize
+        updateTimeDisplay();
+    </script>
+</body>
+</html>

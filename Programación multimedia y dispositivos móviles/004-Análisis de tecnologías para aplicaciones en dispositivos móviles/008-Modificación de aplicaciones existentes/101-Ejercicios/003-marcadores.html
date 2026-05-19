@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Geolocation + OpenStreetMap + Markers</title>
+
+  <!-- Leaflet (OSM map via tiles) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <style>
+    html, body { height: 100%; margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    #app { height: 100%; display: flex; flex-direction: column; }
+    header {
+      padding: 12px 14px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #e5e7eb;
+      background: #ffffff;
+    }
+    header .status { color: #374151; font-size: 14px; }
+    header button {
+      border: 1px solid #d1d5db;
+      background: #fff;
+      padding: 8px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    header button:hover { background: #f9fafb; }
+    #map { flex: 1; }
+    .muted { color: #6b7280; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <header>
+      <button id="btnLocate">Locate me</button>
+      <button id="btnAddMarker" title="Adds a marker at the current map center">Add marker here</button>
+      <button id="btnClear">Clear markers</button>
+
+      <span class="status" id="status">
+        <span class="muted">Waiting…</span>
+      </span>
+    </header>
+
+    <div id="map"></div>
+  </div>
+
+  <script>
+    // -----------------------------
+    // Helpers
+    // -----------------------------
+    function fmt(n) { return (Math.round(n * 1e6) / 1e6).toFixed(6); }
+
+    function loadSavedMarkers() {
+      try {
+        const raw = localStorage.getItem("markers_v1");
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveMarkers(arr) {
+      localStorage.setItem("markers_v1", JSON.stringify(arr));
+    }
+
+    // -----------------------------
+    // Map init (start somewhere safe)
+    // -----------------------------
+    const statusEl = document.getElementById("status");
+
+    const map = L.map("map", {
+      zoomControl: true,
+      attributionControl: true
+    }).setView([40.4168, -3.7038], 13); // default: Madrid
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // A marker for "you"
+    let youMarker = null;
+    let youCircle = null;
+
+    // Markers collection (persisted)
+    const markerLayer = L.layerGroup().addTo(map);
+    let markersData = loadSavedMarkers();
+
+    function renderSavedMarkers() {
+      markerLayer.clearLayers();
+      for (const m of markersData) {
+        const mk = L.marker([m.lat, m.lng]).addTo(markerLayer);
+        const label = m.label ? m.label : "Marker";
+        mk.bindPopup(`<b>${label}</b><br><span class="mono">${fmt(m.lat)}, ${fmt(m.lng)}</span>`);
+      }
+    }
+
+    renderSavedMarkers();
+
+    // -----------------------------
+    // Add marker
+    // -----------------------------
+    function addMarker(lat, lng, label) {
+      markersData.push({
+        lat: Number(lat),
+        lng: Number(lng),
+        label: label || `Marker ${markersData.length + 1}`
+      });
+      saveMarkers(markersData);
+      renderSavedMarkers();
+    }
+
+    // Click-to-add marker
+    map.on("click", (e) => {
+      const lat = e.latlng.lat;
+      const lng = e.latlng.lng;
+      addMarker(lat, lng, "Pinned");
+      statusEl.innerHTML = `Added marker at <span class="mono">${fmt(lat)}, ${fmt(lng)}</span>`;
+    });
+
+    // Button: add marker at map center
+    document.getElementById("btnAddMarker").addEventListener("click", () => {
+      const c = map.getCenter();
+      addMarker(c.lat, c.lng, "Center");
+      statusEl.innerHTML = `Added marker at center <span class="mono">${fmt(c.lat)}, ${fmt(c.lng)}</span>`;
+    });
+
+    // Clear markers
+    document.getElementById("btnClear").addEventListener("click", () => {
+      markersData = [];
+      saveMarkers(markersData);
+      renderSavedMarkers();
+      statusEl.textContent = "Markers cleared.";
+    });
+
+    // -----------------------------
+    // Geolocation
+    // -----------------------------
+    function locate() {
+      if (!("geolocation" in navigator)) {
+        statusEl.textContent = "Geolocation not supported by this browser.";
+        return;
+      }
+
+      statusEl.textContent = "Requesting location permission…";
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const acc = pos.coords.accuracy; // meters
+
+          // Move map
+          map.setView([lat, lng], 16);
+
+          // Update "you" marker + accuracy circle
+          if (youMarker) map.removeLayer(youMarker);
+          if (youCircle) map.removeLayer(youCircle);
+
+          youMarker = L.marker([lat, lng]).addTo(map).bindPopup(
+            `<b>You are here</b><br><span class="mono">${fmt(lat)}, ${fmt(lng)}</span>`
+          );
+          youCircle = L.circle([lat, lng], { radius: acc }).addTo(map);
+
+          statusEl.innerHTML =
+            `Location: <span class="mono">${fmt(lat)}, ${fmt(lng)}</span> ` +
+            `<span class="muted">(accuracy ~ ${Math.round(acc)} m)</span>`;
+        },
+        (err) => {
+          // Common cases: denied, unavailable, timeout
+          statusEl.textContent = `Geolocation error: ${err.message}`;
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 30000
+        }
+      );
+    }
+
+    document.getElementById("btnLocate").addEventListener("click", locate);
+
+    // Auto-locate on load (optional, but convenient)
+    locate();
+  </script>
+</body>
+</html>
+

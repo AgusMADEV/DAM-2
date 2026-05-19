@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecurePath - Sistema de Entrenamiento de Evacuación</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Panel de información superior -->
+    <div id="info-panel">
+        <div class="header-content">
+            <div class="logo-section">
+                <span class="logo-icon">🛡️</span>
+                <div class="logo-text">
+                    <h1>SecurePath</h1>
+                    <p class="subtitle">Evacuación Inteligente</p>
+                </div>
+            </div>
+        </div>
+        <div id="stats">
+            <div class="stat-item">
+                <span class="stat-label">Personas evacuadas:</span>
+                <span id="evacuated-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Tiempo promedio:</span>
+                <span id="avg-time">0s</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Generación:</span>
+                <span id="generation">1</span>
+            </div>
+            <div class="stat-item highlight">
+                <span class="stat-label">🏆 Mejor tiempo:</span>
+                <span id="best-time">--</span>
+            </div>
+            <div class="stat-item highlight">
+                <span class="stat-label">📊 Mejor gen.:</span>
+                <span id="best-generation">--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de gestión de datos -->
+    <div id="data-panel">
+        <h3>💾 Gestión de Datos</h3>
+        
+        <div class="data-tabs">
+            <button class="tab-button active" data-tab="experiments">🔬 Experimentos</button>
+            <button class="tab-button" data-tab="presets">⚙️ Presets</button>
+            <button class="tab-button" data-tab="export">📥 Exportar</button>
+        </div>
+        
+        <!-- Tab Experimentos -->
+        <div class="tab-content active" id="experiments-tab">
+            <input type="text" id="experiment-name" placeholder="Nombre experimento" value="Experimento_1">
+            <div class="button-row">
+                <button id="start-experiment" class="secondary-button">🔬 Iniciar</button>
+                <button id="save-experiment" class="secondary-button" disabled>💾 Guardar</button>
+            </div>
+            <div id="storage-info" class="info-text">Almacenamiento: -- KB</div>
+        </div>
+        
+        <!-- Tab Presets -->
+        <div class="tab-content" id="presets-tab">
+            <div class="preset-controls">
+                <input type="text" id="preset-name" placeholder="Nombre preset">
+                <button id="save-preset" class="secondary-button">💾</button>
+            </div>
+            <select id="preset-list" size="2">
+                <option value="">No hay presets</option>
+            </select>
+            <div class="button-row">
+                <button id="load-preset" class="secondary-button">📂 Cargar</button>
+                <button id="delete-preset" class="secondary-button">🗑️</button>
+            </div>
+        </div>
+        
+        <!-- Tab Exportar -->
+        <div class="tab-content" id="export-tab">
+            <div class="button-column">
+                <button id="export-current" class="secondary-button">📥 Exportar Actual</button>
+                <button id="export-all" class="secondary-button">📥 Exportar Todo</button>
+                <input type="file" id="import-file" accept=".json" style="display: none;">
+                <button id="import-data" class="secondary-button">📤 Importar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de gráfico de evolución -->
+    <div id="evolution-panel">
+        <h3>📈 Evolución del Algoritmo Genético</h3>
+        <canvas id="evolution-chart"></canvas>
+        <div id="chart-legend">
+            <div class="legend-item">
+                <span class="legend-color" style="background: #4ade80;"></span>
+                <span>Mejor tiempo</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #60a5fa;"></span>
+                <span>Promedio</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #f59e0b;"></span>
+                <span>Peor tiempo</span>
+            </div>
+        </div>
+        <button id="reset-history" class="secondary-button">🔄 Reiniciar Historial</button>
+    </div>
+
+    <!-- Panel de video webcam -->
+    <div id="webcam-panel">
+        <video id="webcam" autoplay playsinline></video>
+        <canvas id="hand-canvas"></canvas>
+        <div id="gesture-indicator">
+            <p id="gesture-text">👋 Muestra tus manos</p>
+        </div>
+    </div>
+
+    <!-- Panel de control -->
+    <div id="control-panel">
+        <!-- Sección de modo de control -->
+        <div class="control-mode-section">
+            <h4>🎮 <span id="current-mode">Teclado</span></h4>
+            <button id="cycle-mode" class="compact-button">🔄</button>
+        </div>
+        
+        <h3>⚙️ Configuración</h3>
+        <div class="control-group">
+            <label for="num-people">Número de personas:</label>
+            <input type="range" id="num-people" min="10" max="200" value="50">
+            <span id="num-people-value">50</span>
+        </div>
+        <div class="control-group">
+            <label for="num-exits">Número de salidas:</label>
+            <input type="range" id="num-exits" min="1" max="6" value="2">
+            <span id="num-exits-value">2</span>
+        </div>
+        <div class="control-group">
+            <label for="evolution-speed">Velocidad evolución:</label>
+            <input type="range" id="evolution-speed" min="1" max="10" value="5">
+            <span id="evolution-speed-value">5</span>
+        </div>
+        <div class="button-group">
+            <button id="start-simulation">▶️ Iniciar Simulación</button>
+            <button id="reset-simulation">🔄 Reiniciar</button>
+            <button id="toggle-heatmap">🔥 Mapa de Calor</button>
+        </div>
+    </div>
+
+    <!-- Canvas principal Three.js -->
+    <div id="scene-container"></div>
+
+    <!-- Leyenda de controles -->
+    <div id="controls-legend">
+        <h4>🎮 Controles por Gestos</h4>
+        <ul>
+            <li>✋ <strong>Palma abierta + Mover</strong>: Mover cámara (pan)</li>
+            <li>🤏 <strong>Índice + Pulgar juntos</strong>: Rotar cámara</li>
+            <li>✌️ <strong>Dos manos abiertas</strong>: Zoom (separar/juntar)</li>
+        </ul>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="scripts/data-manager.js"></script>
+    <script src="scripts/building.js"></script>
+    <script src="scripts/person.js"></script>
+    <script src="scripts/genetic-algorithm.js"></script>
+    <script src="scripts/hand-controls.js"></script>
+    <script src="scripts/hybrid-controls.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>

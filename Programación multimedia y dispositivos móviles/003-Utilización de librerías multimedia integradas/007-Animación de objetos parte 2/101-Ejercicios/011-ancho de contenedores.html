@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <title>Animación en CSS</title>
+    <meta charset="utf-8">
+    <style>
+      h1{font-family:ubuntu; display:flex; align-items:center; gap:10px;}
+
+      /* El contenedor (recorta) */
+      .clip{
+        overflow:hidden;
+        position:relative;
+        display:block;
+        width:220px;            /* <-- clave: ancho que recorta */
+        white-space:nowrap;     /* evita saltos */
+      }
+
+      /* El hijo (se mueve) */
+      .move{
+        display:inline-block;
+      }
+
+      .separador{
+        width:3px;height:40px;background:black;
+        animation:barra 1s;
+        animation-delay:5s;
+        animation-fill-mode:backwards;
+      }
+      @keyframes barra{
+        0%{height:0px;}
+        100%{height:40px;}
+      }
+
+      /* Empresa entra desde la derecha */
+      .empresa .move{
+        transform:translateX(100%);
+        animation:mueveempresa 3s;
+        animation-delay:7s;
+        animation-fill-mode:forwards;
+      }
+      @keyframes mueveempresa{
+        0%{transform:translateX(100%);}
+        100%{transform:translateX(0);}
+      }
+
+      /* Producto entra desde la izquierda */
+      .producto .move{
+        transform:translateX(-100%);
+        animation:mueveproducto 3s;
+        animation-delay:10s;
+        animation-fill-mode:forwards;
+      }
+      @keyframes mueveproducto{
+        0%{transform:translateX(-100%);}
+        100%{transform:translateX(0);}
+      }
+    </style>
+  </head>
+  <body>
+    <h1>jocarsa | formación</h1>
+
+    <script>
+      document.querySelectorAll("h1").forEach((titulo) => {
+        if(!titulo.textContent.includes(" | ")) return;
+
+        const [empresa, producto] = titulo.textContent.split(" | ");
+        titulo.textContent = "";
+
+        // Empresa (clip + move)
+        const contEmpresa = document.createElement("div");
+        contEmpresa.className = "clip empresa";
+        const moveEmpresa = document.createElement("span");
+        moveEmpresa.className = "move";
+        moveEmpresa.textContent = empresa;
+        contEmpresa.appendChild(moveEmpresa);
+        titulo.appendChild(contEmpresa);
+
+        // Separador
+        const separador = document.createElement("div");
+        separador.className = "separador";
+        titulo.appendChild(separador);
+
+        // Producto (clip + move)
+        const contProducto = document.createElement("div");
+        contProducto.className = "clip producto";
+        const moveProducto = document.createElement("span");
+        moveProducto.className = "move";
+        moveProducto.textContent = producto;
+        contProducto.appendChild(moveProducto);
+        titulo.appendChild(contProducto);
+      });
+    </script>
+  </body>
+</html>
+

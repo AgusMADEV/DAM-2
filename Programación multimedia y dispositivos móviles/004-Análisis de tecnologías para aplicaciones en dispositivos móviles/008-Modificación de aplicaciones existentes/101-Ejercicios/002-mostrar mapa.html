@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My location (OpenStreetMap)</title>
+
+  <!-- Leaflet (map UI) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <style>
+    html, body { height: 100%; margin: 0; }
+    #map { height: 100%; width: 100%; }
+    #panel{
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 9999;
+      background: rgba(255,255,255,.95);
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font: 14px/1.3 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      max-width: 320px;
+    }
+    #panel button{
+      cursor: pointer;
+      border: 1px solid #ccc;
+      background: #f7f7f7;
+      padding: 6px 10px;
+      border-radius: 10px;
+      margin-right: 8px;
+    }
+    #panel code{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  </style>
+</head>
+<body>
+  <div id="panel">
+    <div style="margin-bottom:8px;">
+      <button id="btnLocate">Locate me</button>
+      <span id="status">Ready.</span>
+    </div>
+    <div id="info"></div>
+  </div>
+
+  <div id="map"></div>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <script>
+    const statusEl = document.getElementById("status");
+    const infoEl = document.getElementById("info");
+    const btn = document.getElementById("btnLocate");
+
+    // Default view (will recenter once we get location)
+    const map = L.map("map").setView([40.4168, -3.7038], 5); // Madrid-ish
+
+    // OpenStreetMap tiles
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker = null;
+    let accuracyCircle = null;
+
+    function setStatus(msg) {
+      statusEl.textContent = msg;
+    }
+
+    function showInfo(lat, lon, accuracy) {
+      infoEl.innerHTML =
+        `Lat: <code>${lat.toFixed(6)}</code><br>` +
+        `Lon: <code>${lon.toFixed(6)}</code><br>` +
+        `Accuracy: <code>${Math.round(accuracy)} m</code>`;
+    }
+
+    function locateOnce() {
+      if (!("geolocation" in navigator)) {
+        setStatus("Geolocation not supported.");
+        return;
+      }
+
+      setStatus("Requesting location…");
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude: lat, longitude: lon, accuracy } = pos.coords;
+
+          setStatus("Location acquired.");
+          showInfo(lat, lon, accuracy);
+
+          if (marker) map.removeLayer(marker);
+          if (accuracyCircle) map.removeLayer(accuracyCircle);
+
+          marker = L.marker([lat, lon]).addTo(map).bindPopup("You are here").openPopup();
+          accuracyCircle = L.circle([lat, lon], { radius: accuracy }).addTo(map);
+
+          // Zoom to show accuracy circle nicely
+          map.fitBounds(accuracyCircle.getBounds(), { padding: [20, 20] });
+        },
+        (err) => {
+          // Common causes: user denied, insecure context (no HTTPS), timeout
+          setStatus(`Error: ${err.message}`);
+          infoEl.textContent = "";
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    }
+
+    btn.addEventListener("click", locateOnce);
+
+    // Auto-run on load (optional)
+    locateOnce();
+  </script>
+</body>
+</html>
+

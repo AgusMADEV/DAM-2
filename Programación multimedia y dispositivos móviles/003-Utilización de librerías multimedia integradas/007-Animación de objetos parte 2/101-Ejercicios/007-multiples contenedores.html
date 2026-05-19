@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <title>Animación en CSS</title>
+    <meta charset="utf-8">
+    <style>
+      h1{font-family:ubuntu;}
+     .separador{width:3px;height:40px;background:black;}
+    </style>
+  </head>
+  <body>
+    <h1>jocarsa | formación</h1>
+    <script>
+      let titulos = document.querySelectorAll("h1")
+      titulos.forEach(function(titulo){
+        // Comprobar si tiene un pipe vertical
+        if(titulo.textContent.includes(" | ")){
+          let empresa = titulo.textContent.split(" | ")[0]
+          let producto = titulo.textContent.split(" | ")[1]
+          console.log(empresa,producto)
+          titulo.textContent = ""
+          titulo.style.display = "flex";
+          titulo.style.alignItems = "center"
+          titulo.style.gap = "10px";
+          // Nombre de la empresa
+          let contenedorempresa = document.createElement("div")
+          let nombreempresa = document.createElement("div")
+          nombreempresa.textContent = empresa
+          contenedorempresa.appendChild(nombreempresa)
+          titulo.appendChild(contenedorempresa)
+          // Separador
+          let separador = document.createElement("div")
+          separador.classList.add("separador")
+          titulo.appendChild(separador)
+          // Nombre del producto
+          let contenedorproducto = document.createElement("div")
+          let nombreproducto = document.createElement("div")
+          nombreproducto.textContent = producto
+          contenedorproducto.appendChild(nombreproducto)
+          titulo.appendChild(contenedorproducto)
+        }
+      })
+    </script>
+  </body>
+</html>

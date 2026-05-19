@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Media Control Hub · PMDM 003</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <button class="theme-toggle" id="themeToggle" title="Cambiar tema">🌙</button>
+    <div id="toastBox"></div>
+
+    <main class="layout">
+      <section class="panel player-panel">
+        <h1>Media Control Hub</h1>
+        <p class="subtitle">Reproductor personalizado con trazabilidad de sesiones</p>
+
+        <div class="auth-row">
+          <input id="operatorName" type="text" placeholder="Nombre" />
+          <input id="operatorDni" type="text" placeholder="DNI" value="53945291X" />
+          <button id="btnRegister">Registrar operador</button>
+        </div>
+
+        <div class="media-stage">
+          <video id="videoPlayer" playsinline preload="metadata"></video>
+          <audio id="audioPlayer" preload="metadata"></audio>
+          <div id="nowPlaying"><span class="playing-dot" id="playingDot"></span>Selecciona un contenido de la biblioteca</div>
+        </div>
+
+        <div class="progress-bar" id="progressBar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <span id="timeInfo" style="font-size:var(--fs-xs);color:var(--muted);">00:00 / 00:00</span>
+
+        <div class="controls-grid">
+          <button id="btnPlay">▶ Reproducir</button>
+          <button id="btnPause">⏸ Pausar</button>
+          <button id="btnStop">⏹ Detener</button>
+          <button id="btnBack">⏪ -10s</button>
+          <button id="btnForward">⏩ +10s</button>
+          <label>Velocidad
+            <select id="speed">
+              <option value="0.75">0.75x</option>
+              <option value="1" selected>1x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+            </select>
+          </label>
+          <label>Volumen
+            <input id="volume" type="range" min="0" max="1" step="0.01" value="0.8" />
+          </label>
+        </div>
+
+        <p class="shortcuts-hint"><kbd>Espacio</kbd> play/pausa · <kbd>←</kbd><kbd>→</kbd> ±5s · <kbd>↑</kbd><kbd>↓</kbd> volumen</p>
+      </section>
+
+      <section class="panel data-panel">
+        <h2>📂 Biblioteca</h2>
+        <form id="mediaForm" class="media-form">
+          <input name="title" type="text" placeholder="Título" required />
+          <select name="kind">
+            <option value="audio">Audio</option>
+            <option value="video">Vídeo</option>
+          </select>
+          <input name="sourceUrl" type="url" placeholder="URL fuente" required />
+          <input name="durationSeconds" type="number" min="0" placeholder="Duración (s)" />
+          <input name="genre" type="text" placeholder="Género" />
+          <button type="submit">Añadir por URL</button>
+        </form>
+
+        <div class="upload-zone" id="uploadZone">
+          <div class="upload-icon">📁</div>
+          <p>Arrastra archivos aquí o <label for="uploadInput" class="upload-label">selecciona desde tu ordenador</label></p>
+          <p class="upload-hint">MP3 · WAV · OGG · FLAC · MP4 · WEBM · MOV (máx. 100 MB)</p>
+          <input type="file" id="uploadInput" accept="audio/*,video/*" multiple hidden />
+        </div>
+        <div id="uploadProgress" class="upload-progress" style="display:none">
+          <div class="upload-bar" id="uploadBar"></div>
+          <span id="uploadStatus">Subiendo...</span>
+        </div>
+
+        <div id="library"></div>
+
+        <div class="data-actions">
+          <button class="btn-seed" id="seedBtn">🌱 Seed</button>
+          <button class="btn-export" id="exportBtn">📥 Exportar</button>
+          <button class="btn-import" id="importBtn">📤 Importar</button>
+        </div>
+        <input type="file" id="importFile" accept=".json" hidden />
+
+        <h2>📊 Métricas</h2>
+        <div id="stats" class="kpis"></div>
+
+        <h2>🏆 Ranking</h2>
+        <div id="leaders"></div>
+
+        <h2>📜 Historial operador</h2>
+        <div id="history"></div>
+      </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musical Trebuchet Balls</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Set canvas to full browser size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Musical notes (C major scale)
+        const notes = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4'];
+        const noteFrequencies = {
+            'C4': 261.63,
+            'D4': 293.66,
+            'E4': 329.63,
+            'F4': 349.23,
+            'G4': 392.00,
+            'A4': 440.00,
+            'B4': 493.88
+        };
+
+        // Colors for each note
+        const noteColors = {
+            'C4': '#FF5252',
+            'D4': '#FF4081',
+            'E4': '#E040FB',
+            'F4': '#7C4DFF',
+            'G4': '#536DFE',
+            'A4': '#448AFF',
+            'B4': '#40C4FF'
+        };
+
+        // Circle properties
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = Math.min(canvas.width, canvas.height) * 0.4;
+
+        // Balls array
+        const balls = [];
+        let activeOscillators = 0;
+
+        // Drag state
+        let isDragging = false;
+        let dragStartX, dragStartY;
+        let dragEndX, dragEndY;
+
+        // Draw the circle and arcs
+        function drawCircle() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Draw arcs for each note
+            const arcAngle = (2 * Math.PI) / notes.length;
+            notes.forEach((note, i) => {
+                ctx.strokeStyle = noteColors[note];
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, i * arcAngle, (i + 1) * arcAngle);
+                ctx.stroke();
+            });
+        }
+
+        // Draw all balls
+        function drawBalls() {
+            balls.forEach(ball => {
+                ctx.fillStyle = ball.color || '#333';
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        // Draw preview line during drag
+        function drawPreviewLine() {
+            if (isDragging) {
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(dragStartX, dragStartY);
+                ctx.lineTo(dragEndX, dragEndY);
+                ctx.stroke();
+            }
+        }
+
+        // Update all balls' positions and handle bouncing
+        function updateBalls() {
+            balls.forEach(ball => {
+                ball.x += ball.dx;
+                ball.y += ball.dy;
+
+                // Distance from center
+                const distance = Math.sqrt((ball.x - centerX) ** 2 + (ball.y - centerY) ** 2);
+
+                // Bounce off the circle
+                if (distance + ball.radius >= radius) {
+                    // Calculate angle of collision
+                    const angle = Math.atan2(ball.y - centerY, ball.x - centerX);
+                    const arcAngle = (2 * Math.PI) / notes.length;
+                    const arcIndex = Math.floor((angle + 2 * Math.PI) % (2 * Math.PI) / arcAngle);
+
+                    // Play note
+                    if (arcIndex >= 0 && arcIndex < notes.length) {
+                        playNote(notes[arcIndex]);
+                    }
+
+                    // Reflect the ball's velocity
+                    const normalX = (ball.x - centerX) / distance;
+                    const normalY = (ball.y - centerY) / distance;
+                    const dotProduct = ball.dx * normalX + ball.dy * normalY;
+                    ball.dx = ball.dx - 2 * dotProduct * normalX;
+                    ball.dy = ball.dy - 2 * dotProduct * normalY;
+
+                    // Reposition ball to avoid sticking
+                    const overlap = distance + ball.radius - radius;
+                    ball.x -= overlap * normalX;
+                    ball.y -= overlap * normalY;
+                }
+            });
+        }
+
+        // Play a note with piano-like decay and dynamic gain
+        function playNote(note) {
+            const now = audioCtx.currentTime;
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'sine';
+            oscillator.frequency.value = noteFrequencies[note];
+
+            // Dynamic gain: divide by number of active oscillators + 1
+            const gainValue = 0.5 / (activeOscillators + 1);
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(gainValue, now + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start(now);
+            oscillator.stop(now + 1);
+
+            activeOscillators++;
+            oscillator.onended = () => {
+                activeOscillators--;
+            };
+        }
+
+        // Create a new ball with direction and speed from drag
+        function createBall(x, y, dx, dy) {
+            const ballRadius = 10;
+            const ball = {
+                x: x,
+                y: y,
+                radius: ballRadius,
+                dx: dx,
+                dy: dy,
+                color: `hsl(${Math.random() * 360}, 70%, 60%)`
+            };
+            balls.push(ball);
+        }
+
+        // Animation loop
+        function animate() {
+            drawCircle();
+            updateBalls();
+            drawBalls();
+            drawPreviewLine();
+            requestAnimationFrame(animate);
+        }
+
+        // Event listeners for mouse interactions
+        canvas.addEventListener('mousedown', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            dragStartX = event.clientX - rect.left;
+            dragStartY = event.clientY - rect.top;
+            isDragging = true;
+        });
+
+        canvas.addEventListener('mousemove', (event) => {
+            if (isDragging) {
+                const rect = canvas.getBoundingClientRect();
+                dragEndX = event.clientX - rect.left;
+                dragEndY = event.clientY - rect.top;
+            }
+        });
+
+        canvas.addEventListener('mouseup', (event) => {
+            if (isDragging) {
+                const rect = canvas.getBoundingClientRect();
+                dragEndX = event.clientX - rect.left;
+                dragEndY = event.clientY - rect.top;
+
+                // Calculate direction and speed
+                const dx = (dragStartX - dragEndX) * 0.1;
+                const dy = (dragStartY - dragEndY) * 0.1;
+
+                // Create ball if inside the circle
+                const distance = Math.sqrt((dragStartX - centerX) ** 2 + (dragStartY - centerY) ** 2);
+                if (distance <= radius) {
+                    createBall(dragStartX, dragStartY, dx, dy);
+                }
+
+                isDragging = false;
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            centerX = canvas.width / 2;
+            centerY = canvas.height / 2;
+        });
+
+        // Start animation
+        animate();
+    </script>
+</body>
+</html>
+
