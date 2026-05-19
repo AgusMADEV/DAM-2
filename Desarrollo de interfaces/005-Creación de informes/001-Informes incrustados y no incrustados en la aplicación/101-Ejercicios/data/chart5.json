@@ -1,0 +1,22 @@
+[
+  {
+    "label": "Chrome",
+    "value": 97.0,
+    "color": "#09122c"
+  },
+  {
+    "label": "Firefox",
+    "value": 680.0,
+    "color": "#111d40"
+  },
+  {
+    "label": "Edge",
+    "value": 1976.0,
+    "color": "#1b2d59"
+  },
+  {
+    "label": "Safari",
+    "value": 800.0,
+    "color": "#274173"
+  }
+]

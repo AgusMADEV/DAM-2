@@ -1,0 +1,52 @@
+{
+  "nodes": [
+    {
+      "id": "n2",
+      "x": 77.617,
+      "y": 156.228,
+      "type": "constante",
+      "config": {
+        "name": "A",
+        "value": "a"
+      }
+    },
+    {
+      "id": "n3",
+      "x": 490.438,
+      "y": 212.894,
+      "type": "var_get",
+      "config": {
+        "name": "a",
+        "default": "19"
+      }
+    },
+    {
+      "id": "n4",
+      "x": 888.209,
+      "y": 241.828,
+      "type": "imprimir",
+      "config": {
+        "prefix": "A"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "n2",
+      "to": "n3",
+      "from_port": "default"
+    },
+    {
+      "from": "n3",
+      "to": "n4",
+      "from_port": "default"
+    }
+  ],
+  "viewport": {
+    "scale": 1,
+    "translateX": 0,
+    "translateY": 0
+  },
+  "saved_at": "2026-02-18T18:47:35.974319",
+  "name": "mi-workflow"
+}

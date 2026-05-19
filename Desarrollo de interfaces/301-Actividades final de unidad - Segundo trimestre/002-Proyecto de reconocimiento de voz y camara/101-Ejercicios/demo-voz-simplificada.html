@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Demo Simplificada - Reconocimiento de Voz</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2c3e50;
+      --secondary: #34495e;
+      --accent: #3498db;
+      --success: #27ae60;
+      --danger: #e74c3c;
+      --light: #ecf0f1;
+      --lighter: #f8f9fa;
+      --border: #e1e8ed;
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.08);
+      --radius: 12px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      color: var(--secondary);
+      line-height: 1.6;
+    }
+    
+    .panel {
+      background: white;
+      max-width: 900px;
+      width: 100%;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      padding: 50px 40px;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 2em;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 1em;
+      opacity: 0.9;
+      font-weight: 400;
+    }
+
+    .content {
+      padding: 40px;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 15px;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    button:hover {
+      background: var(--secondary);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button.listening {
+      background: var(--accent);
+      animation: pulseGlow 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulseGlow {
+      0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4);
+      }
+      50% { 
+        box-shadow: 0 0 0 8px rgba(52, 152, 219, 0);
+      }
+    }
+    
+    #output {
+      background: var(--lighter);
+      padding: 24px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      min-height: 80px;
+      border-left: 3px solid var(--accent);
+      font-size: 15px;
+      color: var(--secondary);
+      display: flex;
+      align-items: center;
+      transition: all 0.4s ease;
+    }
+
+    #output:empty:before {
+      content: 'Esperando comando de voz...';
+      opacity: 0.5;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    th, td {
+      padding: 16px 20px;
+      text-align: left;
+    }
+
+    th {
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+      transition: var(--transition);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover td {
+      background: var(--lighter);
+      transform: scale(1.01);
+    }
+    
+    .completada {
+      text-decoration: line-through;
+      opacity: 0.5;
+      color: var(--success);
+    }
+    
+    .info {
+      background: #e8f4f8;
+      padding: 20px 24px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      border-left: 3px solid var(--accent);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .info strong {
+      display: block;
+      margin-bottom: 12px;
+      font-size: 15px;
+      color: var(--primary);
+    }
+
+    .comando {
+      padding: 6px 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .comando:before {
+      content: '•';
+      color: var(--accent);
+      font-weight: bold;
+      margin-right: 8px;
+      font-size: 18px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #95a5a6;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 20px 10px;
+      }
+
+      .header {
+        padding: 40px 20px;
+      }
+
+      .content {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 1.6em;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+        justify-content: center;
+      }
+
+      th, td {
+        padding: 12px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <div class="header">
+      <h1>🎤 Reconocimiento de Voz</h1>
+      <p class="subtitle">Control por comandos de voz en español</p>
+    </div>
+
+    <div class="content">
+      <div class="info">
+        <strong>📢 Comandos disponibles</strong>
+        <div class="comando">"agregar [nombre]" - Añade una nueva tarea</div>
+        <div class="comando">"eliminar [número]" - Elimina tarea específica</div>
+        <div class="comando">"completar [número]" - Marca como completada</div>
+        <div class="comando">"leer tareas" - Lee todas las tareas en voz alta</div>
+      </div>
+      
+      <div class="controls">
+        <button id="btnEscuchar">
+          <span>🎙️</span>
+          <span>Escuchar Comando</span>
+        </button>
+        <button id="btnLimpiar">
+          <span>🗑️</span>
+          <span>Limpiar Todo</span>
+        </button>
+      </div>
+      
+      <div id="output">Pulsa "Escuchar Comando" para comenzar...</div>
+      
+      <div id="contenedor"></div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // DATOS
+    // ==========================================
+    let tareas = [
+      {id: 1, titulo: "Explorar comandos de voz disponibles", completada: false},
+      {id: 2, titulo: "Probar reconocimiento de voz en español", completada: false},
+      {id: 3, titulo: "Experimentar con la síntesis de voz", completada: false}
+    ];
+    
+    let contadorId = 4;
+    
+    // ==========================================
+    // FUNCIONES DE VISUALIZACIÓN
+    // ==========================================
+    function pintarTabla() {
+      if (tareas.length === 0) {
+        document.getElementById('contenedor').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <p>No hay tareas aún</p>
+            <p style="font-size: 14px; margin-top: 8px;">Usa comandos de voz para agregar tareas</p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '<table><tr><th>#</th><th>Tarea</th><th>Estado</th></tr>';
+      
+      tareas.forEach((tarea, indice) => {
+        const clase = tarea.completada ? 'class="completada"' : '';
+        const estado = tarea.completada ? '✅' : '⏳';
+        html += `<tr ${clase}>
+          <td>${indice}</td>
+          <td>${tarea.titulo}</td>
+          <td style="text-align: center;">${estado}</td>
+        </tr>`;
+      });
+      
+      html += '</table>';
+      document.getElementById('contenedor').innerHTML = html;
+    }
+    
+    function mostrarMensaje(texto, tipo = 'normal') {
+      const output = document.getElementById('output');
+      output.textContent = texto;
+      
+      // Cambiar color del borde según el tipo
+      switch(tipo) {
+        case 'error':
+          output.style.borderLeftColor = 'var(--danger)';
+          output.style.background = '#fee';
+          break;
+        case 'success':
+          output.style.borderLeftColor = 'var(--success)';
+          output.style.background = '#efe';
+          break;
+        case 'listening':
+          output.style.borderLeftColor = 'var(--accent)';
+          output.style.background = '#e8f4f8';
+          break;
+        default:
+          output.style.borderLeftColor = 'var(--accent)';
+          output.style.background = 'var(--lighter)';
+      }
+      
+      // Restaurar después de 3 segundos
+      setTimeout(() => {
+        output.style.borderLeftColor = 'var(--accent)';
+        output.style.background = 'var(--lighter)';
+      }, 3000);
+    }
+    
+    // ==========================================
+    // FUNCIONES DE LÓGICA
+    // ==========================================
+    function agregarTarea(titulo) {
+      if (!titulo || titulo.trim() === '') {
+        hablar("No puedo agregar una tarea vacía");
+        return;
+      }
+      
+      tareas.push({
+        id: contadorId++,
+        titulo: titulo.trim(),
+        completada: false
+      });
+      
+      pintarTabla();
+      hablar(`Tarea agregada: ${titulo}`);
+      mostrarMensaje(`✅ Tarea agregada: ${titulo}`, 'success');
+    }
+    
+    function eliminarTarea(indice) {
+      if (indice >= 0 && indice < tareas.length) {
+        const tarea = tareas[indice];
+        tareas.splice(indice, 1);
+        pintarTabla();
+        hablar(`Tarea eliminada: ${tarea.titulo}`);
+        mostrarMensaje(`🗑️ Tarea eliminada: ${tarea.titulo}`, 'success');
+      } else {
+        hablar("Número de tarea no válido");
+        mostrarMensaje("❌ Número de tarea no válido", 'error');
+      }
+    }
+    
+    function completarTarea(indice) {
+      if (indice >= 0 && indice < tareas.length) {
+        tareas[indice].completada = true;
+        pintarTabla();
+        hablar(`Tarea completada: ${tareas[indice].titulo}`);
+        mostrarMensaje(`✅ Tarea completada: ${tareas[indice].titulo}`, 'success');
+      } else {
+        hablar("Número de tarea no válido");
+        mostrarMensaje("❌ Número de tarea no válido", 'error');
+      }
+    }
+    
+    function leerTareas() {
+      if (tareas.length === 0) {
+        hablar("No hay tareas en la lista");
+        return;
+      }
+      
+      let mensaje = `Tienes ${tareas.length} tareas. `;
+      tareas.forEach((tarea, indice) => {
+        const estado = tarea.completada ? "completada" : "pendiente";
+        mensaje += `Número ${indice}: ${tarea.titulo}, ${estado}. `;
+      });
+      
+      hablar(mensaje);
+      mostrarMensaje("🔊 Leyendo tareas...");
+    }
+    
+    // ==========================================
+    // SÍNTESIS DE VOZ
+    // ==========================================
+    let voces = [];
+    
+    function cargarVoces() {
+      voces = speechSynthesis.getVoices();
+    }
+    
+    function elegirVoz() {
+      return voces.find(v => /es-|Spanish/i.test(v.lang)) || voces[0];
+    }
+    
+    function hablar(texto) {
+      const utterance = new SpeechSynthesisUtterance(texto);
+      const voz = elegirVoz();
+      if (voz) utterance.voice = voz;
+      utterance.lang = 'es-ES';
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utterance);
+    }
+    
+    cargarVoces();
+    speechSynthesis.onvoiceschanged = cargarVoces;
+    
+    // ==========================================
+    // RECONOCIMIENTO DE VOZ
+    // ==========================================
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+      mostrarMensaje("❌ Tu navegador no soporta reconocimiento de voz. Usa Chrome o Edge.", 'error');
+    } else {
+      const reconocimiento = new SpeechRecognition();
+      reconocimiento.lang = "es-ES";
+      reconocimiento.interimResults = false;
+      
+      reconocimiento.onstart = function() {
+        document.getElementById("btnEscuchar").classList.add("listening");
+        mostrarMensaje("🎤 Escuchando... Habla ahora", 'listening');
+      };
+      
+      reconocimiento.onend = function() {
+        document.getElementById("btnEscuchar").classList.remove("listening");
+      };
+      
+      reconocimiento.onresult = function(event) {
+        const texto = event.results[0][0].transcript.toLowerCase();
+        mostrarMensaje(`📝 Escuché: "${texto}"`);
+        procesarComando(texto);
+      };
+      
+      reconocimiento.onerror = function(event) {
+        mostrarMensaje(`❌ Error: ${event.error}`, 'error');
+        document.getElementById("btnEscuchar").classList.remove("listening");
+      };
+      
+      document.getElementById("btnEscuchar").onclick = function() {
+        reconocimiento.start();
+      };
+    }
+    
+    // ==========================================
+    // PROCESAMIENTO DE COMANDOS
+    // ==========================================
+    function procesarComando(comando) {
+      const palabras = comando.split(" ");
+      const accion = palabras[0];
+      
+      switch(accion) {
+        case "agregar":
+        case "añadir":
+        case "crear":
+          const titulo = palabras.slice(1).join(" ");
+          agregarTarea(titulo);
+          break;
+          
+        case "eliminar":
+        case "borrar":
+          const numEliminar = convertirNumero(palabras[1]);
+          if (numEliminar !== null) {
+            eliminarTarea(numEliminar);
+          } else {
+            hablar("No entendí el número");
+            mostrarMensaje("❌ No entendí el número de tarea", 'error');
+          }
+          break;
+          
+        case "completar":
+        case "terminar":
+          const numCompletar = convertirNumero(palabras[1]);
+          if (numCompletar !== null) {
+            completarTarea(numCompletar);
+          } else {
+            hablar("No entendí el número");
+            mostrarMensaje("❌ No entendí el número de tarea", 'error');
+          }
+          break;
+          
+        case "leer":
+          leerTareas();
+          break;
+          
+        default:
+          const msg = "Comando no reconocido. Usa: agregar, eliminar, completar o leer";
+          hablar(msg);
+          mostrarMensaje("❌ " + msg, 'error');
+      }
+    }
+    
+    function convertirNumero(texto) {
+      const numeros = {
+        "cero": 0, "uno": 1, "dos": 2, "tres": 3, "cuatro": 4,
+        "cinco": 5, "seis": 6, "siete": 7, "ocho": 8, "nueve": 9
+      };
+      
+      if (numeros.hasOwnProperty(texto)) {
+        return numeros[texto];
+      }
+      
+      const num = parseInt(texto);
+      return isNaN(num) ? null : num;
+    }
+    
+    // ==========================================
+    // EVENTOS
+    // ==========================================
+    document.getElementById("btnLimpiar").onclick = function() {
+      if (tareas.length === 0) {
+        mostrarMensaje("ℹ️ No hay tareas para eliminar", 'error');
+        return;
+      }
+      
+      if (confirm("¿Estás seguro de eliminar todas las tareas?")) {
+        tareas = [];
+        pintarTabla();
+        hablar("Todas las tareas eliminadas");
+        mostrarMensaje("✨ Todas las tareas han sido eliminadas", 'success');
+      }
+    };
+    
+    // ==========================================
+    // INICIALIZACIÓN
+    // ==========================================
+    pintarTabla();
+    mostrarMensaje("✨ Sistema listo. Pulsa 'Escuchar Comando' para comenzar");
+    
+    // Mensaje de bienvenida sutil (opcional)
+    setTimeout(() => {
+      if (tareas.length > 0) {
+        hablar("Sistema de reconocimiento de voz iniciado");
+      }
+    }, 500);
+  </script>
+</body>
+</html>

@@ -1,0 +1,589 @@
+{
+  "name": "WhatsApp IA Local - Ollama",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-in",
+        "options": {
+          "responseCode": {
+            "values": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        144,
+        -304
+      ],
+      "id": "2b7e04ba-490b-4b33-8993-4de52c727b43",
+      "name": "Webhook",
+      "webhookId": "aa83ff6e-7525-4f69-ac7a-735576e7ca8a"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body || $json;\n\nconst entry = body.entry?.[0];\nconst change = entry?.changes?.[0];\nconst value = change?.value;\n\nconst message = value?.messages?.[0];\nconst contact = value?.contacts?.[0];\n\nif (!message) {\n  return [];\n}\n\nreturn [\n  {\n    json: {\n      provider: \"whatsapp_cloud\",\n      phone_number_id: value.metadata?.phone_number_id || \"\",\n      from: message.from || \"\",\n      name: contact?.profile?.name || \"\",\n      message_id: message.id || \"\",\n      type: message.type || \"\",\n      text: message.text?.body || \"\",\n      timestamp: message.timestamp || \"\",\n      raw: body\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        -304
+      ],
+      "id": "12847dbe-5517-413a-a50c-524b661a0ddc",
+      "name": "Normalizar mensaje"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9d7fbdcc-6eb5-4ed1-886a-840f54f8b688",
+              "leftValue": "={{$json.type}}",
+              "rightValue": "text",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        544,
+        -304
+      ],
+      "id": "90602e13-afc7-40ca-9189-4340d3bd6fb6",
+      "name": "Es mensaje de texto"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un asistente de WhatsApp para atención al cliente de MAI Clinic.\n\nTu tarea es responder al ÚLTIMO mensaje del usuario con una respuesta útil, natural y directa, usando la BASE DE CONOCIMIENTO.\n\nPRIORIDAD:\n1. El último mensaje del usuario es lo más importante.\n2. El historial solo sirve para entender el contexto, no para repetir respuestas anteriores.\n3. Si el usuario pide algo más concreto que antes, responde a lo concreto.\n4. No copies ni reformules la última respuesta del asistente.\n\nEstilo:\n- Responde en español de España.\n- Sé cercano, claro y profesional.\n- Responde como WhatsApp.\n- Máximo 6 líneas salvo que el usuario pida más detalle.\n- No empieces con explicaciones largas.\n- No digas que usas una base de conocimiento.\n\nReglas:\n- Responde siempre a la pregunta concreta del usuario si hay información en la BASE DE CONOCIMIENTO.\n- No digas que no puedes responder directamente.\n- No inventes información.\n- No diagnostiques.\n- No prometas resultados médicos.\n- Si el usuario cuenta síntomas, recomienda una valoración personalizada.\n- Si pregunta por precios y no hay precio exacto, indica que depende de la valoración.\n- Si pregunta por cita, contacto, dirección u horarios, usa los datos de la clínica.\n\nRegla de conversación:\n- Si es continuación de conversación, NO saludes de nuevo.\n- Si el usuario responde “sí”, “vale”, “ok”, “me interesa” o similar, interpreta a qué está respondiendo usando el historial.\n- Si antes se le ofreció pedir cita y responde afirmativamente, no repitas tratamientos: indica cómo puede pedir cita.\n- Si el usuario dice “eso”, “ese”, “esa”, “cuánto cuesta”, “me interesa” o “¿duele?”, usa el historial para entender a qué se refiere.\n- Varía el inicio de las respuestas.\n- Evita repetir “Hola” y “Gracias por contactar”.\n\nRegla anti-repetición:\nÚltima respuesta del asistente:\n{{$json.ultima_respuesta_asistente}}\n\nNo repitas esa respuesta.\nSi tu respuesta se parece mucho a la última, cámbiala y responde de forma más concreta al último mensaje.\n\nInstrucción concreta sobre saludo:\n{{$json.instruccion_saludo}}\n\nInstrucción de continuidad:\n{{$json.instruccion_continuidad}}\n\nEstado de conversación:\nEs continuación: {{$json.es_continuacion}}\nDebe saludar: {{$json.debe_saludar}}\nTema actual: {{$json.tema_actual}}\nÚltimo tema: {{$json.ultimo_tema}}\n\nHistorial reciente:\n{{$json.historial_conversacion}}\n\nRegla muy importante para preguntas generales:\nSi el usuario pregunta por tratamientos, servicios o información general:\n- No listes todos los tratamientos uno por uno.\n- No expliques cada tratamiento.\n- Responde en máximo 5 líneas.\n- Agrupa por áreas: Medicina estética y Ginecología regenerativa.\n- Menciona solo ejemplos representativos.\n- Termina recomendando valoración personalizada.\n\nSi el usuario pregunta por tratamientos faciales, estética facial, rostro, arrugas, labios, bruxismo, armonización, bioestimulación, polinucleótidos, neuromoduladores o medicina estética:\n- Responde SOLO sobre medicina estética/facial.\n- Está prohibido mencionar ginecología regenerativa, menopausia, incontinencia, sequedad vaginal, láser ginecológico, PRP vaginal o tratamientos íntimos, salvo que el usuario lo pida expresamente.\n- Si pregunta “qué tratamientos faciales tenéis” o “información sobre tratamientos faciales”, lista únicamente los tratamientos faciales disponibles.\n- No cierres siempre con “¿Quieres programar una cita?”. Varía el cierre: “podemos orientarte según tu caso”, “lo ideal es una valoración personalizada” o “pueden indicarte el tratamiento más adecuado”.\n\nSi en la BASE DE CONOCIMIENTO aparece \"RESUMEN GENERAL DE TRATAMIENTOS\", úsalo como prioridad solo para preguntas generales, no para preguntas concretas.\n\nDatos del usuario:\nNombre: {{$json.name}}\nTeléfono: {{$json.from}}\n\nÚltimo mensaje del usuario:\n{{$json.text}}\n\nDatos de la clínica:\nNombre: {{$json.clinic_name}}\nTeléfono: {{$json.clinic_phone}}\nEmail: {{$json.clinic_email}}\nDirección: {{$json.clinic_address}}\n\nBASE DE CONOCIMIENTO:\n{{$json.contexto_base}}\n\nRedacta ahora la respuesta final para enviar por WhatsApp.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1232,
+        -320
+      ],
+      "id": "bd67d1ed-6944-41a2-8ef8-5cc4a3e71289",
+      "name": "Agente WhatsApp",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": "llama3.2:3b",
+        "options": {
+          "temperature": 0.2,
+          "numCtx": 3072,
+          "numPredict": 260
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        -96
+      ],
+      "id": "22653f36-1284-4bea-92ef-6ae295c51353",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "GI9POaOJpONaymbM",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v25.0/1094637353738265/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASjQN74zyYBRYgSMZAirHZBqQbPHdkzy3wAT0Alha9En2iMPBf3yrxQy57M7ytn0eXxTONqxCrpgpr5MXlPjXYTn7ar1jA1q3UtkXz0IVHmBKZCcrBgzUtFDsSzrZCl8YpCwSDUcBA07xZA3AvSNU6DwI7OWZBu7r1fP9oVerBIQrOPt09p5mRXad0NpMmpZC4XAW2TbUkmgqKYkxnnZBZAxZC3WAVkwzahZCaILVjIcKBTBaaB2LWN0jmdQdxXiH82XcZCoHmyN7t8gyZCeWiBrUjpZAQkqt2wZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  messaging_product: \"whatsapp\",\n  to: $node[\"Normalizar mensaje\"].json[\"from\"],\n  type: \"text\",\n  text: {\n    body: String(\n      $json.respuesta_directa ||\n      $json.output ||\n      \"Ahora mismo no puedo responderte correctamente.\"\n    ).slice(0, 4000)\n  }\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1792,
+        -336
+      ],
+      "id": "b9dcb662-0e00-4375-9927-998905c49857",
+      "name": "Enviar WhatsApp"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1oIs38D6JeFz3EDQ6lfAbM1qrmEv8iaB4EdLQd0WamME/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oIs38D6JeFz3EDQ6lfAbM1qrmEv8iaB4EdLQd0WamME/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fecha": "={{$now}}",
+            "telefono": "={{$node[\"Normalizar mensaje\"].json[\"from\"]}}",
+            "nombre": "={{$node[\"Normalizar mensaje\"].json[\"name\"]}}",
+            "mensaje_usuario": "={{$node[\"Normalizar mensaje\"].json[\"text\"]}}",
+            "estado": "respondido",
+            "tipo": "={{$node[\"Normalizar mensaje\"].json[\"type\"]}}",
+            "message_id": "={{$node[\"Normalizar mensaje\"].json[\"message_id\"]}}",
+            "respuesta_ia": "={{$node[\"Agente WhatsApp\"].json[\"output\"]}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "telefono",
+              "displayName": "telefono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nombre",
+              "displayName": "nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mensaje_usuario",
+              "displayName": "mensaje_usuario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "respuesta_ia",
+              "displayName": "respuesta_ia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tipo",
+              "displayName": "tipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2000,
+        -336
+      ],
+      "id": "f7b7af29-b7a6-4d8e-9598-049d34ac728f",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PGtualgb4ukwEdaI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v25.0/1094637353738265/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAASjQN74zyYBRYgSMZAirHZBqQbPHdkzy3wAT0Alha9En2iMPBf3yrxQy57M7ytn0eXxTONqxCrpgpr5MXlPjXYTn7ar1jA1q3UtkXz0IVHmBKZCcrBgzUtFDsSzrZCl8YpCwSDUcBA07xZA3AvSNU6DwI7OWZBu7r1fP9oVerBIQrOPt09p5mRXad0NpMmpZC4XAW2TbUkmgqKYkxnnZBZAxZC3WAVkwzahZCaILVjIcKBTBaaB2LWN0jmdQdxXiH82XcZCoHmyN7t8gyZCeWiBrUjpZAQkqt2wZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  messaging_product: \"whatsapp\",\n  to: $node[\"Normalizar mensaje\"].json[\"from\"],\n  type: \"text\",\n  text: {\n    body: \"Ahora mismo no puedo responderte correctamente. Te atenderemos en cuanto sea posible.\"\n  }\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1648,
+        -128
+      ],
+      "id": "e1da6a49-e379-4f19-a4db-a4770204d90b",
+      "name": "Enviar fallback WhatsApp"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1oIs38D6JeFz3EDQ6lfAbM1qrmEv8iaB4EdLQd0WamME/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oIs38D6JeFz3EDQ6lfAbM1qrmEv8iaB4EdLQd0WamME/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fecha": "={{$now}}",
+            "telefono": "={{$node[\"Normalizar mensaje\"].json[\"from\"]}}",
+            "nombre": "={{$node[\"Normalizar mensaje\"].json[\"name\"]}}",
+            "mensaje_usuario": "={{$node[\"Normalizar mensaje\"].json[\"text\"]}}",
+            "estado": "fallo_ia_fallback_enviado",
+            "tipo": "={{$node[\"Normalizar mensaje\"].json[\"type\"]}}",
+            "message_id": "={{$node[\"Normalizar mensaje\"].json[\"message_id\"]}}",
+            "respuesta_ia": "=Ahora mismo no puedo responderte correctamente. Te atenderemos en cuanto sea posible."
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "telefono",
+              "displayName": "telefono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "nombre",
+              "displayName": "nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mensaje_usuario",
+              "displayName": "mensaje_usuario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "respuesta_ia",
+              "displayName": "respuesta_ia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tipo",
+              "displayName": "tipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1856,
+        -128
+      ],
+      "id": "cb02b6d1-727b-4f59-84d1-3779e504740a",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PGtualgb4ukwEdaI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const fs = require('fs');\n\nconst input = $input.first().json;\n\nconst KB_PATH = '/files/knowledge/base-conocimiento-maiclinic.json';\n\nif (!fs.existsSync(KB_PATH)) {\n  throw new Error(`No se encuentra la base de conocimiento en: ${KB_PATH}`);\n}\n\nconst raw = fs.readFileSync(KB_PATH, 'utf8');\nconst base = JSON.parse(raw);\n\nconst mensajeUsuario = input.text || '';\n\nfunction normalizar(texto) {\n  return String(texto || '')\n    .toLowerCase()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '')\n    .replace(/[^\\p{L}\\p{N}\\s]/gu, ' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nconst consultaNormalizada = normalizar(mensajeUsuario);\n\nconst stopwords = new Set([\n  'hola', 'buenas', 'buenos', 'dias', 'tardes', 'noches',\n  'quiero', 'queria', 'saber', 'puedo', 'puedes', 'podrias',\n  'podriais', 'podeis', 'podéis', 'teneis', 'tenéis',\n  'tengo', 'sobre', 'para', 'como', 'cuando', 'cuanto',\n  'cuánto', 'donde', 'dónde', 'este', 'esta', 'esto',\n  'esas', 'esos', 'una', 'unos', 'unas', 'con', 'por',\n  'que', 'qué', 'del', 'las', 'los', 'hay', 'soy',\n  'me', 'mi', 'en', 'el', 'la', 'de', 'y', 'o',\n  'un', 'al', 'lo', 'se', 'su', 'sus', 'mas', 'más',\n  'pasar', 'dar', 'dais', 'mandar', 'enviar',\n  'informacion', 'información', 'info', 'algo', 'poco',\n  'favor', 'gracias'\n]);\n\nconst palabras = consultaNormalizada\n  .split(' ')\n  .filter(p => p.length > 2 && !stopwords.has(p));\n\nconst sinonimos = {\n  tratamiento: ['tratamientos', 'servicios', 'tecnicas', 'medicina estetica', 'ginecologia regenerativa'],\n  tratamientos: ['tratamiento', 'servicios', 'tecnicas', 'medicina estetica', 'ginecologia regenerativa'],\n  servicio: ['servicios', 'tratamientos', 'tecnicas', 'medicina estetica', 'ginecologia regenerativa'],\n  servicios: ['servicio', 'tratamientos', 'tecnicas', 'medicina estetica', 'ginecologia regenerativa'],\n  tecnica: ['tecnicas', 'tratamientos'],\n  tecnicas: ['tecnica', 'tratamientos'],\n\n  estetica: ['medicina estetica', 'facial', 'armonizacion', 'full face', 'antiarrugas', 'labios', 'ojeras'],\n  facial: ['medicina estetica', 'armonizacion facial', 'full face', 'antiarrugas'],\n  faciales: ['medicina estetica', 'facial', 'armonizacion facial', 'full face', 'antiarrugas'],\n  cara: ['facial', 'armonizacion facial', 'full face'],\n  rostro: ['facial', 'armonizacion facial', 'full face'],\n\n  armonizacion: ['armonizacion facial', 'full face', 'relleno', 'volumen'],\n  full: ['full face', 'armonizacion facial'],\n  face: ['full face', 'armonizacion facial'],\n\n  bioestimulacion: ['bioestimulacion de colageno', 'colageno', 'inductores de colageno'],\n  bioestimuladores: ['bioestimulacion', 'inductores de colageno', 'colageno'],\n  colageno: ['bioestimulacion de colageno', 'inductores de colageno'],\n  inductores: ['inductores de colageno', 'bioestimulacion de colageno'],\n\n  polinucleotidos: ['regeneracion piel', 'calidad de piel', 'bioestimulacion'],\n  piel: ['polinucleotidos', 'bioestimulacion', 'inductores de colageno'],\n\n  botox: ['neuromoduladores', 'toxina botulinica', 'antiarrugas', 'tercio superior', 'bruxismo', 'sonrisa gingival'],\n  toxina: ['botox', 'neuromoduladores'],\n  neuromoduladores: ['botox', 'toxina botulinica', 'antiarrugas', 'tercio superior', 'bruxismo', 'sonrisa gingival'],\n\n  antiarrugas: ['tercio superior', 'neuromoduladores', 'botox'],\n  arrugas: ['antiarrugas', 'tercio superior', 'neuromoduladores'],\n  frente: ['tercio superior', 'antiarrugas', 'neuromoduladores'],\n  entrecejo: ['tercio superior', 'antiarrugas', 'neuromoduladores'],\n  patas: ['patas de gallo', 'tercio superior', 'antiarrugas'],\n  gallo: ['patas de gallo', 'tercio superior', 'antiarrugas'],\n\n  sonrisa: ['sonrisa gingival', 'neuromoduladores'],\n  gingival: ['sonrisa gingival', 'neuromoduladores'],\n\n  bruxismo: ['masetero', 'neuromoduladores', 'mandibula'],\n  masetero: ['bruxismo', 'neuromoduladores'],\n  mandibula: ['bruxismo', 'masetero'],\n\n  labios: ['acido hialuronico', 'zona peribucal', 'relleno labios'],\n  labio: ['labios', 'zona peribucal', 'relleno labios'],\n  peribucal: ['labios', 'codigo de barras', 'acido hialuronico'],\n  ojeras: ['mirada', 'acido hialuronico'],\n\n  sudor: ['hiperhidrosis', 'neuromoduladores'],\n  sudoracion: ['hiperhidrosis', 'neuromoduladores'],\n  hiperhidrosis: ['sudoracion excesiva', 'neuromoduladores'],\n\n  ginecologia: ['ginecologia regenerativa', 'zona intima', 'vaginal'],\n  vaginal: ['ginecologia regenerativa', 'zona intima'],\n  vulvar: ['ginecologia regenerativa', 'zona intima'],\n  intima: ['ginecologia regenerativa', 'vaginal', 'vulvar'],\n\n  sequedad: ['atrofia', 'hidratacion', 'lubricacion', 'menopausia', 'acido hialuronico vaginal'],\n  seca: ['sequedad', 'atrofia', 'lubricacion'],\n  lubricacion: ['sequedad', 'hidratacion'],\n  atrofia: ['sequedad', 'menopausia', 'rejuvenecimiento vaginal'],\n\n  pis: ['orina', 'incontinencia', 'urinaria'],\n  orina: ['pis', 'incontinencia', 'urinaria'],\n  urinaria: ['orina', 'incontinencia'],\n  perdida: ['incontinencia', 'orina'],\n  perdidas: ['incontinencia', 'orina'],\n  escape: ['incontinencia', 'orina'],\n  escapes: ['incontinencia', 'orina'],\n\n  relaciones: ['dispareunia', 'dolor', 'sexual', 'vaginismo'],\n  sexo: ['relaciones', 'dispareunia', 'dolor', 'sexual'],\n  sexual: ['relaciones', 'sexo', 'dispareunia'],\n  dolor: ['dispareunia', 'vulvodinia', 'vaginismo'],\n\n  menopausia: ['sofocos', 'hormonal', 'sequedad', 'atrofia', 'tratamiento hormonal'],\n  sofocos: ['menopausia', 'hormonal'],\n  hormonal: ['menopausia', 'terapia hormonal', 'modulacion hormonal'],\n\n  laser: ['láser', 'co2', 'ginecologico'],\n  radiofrecuencia: ['regenerativa', 'vaginal', 'vulvar'],\n  prp: ['plasma', 'plaquetas'],\n  plasma: ['prp', 'plaquetas'],\n  exosomas: ['regeneracion', 'regenerativa'],\n  ondas: ['ondas de choque', 'dolor pelvico', 'regeneracion'],\n  liquen: ['escleroso', 'vulvar', 'picor'],\n  picor: ['liquen', 'escozor', 'irritacion'],\n  infecciones: ['candidiasis', 'vaginosis', 'repeticion'],\n  postparto: ['cicatrices', 'recuperacion post parto', 'suelo pelvico'],\n\n  precio: ['cuesta', 'coste', 'presupuesto', 'valoracion'],\n  precios: ['cuesta', 'coste', 'presupuesto', 'valoracion'],\n  cuesta: ['precio', 'coste', 'presupuesto'],\n  coste: ['precio', 'cuesta', 'presupuesto'],\n  presupuesto: ['precio', 'coste', 'valoracion'],\n\n  cita: ['consulta', 'telefono', 'email', 'direccion'],\n  consulta: ['cita', 'telefono', 'email', 'direccion'],\n  ubicacion: ['direccion', 'clinica', 'valencia'],\n  direccion: ['ubicacion', 'clinica', 'valencia'],\n  telefono: ['contacto', 'cita', 'consulta'],\n  email: ['contacto', 'cita', 'consulta']\n};\n\nconst terminosBusqueda = new Set(palabras);\n\nfor (const palabra of palabras) {\n  if (sinonimos[palabra]) {\n    sinonimos[palabra].forEach(s => terminosBusqueda.add(normalizar(s)));\n  }\n}\n\nfunction textoItem(item) {\n  const faqs = (item.faqs || [])\n    .map(f => `${f.question || ''} ${f.answer || ''}`)\n    .join('\\n');\n\n  const headings = (item.content?.headings || [])\n    .map(h => h.text || '')\n    .join('\\n');\n\n  const paragraphs = (item.content?.paragraphs || [])\n    .join('\\n');\n\n  return `\n    ${item.sourceFile || ''}\n    ${item.url || ''}\n    ${item.title || ''}\n    ${item.ogTitle || ''}\n    ${item.metaDescription || ''}\n    ${item.ogDescription || ''}\n    ${item.treatment?.name || ''}\n    ${item.treatment?.category || ''}\n    ${headings}\n    ${paragraphs}\n    ${item.content?.fullText || ''}\n    ${faqs}\n  `;\n}\n\nfunction obtenerClinica() {\n  return base.find(i => i.clinic)?.clinic || {};\n}\n\nfunction obtenerHorarios(clinic) {\n  return (clinic.openingHours || [])\n    .map(h => {\n      const dias = Array.isArray(h.dayOfWeek)\n        ? h.dayOfWeek.join(', ')\n        : h.dayOfWeek;\n\n      return `${dias}: ${h.opens} - ${h.closes}`;\n    })\n    .join('\\n');\n}\n\nfunction esPaginaUtil(item) {\n  const nombre = normalizar(item.treatment?.name || '');\n  const titulo = normalizar(item.title || '');\n  const source = normalizar(item.sourceFile || '');\n\n  if (!item.treatment?.name && !item.treatment?.category) return false;\n  if (nombre.includes('page has moved')) return false;\n  if (titulo.includes('page has moved')) return false;\n  if (source.includes('equipo medico')) return false;\n\n  return true;\n}\n\nfunction esPaginaPrincipal(item) {\n  const source = normalizar(item.sourceFile || '');\n\n  return (\n    source === 'index html' ||\n    source === 'medicina estetica index html' ||\n    source === 'ginecologia regenerativa index html'\n  );\n}\n\nfunction esMedicinaEstetica(item) {\n  return (\n    normalizar(item.treatment?.category || '').includes('medicina estetica') ||\n    normalizar(item.sourceFile || '').includes('medicina estetica')\n  );\n}\n\nfunction esGinecologiaRegenerativa(item) {\n  return (\n    normalizar(item.treatment?.category || '').includes('ginecologia regenerativa') ||\n    normalizar(item.sourceFile || '').includes('ginecologia regenerativa')\n  );\n}\n\nfunction construirContexto(items, limiteTexto = 800) {\n  return items.map((item, index) => {\n    const headings = (item.content?.headings || [])\n      .map(h => `- ${h.text || ''}`)\n      .filter(Boolean)\n      .join('\\n');\n\n    const paragraphs = (item.content?.paragraphs || [])\n      .filter(Boolean)\n      .join('\\n');\n\n    const fullText = item.content?.fullText || '';\n\n    const faqs = (item.faqs || [])\n      .slice(0, 4)\n      .map(f => `P: ${f.question || ''}\\nR: ${f.answer || ''}`)\n      .join('\\n');\n\n    const textoBase = [\n      headings ? `Apartados y tratamientos detectados:\\n${headings}` : '',\n      fullText ? `Contenido:\\n${fullText}` : '',\n      paragraphs ? `Texto adicional:\\n${paragraphs}` : '',\n      faqs ? `Preguntas frecuentes:\\n${faqs}` : ''\n    ]\n      .filter(Boolean)\n      .join('\\n\\n');\n\n    return `\nFUENTE ${index + 1}\nTítulo: ${item.title || ''}\nTratamiento: ${item.treatment?.name || ''}\nCategoría: ${item.treatment?.category || ''}\nURL: ${item.url || ''}\n\nInformación relevante:\n${textoBase.slice(0, limiteTexto)}\n`;\n  }).join('\\n\\n---\\n\\n');\n}\n\nfunction crearRespuesta(items, debugExtra = {}, opciones = {}) {\n  const clinic = obtenerClinica();\n  const horarios = obtenerHorarios(clinic);\n\n  const limiteTexto = opciones.limiteTexto || 800;\n\n  return [\n    {\n      json: {\n        ...input,\n\n        contexto_base: construirContexto(items, limiteTexto),\n        resultados_encontrados: items.length,\n\n        clinic_name: clinic.name || 'MAI CLINIC',\n        clinic_phone: clinic.telephone || '',\n        clinic_email: clinic.email || '',\n        clinic_address: clinic.address\n          ? `${clinic.address.street}, ${clinic.address.postalCode} ${clinic.address.city}`\n          : '',\n        clinic_opening_hours: horarios,\n\n        debug_busqueda: {\n          mensaje_original: mensajeUsuario,\n          consulta_normalizada: consultaNormalizada,\n          palabras_detectadas: palabras,\n          terminos_busqueda: Array.from(terminosBusqueda),\n          resultados: items.map(item => ({\n            title: item.title || '',\n            treatment: item.treatment?.name || '',\n            category: item.treatment?.category || '',\n            sourceFile: item.sourceFile || '',\n            url: item.url || ''\n          })),\n          ...debugExtra\n        }\n      }\n    }\n  ];\n}\n\n/**\n * 1. Consultas de contacto, cita, dirección u horarios.\n */\nconst palabrasContacto = new Set([\n  'cita',\n  'citas',\n  'telefono',\n  'teléfono',\n  'contacto',\n  'contactar',\n  'direccion',\n  'dirección',\n  'ubicacion',\n  'ubicación',\n  'horario',\n  'horarios',\n  'email',\n  'correo',\n  'donde',\n  'dónde'\n]);\n\nconst esConsultaContacto = palabras.some(p => palabrasContacto.has(p));\n\nif (esConsultaContacto) {\n  const paginasContacto = base\n    .filter(item => item.clinic)\n    .slice(0, 1);\n\n  if (paginasContacto.length > 0) {\n    return crearRespuesta(paginasContacto, {\n      tipo_busqueda: 'consulta_contacto'\n    });\n  }\n}\n\n/**\n * 2. Detectar consulta facial concreta.\n */\nconst consultaEsFacialConcreta =\n  consultaNormalizada.includes('facial') ||\n  consultaNormalizada.includes('faciales') ||\n  consultaNormalizada.includes('rostro') ||\n  consultaNormalizada.includes('cara') ||\n  consultaNormalizada.includes('labios') ||\n  consultaNormalizada.includes('bruxismo') ||\n  consultaNormalizada.includes('arrugas') ||\n  consultaNormalizada.includes('antiarrugas') ||\n  consultaNormalizada.includes('armonizacion') ||\n  consultaNormalizada.includes('bioestimulacion') ||\n  consultaNormalizada.includes('polinucleotidos') ||\n  consultaNormalizada.includes('neuromoduladores') ||\n  consultaNormalizada.includes('botox') ||\n  consultaNormalizada.includes('sonrisa gingival') ||\n  consultaNormalizada.includes('hiperhidrosis') ||\n  consultaNormalizada.includes('medicina estetica');\n\n/**\n * 3. NUEVO BLOQUE IMPORTANTE:\n * Si pregunta por tratamientos faciales o medicina estética, usamos un resumen exclusivo\n * y no dejamos que entre en el resumen general de ginecología.\n */\nconst esConsultaGeneralFacial =\n  consultaEsFacialConcreta &&\n  (\n    consultaNormalizada.includes('tratamientos') ||\n    consultaNormalizada.includes('tratamiento') ||\n    consultaNormalizada.includes('servicios') ||\n    consultaNormalizada.includes('servicio') ||\n    consultaNormalizada.includes('informacion') ||\n    consultaNormalizada.includes('información') ||\n    consultaNormalizada.includes('info') ||\n    consultaNormalizada.includes('que teneis') ||\n    consultaNormalizada.includes('que tenéis') ||\n    consultaNormalizada.includes('que ofreceis') ||\n    consultaNormalizada.includes('que ofrecéis') ||\n    consultaNormalizada.includes('exactamente')\n  );\n\nif (esConsultaGeneralFacial) {\n  const clinic = obtenerClinica();\n  const horarios = obtenerHorarios(clinic);\n\n  const resumenFacial = `\nRESUMEN EXCLUSIVO DE TRATAMIENTOS FACIALES / MEDICINA ESTÉTICA DE MAI CLINIC\n\nEl usuario pregunta por tratamientos faciales o medicina estética facial.\n\nTratamientos faciales disponibles:\n- Armonización facial o full face.\n- Bioestimulación de colágeno.\n- Polinucleótidos.\n- Inductores de colágeno.\n- Neuromoduladores.\n- Tratamiento antiarrugas del tercio superior.\n- Sonrisa gingival.\n- Tratamiento de labios y zona peribucal.\n- Tratamiento de bruxismo.\n- Hiperhidrosis.\n\nINSTRUCCIÓN OBLIGATORIA:\nResponde SOLO sobre medicina estética/facial.\nNO menciones ginecología regenerativa.\nNO menciones incontinencia, menopausia, sequedad vaginal ni tratamientos íntimos.\nSi el usuario pide información general, lista estos tratamientos de forma breve y ofrece valoración personalizada.\n`;\n\n  return [\n    {\n      json: {\n        ...input,\n\n        contexto_base: resumenFacial,\n        resultados_encontrados: 10,\n\n        clinic_name: clinic.name || 'MAI CLINIC',\n        clinic_phone: clinic.telephone || '',\n        clinic_email: clinic.email || '',\n        clinic_address: clinic.address\n          ? `${clinic.address.street}, ${clinic.address.postalCode} ${clinic.address.city}`\n          : '',\n        clinic_opening_hours: horarios,\n\n        debug_busqueda: {\n          mensaje_original: mensajeUsuario,\n          consulta_normalizada: consultaNormalizada,\n          palabras_detectadas: palabras,\n          terminos_busqueda: Array.from(terminosBusqueda),\n          tipo_busqueda: 'consulta_general_facial_resumen_exclusivo'\n        }\n      }\n    }\n  ];\n}\n\n/**\n * 4. Consultas generales sobre tratamientos o servicios.\n * Si era facial concreta, NO entra aquí.\n */\nconst patronesConsultaGeneral = [\n  'tratamientos',\n  'tratamiento',\n  'servicios',\n  'servicio',\n  'que ofrece',\n  'que ofreceis',\n  'que ofrecéis',\n  'que ofrecen',\n  'que teneis',\n  'que tenéis',\n  'que haceis',\n  'que hacéis',\n  'especialidades',\n  'informacion general',\n  'información general',\n  'info general',\n  'informacion de tratamientos',\n  'información de tratamientos',\n  'info de tratamientos'\n];\n\nconst palabrasConsultaGeneral = new Set([\n  'tratamiento',\n  'tratamientos',\n  'servicio',\n  'servicios',\n  'ofrece',\n  'ofrecen',\n  'ofreceis',\n  'ofrecéis',\n  'ofrecemos',\n  'especialidad',\n  'especialidades',\n  'tecnicas',\n  'técnicas',\n  'opciones'\n]);\n\nconst esConsultaGeneralTratamientos =\n  !consultaEsFacialConcreta &&\n  (\n    patronesConsultaGeneral.some(p => consultaNormalizada.includes(normalizar(p))) ||\n    palabras.some(p => palabrasConsultaGeneral.has(p))\n  );\n\nif (esConsultaGeneralTratamientos) {\n  const clinic = obtenerClinica();\n  const horarios = obtenerHorarios(clinic);\n\n  const resumenGeneralTratamientos = `\nRESUMEN GENERAL DE TRATAMIENTOS DE MAI CLINIC\n\nMAI Clinic trabaja principalmente dos áreas:\n\n1. Medicina estética:\nArmonización facial o full face, bioestimulación de colágeno, polinucleótidos, inductores de colágeno, neuromoduladores, tratamiento antiarrugas del tercio superior, sonrisa gingival, tratamiento de labios y zona peribucal, bruxismo e hiperhidrosis.\n\n2. Ginecología regenerativa:\nLáser ginecológico, radiofrecuencia vaginal y vulvar, PRP vaginal, ácido hialurónico vaginal, exosomas, ondas de choque, incontinencia de orina, menopausia, recuperación posparto, disfunciones sexuales, liquen escleroso, infecciones vaginales de repetición y rejuvenecimiento vaginal.\n\nINSTRUCCIÓN PARA LA RESPUESTA:\nResponde en máximo 5 líneas.\nNo listes todos los tratamientos uno por uno.\nAgrupa por áreas.\nTermina recomendando una valoración personalizada.\n`;\n\n  return [\n    {\n      json: {\n        ...input,\n\n        contexto_base: resumenGeneralTratamientos,\n        resultados_encontrados: 2,\n\n        clinic_name: clinic.name || 'MAI CLINIC',\n        clinic_phone: clinic.telephone || '',\n        clinic_email: clinic.email || '',\n        clinic_address: clinic.address\n          ? `${clinic.address.street}, ${clinic.address.postalCode} ${clinic.address.city}`\n          : '',\n        clinic_opening_hours: horarios,\n\n        debug_busqueda: {\n          mensaje_original: mensajeUsuario,\n          consulta_normalizada: consultaNormalizada,\n          palabras_detectadas: palabras,\n          terminos_busqueda: Array.from(terminosBusqueda),\n          tipo_busqueda: 'consulta_general_resumen_compacto'\n        }\n      }\n    }\n  ];\n}\n\n/**\n * 5. Detección de intención por área.\n */\nconst terminosMedicinaEstetica = [\n  'estetica', 'facial', 'faciales', 'cara', 'rostro', 'armonizacion', 'full face',\n  'bioestimulacion', 'colageno', 'inductores', 'polinucleotidos',\n  'botox', 'toxina', 'neuromoduladores', 'antiarrugas', 'arrugas',\n  'tercio superior', 'frente', 'entrecejo', 'patas de gallo',\n  'sonrisa gingival', 'bruxismo', 'masetero', 'labios', 'labio',\n  'peribucal', 'ojeras', 'hiperhidrosis', 'sudor'\n];\n\nconst terminosGinecologia = [\n  'ginecologia', 'vaginal', 'vagina', 'vulvar', 'vulva', 'intima',\n  'sequedad', 'lubricacion', 'atrofia', 'menopausia', 'sofocos',\n  'incontinencia', 'orina', 'pis', 'relaciones', 'sexo', 'sexual',\n  'vaginismo', 'vulvodinia', 'liquen', 'picor', 'infecciones',\n  'postparto', 'parto', 'laser ginecologico', 'radiofrecuencia vaginal',\n  'prp vaginal', 'ondas de choque'\n];\n\nconst consultaEsMedicinaEstetica = terminosMedicinaEstetica.some(t =>\n  consultaNormalizada.includes(normalizar(t))\n);\n\nconst consultaEsGinecologia = terminosGinecologia.some(t =>\n  consultaNormalizada.includes(normalizar(t))\n);\n\n/**\n * 6. Búsqueda normal por relevancia.\n */\nconst resultados = base\n  .filter(esPaginaUtil)\n  .map(item => {\n    const titulo = normalizar(`\n      ${item.title || ''}\n      ${item.treatment?.name || ''}\n      ${item.treatment?.category || ''}\n      ${item.sourceFile || ''}\n    `);\n\n    const completo = normalizar(textoItem(item));\n\n    const faqs = normalizar(\n      (item.faqs || [])\n        .map(f => `${f.question || ''} ${f.answer || ''}`)\n        .join(' ')\n    );\n\n    let score = 0;\n\n    for (const termino of terminosBusqueda) {\n      if (!termino) continue;\n\n      if (titulo.includes(termino)) score += 12;\n      if (faqs.includes(termino)) score += 7;\n      if (completo.includes(termino)) score += 3;\n    }\n\n    if (consultaEsMedicinaEstetica && esMedicinaEstetica(item)) score += 12;\n    if (consultaEsMedicinaEstetica && esGinecologiaRegenerativa(item)) score -= 8;\n\n    if (consultaEsGinecologia && esGinecologiaRegenerativa(item)) score += 12;\n    if (consultaEsGinecologia && esMedicinaEstetica(item)) score -= 8;\n\n    const preguntaPorSequedad =\n      consultaNormalizada.includes('sequedad') ||\n      consultaNormalizada.includes('seca') ||\n      consultaNormalizada.includes('lubricacion') ||\n      consultaNormalizada.includes('atrofia');\n\n    const itemSequedad =\n      titulo.includes('sequedad') ||\n      titulo.includes('hialuronico vaginal') ||\n      titulo.includes('acido hialuronico vaginal');\n\n    if (!preguntaPorSequedad && itemSequedad) {\n      score -= 8;\n    }\n\n    if (esPaginaPrincipal(item)) {\n      score -= 4;\n    }\n\n    return {\n      score,\n      item\n    };\n  })\n  .filter(r => r.score > 0)\n  .sort((a, b) => b.score - a.score)\n  .slice(0, 4);\n\n/**\n * 7. Fallback si no encuentra nada.\n */\nif (resultados.length === 0) {\n  const clinic = obtenerClinica();\n  const horarios = obtenerHorarios(clinic);\n\n  const resumenFallback = `\nRESUMEN GENERAL DE MAI CLINIC\n\nMAI Clinic trabaja principalmente en medicina estética y ginecología regenerativa.\n\nMedicina estética:\nArmonización facial, bioestimulación de colágeno, polinucleótidos, inductores de colágeno, neuromoduladores, labios, bruxismo e hiperhidrosis.\n\nGinecología regenerativa:\nLáser ginecológico, radiofrecuencia, PRP, ácido hialurónico vaginal, exosomas, ondas de choque, menopausia, incontinencia, disfunciones sexuales y recuperación posparto.\n\nSi no hay información concreta suficiente, ofrece una valoración personalizada.\n`;\n\n  return [\n    {\n      json: {\n        ...input,\n\n        contexto_base: resumenFallback,\n        resultados_encontrados: 0,\n\n        clinic_name: clinic.name || 'MAI CLINIC',\n        clinic_phone: clinic.telephone || '',\n        clinic_email: clinic.email || '',\n        clinic_address: clinic.address\n          ? `${clinic.address.street}, ${clinic.address.postalCode} ${clinic.address.city}`\n          : '',\n        clinic_opening_hours: horarios,\n\n        debug_busqueda: {\n          mensaje_original: mensajeUsuario,\n          consulta_normalizada: consultaNormalizada,\n          palabras_detectadas: palabras,\n          terminos_busqueda: Array.from(terminosBusqueda),\n          tipo_busqueda: 'fallback_resumen_compacto'\n        }\n      }\n    }\n  ];\n}\n\nreturn crearRespuesta(\n  resultados.map(r => r.item),\n  {\n    tipo_busqueda: 'busqueda_normal',\n    area_detectada: consultaEsMedicinaEstetica\n      ? 'medicina_estetica'\n      : consultaEsGinecologia\n        ? 'ginecologia_regenerativa'\n        : 'sin_area_clara',\n    scores: resultados.map(r => ({\n      score: r.score,\n      title: r.item.title || '',\n      treatment: r.item.treatment?.name || '',\n      category: r.item.treatment?.category || '',\n      sourceFile: r.item.sourceFile || '',\n      url: r.item.url || ''\n    }))\n  },\n  {\n    limiteTexto: 800\n  }\n);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        -320
+      ],
+      "id": "58eaaea7-98eb-4372-9e65-d2204102f6c9",
+      "name": "Buscar contexto local"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fs = require('fs');\nconst path = require('path');\n\nconst input = $input.first().json;\n\nconst MEMORY_DIR = '/home/node/.n8n/memory';\nconst MAX_DIAS_HISTORIAL = 14;\nconst MAX_MENSAJES_PROMPT = 6;\n\nconst phone = input.from || 'desconocido';\nconst filePath = path.join(MEMORY_DIR, `${phone}.json`);\n\nif (!fs.existsSync(MEMORY_DIR)) {\n  fs.mkdirSync(MEMORY_DIR, { recursive: true });\n}\n\nfunction normalizar(texto) {\n  return String(texto || '')\n    .toLowerCase()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '')\n    .replace(/[^\\p{L}\\p{N}\\s]/gu, ' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nlet historial = [];\n\nif (fs.existsSync(filePath)) {\n  try {\n    historial = JSON.parse(fs.readFileSync(filePath, 'utf8'));\n  } catch (e) {\n    historial = [];\n  }\n}\n\n// Limpieza por antigüedad\nconst ahora = Date.now();\nconst limiteAntiguedad = ahora - MAX_DIAS_HISTORIAL * 24 * 60 * 60 * 1000;\n\nhistorial = historial.filter(m => {\n  if (!m.timestamp) return false;\n  const fecha = new Date(m.timestamp).getTime();\n  return !Number.isNaN(fecha) && fecha >= limiteAntiguedad;\n});\n\nconst textoUsuario = normalizar(input.text || '');\n\nfunction detectarTema() {\n  const debug = input.debug_busqueda || {};\n  const area = debug.area_detectada || '';\n  const tipo = debug.tipo_busqueda || '';\n\n  if (tipo.includes('consulta_general')) return 'tratamientos_generales';\n  if (tipo.includes('consulta_facial')) return 'medicina_estetica';\n  if (area === 'medicina_estetica') return 'medicina_estetica';\n  if (area === 'ginecologia_regenerativa') return 'ginecologia_regenerativa';\n\n  if (\n    textoUsuario.includes('facial') ||\n    textoUsuario.includes('faciales') ||\n    textoUsuario.includes('rostro') ||\n    textoUsuario.includes('cara') ||\n    textoUsuario.includes('bruxismo') ||\n    textoUsuario.includes('labios') ||\n    textoUsuario.includes('arrugas') ||\n    textoUsuario.includes('antiarrugas') ||\n    textoUsuario.includes('armonizacion') ||\n    textoUsuario.includes('bioestimulacion') ||\n    textoUsuario.includes('polinucleotidos') ||\n    textoUsuario.includes('sonrisa') ||\n    textoUsuario.includes('botox') ||\n    textoUsuario.includes('neuromoduladores') ||\n    textoUsuario.includes('hiperhidrosis')\n  ) {\n    return 'medicina_estetica';\n  }\n\n  if (\n    textoUsuario.includes('vaginal') ||\n    textoUsuario.includes('sequedad') ||\n    textoUsuario.includes('incontinencia') ||\n    textoUsuario.includes('orina') ||\n    textoUsuario.includes('menopausia') ||\n    textoUsuario.includes('laser') ||\n    textoUsuario.includes('radiofrecuencia') ||\n    textoUsuario.includes('prp') ||\n    textoUsuario.includes('exosomas') ||\n    textoUsuario.includes('ondas') ||\n    textoUsuario.includes('liquen') ||\n    textoUsuario.includes('relaciones') ||\n    textoUsuario.includes('vaginismo') ||\n    textoUsuario.includes('vulvodinia')\n  ) {\n    return 'ginecologia_regenerativa';\n  }\n\n  return 'sin_tema_claro';\n}\n\nconst temaActual = detectarTema();\n\nconst ultimoMensaje = historial.length > 0\n  ? historial[historial.length - 1]\n  : null;\n\nconst ultimoTema = ultimoMensaje?.topic || '';\n\nconst ultimoTimestamp = ultimoMensaje?.timestamp\n  ? new Date(ultimoMensaje.timestamp).getTime()\n  : 0;\n\nconst minutosDesdeUltimo = ultimoTimestamp\n  ? Math.round((ahora - ultimoTimestamp) / 60000)\n  : null;\n\nconst expresionesContinuacion = [\n  'y eso',\n  'eso',\n  'ese',\n  'esa',\n  'el anterior',\n  'la anterior',\n  'me interesa',\n  'cuanto cuesta',\n  'cuánto cuesta',\n  'precio',\n  'duele',\n  'y duele',\n  'y cuanto',\n  'y cuánto',\n  'puedo pedir cita',\n  'quiero cita',\n  'para eso',\n  'ese tratamiento',\n  'esa tecnica',\n  'esa técnica',\n  'si',\n  'sí',\n  'vale',\n  'ok',\n  'perfecto'\n];\n\nconst pareceContinuacion =\n  textoUsuario.length < 80 ||\n  expresionesContinuacion.some(e => textoUsuario.includes(normalizar(e)));\n\nconst esReciente = minutosDesdeUltimo !== null && minutosDesdeUltimo <= 45;\n\nconst mismoTema =\n  temaActual !== 'sin_tema_claro' &&\n  ultimoTema !== '' &&\n  temaActual === ultimoTema;\n\nconst esContinuacion = Boolean(\n  historial.length > 0 &&\n  esReciente &&\n  (mismoTema || pareceContinuacion)\n);\n\nconst debeSaludar = !esContinuacion;\n\nconst historialReciente = historial.slice(-MAX_MENSAJES_PROMPT);\n\nconst historialTexto = historialReciente\n  .map(m => {\n    const rol = m.role === 'user' ? 'Usuario' : 'Asistente';\n    return `${rol}: ${m.content}`;\n  })\n  .join('\\n');\n\nconst ultimaRespuestaAsistente = [...historial]\n  .reverse()\n  .find(m => m.role === 'assistant')?.content || '';\n\nconst ultimoMensajeUsuario = [...historial]\n  .reverse()\n  .find(m => m.role === 'user')?.content || '';\n\nconst afirmaciones = [\n  'si',\n  'sí',\n  'vale',\n  'ok',\n  'okay',\n  'perfecto',\n  'me interesa',\n  'claro',\n  'quiero',\n  'adelante'\n];\n\nconst esAfirmacionCorta =\n  afirmaciones.includes(textoUsuario) ||\n  (textoUsuario.length <= 20 && afirmaciones.some(a => textoUsuario.includes(normalizar(a))));\n\nconst ultimaRespuestaNormalizada = normalizar(ultimaRespuestaAsistente);\n\nconst ultimaRespuestaOfreciaCita =\n  ultimaRespuestaNormalizada.includes('quieres programar una cita') ||\n  ultimaRespuestaNormalizada.includes('quieres pedir cita') ||\n  ultimaRespuestaNormalizada.includes('pedir cita') ||\n  ultimaRespuestaNormalizada.includes('programar una cita') ||\n  ultimaRespuestaNormalizada.includes('valoracion personalizada') ||\n  ultimaRespuestaNormalizada.includes('valoración personalizada') ||\n  ultimaRespuestaNormalizada.includes('valorar tu caso');\n\nconst preguntaTratamientosFacialesExactos =\n  textoUsuario.includes('exactamente') &&\n  (\n    textoUsuario.includes('tratamientos faciales') ||\n    textoUsuario.includes('faciales') ||\n    textoUsuario.includes('rostro') ||\n    textoUsuario.includes('cara')\n  );\n\nlet instruccionContinuidad = '';\n\nif (esAfirmacionCorta && ultimaRespuestaOfreciaCita) {\n  instruccionContinuidad = `\nEl usuario está aceptando continuar o pedir cita después de que se le ofreciera programar una valoración.\nNo repitas la información de tratamientos.\nResponde indicando cómo puede pedir cita usando teléfono, email o dirección de la clínica.\n`;\n} else if (preguntaTratamientosFacialesExactos) {\n  instruccionContinuidad = `\nEl usuario está pidiendo exactamente qué tratamientos faciales ofrece la clínica.\nNo repitas la respuesta anterior.\nNo menciones ginecología regenerativa.\nLista solo tratamientos de medicina estética/facial de forma clara y breve.\n`;\n} else {\n  instruccionContinuidad = `\nResponde al último mensaje del usuario de forma específica.\nNo repitas la respuesta anterior.\n`;\n}\n\nconst instruccionSaludo = debeSaludar\n  ? 'Puedes iniciar con un saludo breve y natural, pero varía el inicio. No uses siempre “Hola”.'\n  : 'No saludes de nuevo. No empieces con “Hola”, “Buenas” ni “Gracias por contactar”. Responde como continuación natural.';\n\nreturn [\n  {\n    json: {\n      ...input,\n      historial_conversacion: historialTexto || 'Sin historial previo.',\n      memory_file_path: filePath,\n      tema_actual: temaActual,\n      ultimo_tema: ultimoTema,\n      minutos_desde_ultimo_mensaje: minutosDesdeUltimo,\n      es_continuacion: esContinuacion,\n      debe_saludar: debeSaludar,\n      instruccion_saludo: instruccionSaludo,\n      ultima_respuesta_asistente: ultimaRespuestaAsistente,\n      ultimo_mensaje_usuario: ultimoMensajeUsuario,\n      instruccion_continuidad: instruccionContinuidad\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        -320
+      ],
+      "id": "2de9f5c0-1e33-4f0c-92fa-f9045309513e",
+      "name": "Cargar historial conversación"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fs = require('fs');\nconst path = require('path');\n\nconst normalizarMensaje = $node[\"Normalizar mensaje\"].json;\nconst contexto = $node[\"Cargar historial conversación\"].json;\n\nconst MEMORY_DIR = '/home/node/.n8n/memory';\nconst MAX_MENSAJES_GUARDADOS = 12;\nconst MAX_DIAS_HISTORIAL = 14;\n\nconst phone = normalizarMensaje.from || 'desconocido';\nconst filePath = contexto.memory_file_path || path.join(MEMORY_DIR, `${phone}.json`);\n\nif (!fs.existsSync(MEMORY_DIR)) {\n  fs.mkdirSync(MEMORY_DIR, { recursive: true });\n}\n\nlet historial = [];\n\nif (fs.existsSync(filePath)) {\n  try {\n    historial = JSON.parse(fs.readFileSync(filePath, 'utf8'));\n  } catch (e) {\n    historial = [];\n  }\n}\n\nconst respuestaIA = String(\n  $json.output ||\n  $json.respuesta_directa ||\n  ''\n).trim();\n\nhistorial.push({\n  role: 'user',\n  content: normalizarMensaje.text || '',\n  topic: contexto.tema_actual || 'sin_tema_claro',\n  timestamp: new Date().toISOString()\n});\n\nhistorial.push({\n  role: 'assistant',\n  content: respuestaIA,\n  topic: contexto.tema_actual || 'sin_tema_claro',\n  timestamp: new Date().toISOString()\n});\n\n// Limpieza por antigüedad\nconst ahora = Date.now();\nconst limiteAntiguedad = ahora - MAX_DIAS_HISTORIAL * 24 * 60 * 60 * 1000;\n\nhistorial = historial.filter(m => {\n  if (!m.timestamp) return false;\n  const fecha = new Date(m.timestamp).getTime();\n  return !Number.isNaN(fecha) && fecha >= limiteAntiguedad;\n});\n\n// Límite de mensajes por usuario\nhistorial = historial.slice(-MAX_MENSAJES_GUARDADOS);\n\nfs.writeFileSync(filePath, JSON.stringify(historial, null, 2), 'utf8');\n\nreturn [\n  {\n    json: {\n      ...$json,\n      output: respuestaIA,\n      historial_guardado: true\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        -336
+      ],
+      "id": "14ba8339-07aa-499c-b90c-659f2d6fc6ae",
+      "name": "Guardar historial conversación"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalizar mensaje",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar mensaje": {
+      "main": [
+        [
+          {
+            "node": "Es mensaje de texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Es mensaje de texto": {
+      "main": [
+        [
+          {
+            "node": "Buscar contexto local",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente WhatsApp",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Guardar historial conversación",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar fallback WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar fallback WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar contexto local": {
+      "main": [
+        [
+          {
+            "node": "Cargar historial conversación",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cargar historial conversación": {
+      "main": [
+        [
+          {
+            "node": "Agente WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar historial conversación": {
+      "main": [
+        [
+          {
+            "node": "Enviar WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "bd32f214-6556-4130-b931-3a6fb451121f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ce30596c2036c9787cf7de133bdf9beb7ac4721aa6f313e72b19791ad015b927"
+  },
+  "id": "A17JEBcKXEfub6sy",
+  "tags": []
+}

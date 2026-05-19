@@ -1,0 +1,2292 @@
+{
+  "name": "MAIL_PROCESSOR_IA_MULTI_CLIENT",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "client_id"
+            },
+            {
+              "name": "client_name"
+            },
+            {
+              "name": "mailbox_email"
+            },
+            {
+              "name": "review_email"
+            },
+            {
+              "name": "source_type"
+            },
+            {
+              "name": "gmail_credential_name"
+            },
+            {
+              "name": "gmail_message_id"
+            },
+            {
+              "name": "thread_id"
+            },
+            {
+              "name": "subject"
+            },
+            {
+              "name": "from"
+            },
+            {
+              "name": "to"
+            },
+            {
+              "name": "snippet"
+            },
+            {
+              "name": "collector_status"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        9168,
+        -12048
+      ],
+      "id": "33e8be96-f2d4-463b-870c-80967ffe166c",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ac696946-d2cf-488a-abc5-28fb3dbd32f2",
+              "name": "client_id",
+              "value": "={{ $json.client_id }}",
+              "type": "string"
+            },
+            {
+              "id": "549cbf34-638b-41bb-86ff-9cd0ffaf94e4",
+              "name": "client_name",
+              "value": "={{ $json.client_name }}",
+              "type": "string"
+            },
+            {
+              "id": "96578dce-fdb2-451f-b9ee-4e0551e09640",
+              "name": "mailbox_email",
+              "value": "={{ $json.mailbox_email }}",
+              "type": "string"
+            },
+            {
+              "id": "f60b5f14-d3de-4157-b600-d93c1b9c8ef2",
+              "name": "review_email",
+              "value": "={{ $json.review_email }}",
+              "type": "string"
+            },
+            {
+              "id": "8cbfaa66-c128-48c1-bb07-fa37aa376834",
+              "name": "gmail_credential_name",
+              "value": "={{ $json.gmail_credential_name }}",
+              "type": "string"
+            },
+            {
+              "id": "eab8a817-5056-4325-afc6-9826c25dbd9d",
+              "name": "from",
+              "value": "={{ $json.from }}",
+              "type": "string"
+            },
+            {
+              "id": "adc04f31-8941-4a4e-95a1-76b027b0db7f",
+              "name": "to",
+              "value": "={{ $json.to }}",
+              "type": "string"
+            },
+            {
+              "id": "2aba4ae3-7d38-4ff2-bb8c-8bb516156b14",
+              "name": "subject",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "a0135566-39c3-4ef6-a27e-4b39894fd6c3",
+              "name": "body",
+              "value": "={{ ($json.snippet || '').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "dd2d36e1-5cd7-4ded-89cd-3b992c409e60",
+              "name": "messageId",
+              "value": "={{ $json.gmail_message_id }}",
+              "type": "string"
+            },
+            {
+              "id": "956fb1e9-4848-4e2e-a456-08641d352fe6",
+              "name": "threadId",
+              "value": "={{ $json.thread_id }}",
+              "type": "string"
+            },
+            {
+              "id": "e09f7bb9-4aa1-49a9-abee-9ea6d84fe65d",
+              "name": "receivedDate",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        9328,
+        -12048
+      ],
+      "id": "591cb45f-b8c9-419a-a2bc-efcc211ec246",
+      "name": "Set Gmail"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Cargar reglas de clasificación\nconst rules = {\n  \"rules\": [\n    {\n      \"category\": \"client\",\n      \"mapped_category\": \"soporte\",\n      \"name\": \"Cliente\",\n      \"description\": \"Emails de clientes actuales o en proceso que requieren seguimiento, gestión de cita, documentación o respuesta operativa.\",\n      \"keywords\": [\"pedido\", \"problema\", \"incidencia\", \"seguimiento\", \"mi cita\", \"mi pedido\", \"documentación\", \"cambiar cita\", \"adjunto documentación\"]\n    },\n    {\n      \"category\": \"billing\",\n      \"mapped_category\": \"facturacion\",\n      \"name\": \"Facturas\",\n      \"description\": \"Emails relacionados con facturas, pagos, presupuestos, administración o proveedores.\",\n      \"keywords\": [\"factura\", \"pago\", \"proveedor\", \"presupuesto\", \"abono\", \"recibo\"]\n    },\n    {\n      \"category\": \"lead\",\n      \"mapped_category\": \"leads\",\n      \"name\": \"Lead\",\n      \"description\": \"Emails de personas o empresas que todavía no son clientes y solicitan información, precio o contratación.\",\n      \"keywords\": [\"información\", \"presupuesto\", \"precio\", \"tarifa\", \"me interesa\", \"quisiera saber\", \"solicitar información\", \"cómo funciona\", \"contratar\", \"consulta\"]\n    },\n    {\n      \"category\": \"publicidad\",\n      \"mapped_category\": \"publicidad\",\n      \"name\": \"Publicidad\",\n      \"description\": \"Emails irrelevantes, promocionales o no deseados que no aportan valor al negocio.\",\n      \"keywords\": [\"seo\", \"posicionamiento\", \"oferta\", \"marketing\", \"publicidad\", \"promoción\", \"unsubscribe\", \"gratis\", \"descuento masivo\"]\n    },\n    {\n      \"category\": \"incidencias\",\n      \"mapped_category\": \"incidencias\",\n      \"name\": \"Incidencias\",\n      \"description\": \"Problemas técnicos urgentes, errores o fallos que requieren atención inmediata.\",\n      \"keywords\": [\"error\", \"fallo\", \"no funciona\", \"urgente\", \"crítico\", \"caído\", \"roto\"]\n    }\n  ]\n};\n\nreturn [{\n  json: {\n    ...$input.item.json,\n    classification_rules: rules\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9504,
+        -12048
+      ],
+      "id": "0404c46c-6e96-4ca7-aa1d-2fcb34cd4de0",
+      "name": "Load Classification Rules"
+    },
+    {
+      "parameters": {
+        "jsCode": "function normalizeText(text) {\n  return (text || '')\n    .toLowerCase()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '')\n    .replace(/[¿?.,;:()\"'\\[\\]]/g, ' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nconst subject = normalizeText($json.subject || '');\nconst body = normalizeText($json.body || '');\nconst fullText = `${subject} ${body}`;\n\nconst rules = $json.classification_rules?.rules || [];\n\nlet bestMatch = null;\nlet highestScore = 0;\n\n// Evaluar cada regla\nfor (const rule of rules) {\n  let score = 0;\n  const keywords = rule.keywords || [];\n  \n  // Contar keywords que coinciden\n  for (const keyword of keywords) {\n    const normalizedKeyword = normalizeText(keyword);\n    \n    // Verificar en subject (vale más)\n    if (subject.includes(normalizedKeyword)) {\n      score += 3;\n    }\n    \n    // Verificar en body\n    if (body.includes(normalizedKeyword)) {\n      score += 1;\n    }\n  }\n  \n  // Si este es el mejor score hasta ahora\n  if (score > highestScore) {\n    highestScore = score;\n    bestMatch = rule;\n  }\n}\n\n// Determinar confianza\nlet confidence = 'none';\nlet suggestedCategory = 'otros';\nlet classificationMethod = 'none';\n\nif (bestMatch && highestScore >= 5) {\n  // Alta confianza: 5+ keywords\n  confidence = 'high';\n  suggestedCategory = bestMatch.mapped_category;\n  classificationMethod = 'rules';\n} else if (bestMatch && highestScore >= 2) {\n  // Media confianza: 2-4 keywords\n  confidence = 'medium';\n  suggestedCategory = bestMatch.mapped_category;\n  classificationMethod = 'rules_low_confidence';\n}\n\nreturn [{\n  json: {\n    ...$input.item.json,\n    rule_classification: {\n      category: suggestedCategory,\n      confidence: confidence,\n      score: highestScore,\n      matched_rule: bestMatch?.name || 'none',\n      method: classificationMethod\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        9680,
+        -12048
+      ],
+      "id": "02b60714-92b0-4379-91db-23cd2e0c2986",
+      "name": "Evaluate Rules"
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 2,
+        "output": "={{ $json.rule_classification?.confidence === 'high' ? 0 : 1 }}"
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        9856,
+        -12048
+      ],
+      "id": "75d6ce03-eb18-48d7-ba47-92332b25e18e",
+      "name": "Classification Decision"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "11223344-5566-7788-9900-aabbccddeeff",
+              "name": "categoria",
+              "value": "={{ $json.rule_classification.category }}",
+              "type": "string"
+            },
+            {
+              "id": "22334455-6677-8899-0011-bbccddeeaabb",
+              "name": "prioridad",
+              "value": "={{ $json.rule_classification.category === 'publicidad' ? 'baja' : 'media' }}",
+              "type": "string"
+            },
+            {
+              "id": "33445566-7788-9900-1122-ccddeeffaabb",
+              "name": "resumen",
+              "value": "Clasificado automáticamente por reglas",
+              "type": "string"
+            },
+            {
+              "id": "44556677-8899-0011-2233-ddeeffaabbcc",
+              "name": "intencion",
+              "value": "={{ $json.rule_classification.matched_rule }}",
+              "type": "string"
+            },
+            {
+              "id": "55667788-9900-1122-3344-eeffaabbccdd",
+              "name": "requiere_respuesta",
+              "value": "={{ $json.rule_classification.category === 'publicidad' ? false : true }}",
+              "type": "boolean"
+            },
+            {
+              "id": "66778899-0011-2233-4455-ffaabbccddee",
+              "name": "sentimiento",
+              "value": "neutral",
+              "type": "string"
+            },
+            {
+              "id": "77889900-1122-3344-5566-aabbccddeeff",
+              "name": "urgente",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "88990011-2233-4455-6677-bbccddeeffaa",
+              "name": "classification_method",
+              "value": "rules",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        10160,
+        -12224
+      ],
+      "id": "b60a7d2b-f7d0-4a97-879d-0452b15512ba",
+      "name": "Use Rule Classification"
+    },
+    {
+      "parameters": {
+        "jsCode": "const clientId = $input.first().json.client_id;\n\nconst allClients = $input.all();\n\nconst match = allClients.find(item => item.json.client_id === clientId);\n\nif (!match) {\n  throw new Error(`Cliente no encontrado: ${clientId}`);\n}\n\nreturn [match];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        12640,
+        -12208
+      ],
+      "id": "bd0323d5-8986-40e0-909f-f1c73d827bfb",
+      "name": "Filter client routing"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Filter client routing').item.json.sheet_url }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Filter client routing').item.json.config_tab }}",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        12864,
+        -12032
+      ],
+      "id": "f1f20e1f-85f1-47bc-8821-cb03f93cbbef",
+      "name": "Config empresa",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PGtualgb4ukwEdaI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1XF01PDnsgCgGfQPGYTDdpPw73-WsrPPhYSEgBYQ1ajo/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 131700018,
+          "mode": "list",
+          "cachedResultName": "clients",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XF01PDnsgCgGfQPGYTDdpPw73-WsrPPhYSEgBYQ1ajo/edit#gid=131700018"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        12464,
+        -12208
+      ],
+      "id": "a1cb6c74-dead-4082-9cd1-9ea037cae5e2",
+      "name": "Get client routing",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PGtualgb4ukwEdaI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Filter client routing').item.json.sheet_url }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Filter client routing').item.json.policies_tab }}",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        12528,
+        -12624
+      ],
+      "id": "1157071c-2811-4399-87df-e624b29943f1",
+      "name": "Politicas",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PGtualgb4ukwEdaI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Filter client routing').item.json.sheet_url }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Filter client routing').item.json.history_tab }}",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        12848,
+        -12352
+      ],
+      "id": "66293246-3f78-4c92-a7c1-2cd6d420fe49",
+      "name": "Respuestas IA",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PGtualgb4ukwEdaI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Filter client routing').item.json.sheet_url }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Filter client routing').item.json.faqs_tab }}",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        12864,
+        -12176
+      ],
+      "id": "e4199b43-346e-4499-b78a-1ca7c3037a63",
+      "name": "FAQs",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PGtualgb4ukwEdaI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        11552,
+        -11424
+      ],
+      "id": "aaeec3f4-6ca3-4bd4-a166-1f17fb3dda7a",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "GI9POaOJpONaymbM",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un asistente que clasifica correos de empresa.\n\nTu tarea es analizar el email y devolver EXCLUSIVAMENTE un JSON válido, completo y bien formado.\n\n⚠️ IMPORTANTE:\n- Devuelve SOLO el JSON.\n- No añadas texto antes ni después.\n- No uses markdown.\n- No expliques nada.\n- Asegúrate de cerrar correctamente todas las llaves {}.\n- El JSON debe ser parseable sin errores.\n\nEstructura exacta:\n\n{\n  \"categoria\": \"ventas|leads|soporte|facturacion|incidencias|publicidad|otro\",\n  \"prioridad\": \"baja|media|alta\",\n  \"resumen\": \"string breve\",\n  \"intencion\": \"string breve\",\n  \"requiere_respuesta\": true,\n  \"sentimiento\": \"positivo|neutral|negativo\",\n  \"urgente\": true\n}\n\nReglas de clasificación:\n\n- ventas → interés claro en comprar, presupuestos, productos o contratación inmediata\n- leads → contacto comercial inicial, solicitud de información comercial, demo o primer acercamiento sin intención de compra cerrada\n- soporte → dudas, ayuda, consultas generales\n- facturacion → pagos, facturas, cobros\n- incidencias → errores, fallos, problemas técnicos\n- publicidad → correos irrelevantes, promocionales, marketing no solicitado, SEO, posicionamiento, ofertas genéricas sin valor\n- otro → cualquier caso no claro\n\nReglas adicionales:\n- \"resumen\" → máximo 1 frase clara\n- \"intencion\" → qué quiere el usuario en una frase\n- \"requiere_respuesta\" → true si espera respuesta, false si no\n- \"sentimiento\" → percepción general del mensaje\n- \"urgente\" → true si hay urgencia explícita o implícita\n- Si no puedes clasificar claramente, usa \"otro\" como categoria y \"media\" como prioridad.\nNunca dejes campos vacíos.\n\nEmail:\n\nAsunto: {{ $json.subject }}\nRemitente: {{ $json.from }}\nDestinatario: {{ $json.to }}\n\nContenido:\n{{ $json.body }}",
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        10160,
+        -11920
+      ],
+      "id": "2674b2f8-1f07-4226-a24b-7e4db031cfc4",
+      "name": "Analisis IA"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.text || $json.response || $json.output || '';\nconst match = raw.match(/\\{[\\s\\S]*\\}/);\n\nif (!match) {\n  return [{\n    json: {\n      categoria: 'otro',\n      prioridad: 'media',\n      resumen: 'No se pudo analizar el correo automáticamente.',\n      intencion: 'Revisión manual',\n      requiere_respuesta: true\n    }\n  }];\n}\n\nlet parsed;\ntry {\n  parsed = JSON.parse(match[0]);\n} catch {\n  parsed = {\n    categoria: 'otro',\n    prioridad: 'media',\n    resumen: 'JSON inválido devuelto por el modelo.',\n    intencion: 'Revisión manual',\n    requiere_respuesta: true\n  };\n}\n\nconst categoriasValidas = ['ventas', 'leads', 'soporte', 'facturacion', 'incidencias', 'publicidad', 'otro'];\nconst prioridadesValidas = ['baja', 'media', 'alta'];\n\nparsed.categoria = categoriasValidas.includes(parsed.categoria) ? parsed.categoria : 'otro';\nparsed.prioridad = prioridadesValidas.includes(parsed.prioridad) ? parsed.prioridad : 'media';\nparsed.resumen = parsed.resumen || 'Sin resumen';\nparsed.intencion = parsed.intencion || 'Sin intención clara';\nparsed.requiere_respuesta = typeof parsed.requiere_respuesta === 'boolean' ? parsed.requiere_respuesta : true;\n\nreturn [{ json: parsed }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        10512,
+        -12256
+      ],
+      "id": "73bd3b3f-833c-4df5-9d12-798e5bffb7fe",
+      "name": "Parse Analisis"
+    },
+    {
+      "parameters": {
+        "jsCode": "const config = {};\n\nfor (const item of items) {\n  const clave = item.json.clave;\n  const valor = item.json.valor;\n\n  if (clave) {\n    config[clave] = valor || '';\n  }\n}\n\nreturn [\n  {\n    json: config\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        13056,
+        -12032
+      ],
+      "id": "be1f1b2c-299e-4acf-b7a8-857417659701",
+      "name": "Parsear config"
+    },
+    {
+      "parameters": {
+        "jsCode": "function limpiarTexto(texto) {\n  return (texto || '')\n    .toLowerCase()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '')\n    .replace(/[¿?.,;:()\"']/g, ' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nfunction contieneAlguna(texto, palabras) {\n  return palabras.some(p => texto.includes(p));\n}\n\nfunction puntuacionFaq(faq, text, categoriaEmail) {\n  let score = 0;\n\n  const pregunta = limpiarTexto(faq.pregunta_tipo);\n  const respuesta = limpiarTexto(faq.respuesta_oficial);\n  const cuandoUsar = limpiarTexto(faq.cuando_usar);\n  const cuandoNoUsar = limpiarTexto(faq.cuando_no_usar);\n  const categoriaFaq = limpiarTexto(faq.categoria_origen);\n\n  const bloques = [pregunta, respuesta, cuandoUsar, cuandoNoUsar, categoriaFaq];\n\n  for (const bloque of bloques) {\n    const palabras = bloque.split(' ').filter(p => p.length > 3);\n    for (const palabra of palabras) {\n      if (text.includes(palabra)) score += 1;\n    }\n  }\n\n  if (categoriaEmail && categoriaFaq.includes(categoriaEmail)) {\n    score += 4;\n  }\n\n  const esFacturacion = contieneAlguna(text, [\n    'factura', 'facturacion', 'cargo', 'cobro', 'pago', 'importe', 'recibo'\n  ]);\n\n  const esPrecio = contieneAlguna(text, [\n    'precio', 'presupuesto', 'coste', 'tarifa'\n  ]);\n\n  const esFormacion = contieneAlguna(text, [\n    'formacion', 'workshop', 'workshops', 'taller'\n  ]);\n\n  const esSoporte = contieneAlguna(text, [\n    'soporte', 'ayuda', 'problema', 'error', 'incidencia'\n  ]);\n\n  const esIA = contieneAlguna(text, [\n    'ia', 'inteligencia artificial'\n  ]);\n\n  if (esFacturacion) {\n    if (\n      contieneAlguna(pregunta, ['factura', 'facturacion', 'cargo', 'cobro', 'pago']) ||\n      contieneAlguna(respuesta, ['factura', 'facturacion', 'cargo', 'cobro', 'pago']) ||\n      contieneAlguna(cuandoUsar, ['factura', 'facturacion', 'cargo', 'cobro', 'pago']) ||\n      categoriaFaq.includes('facturacion')\n    ) {\n      score += 6;\n    }\n\n    if (categoriaFaq.includes('lead') || categoriaFaq.includes('ventas')) {\n      score -= 4;\n    }\n  }\n\n  if (esPrecio) {\n    if (\n      contieneAlguna(pregunta, ['precio', 'tarifa', 'coste', 'presupuesto']) ||\n      contieneAlguna(respuesta, ['precio', 'tarifa', 'coste', 'presupuesto'])\n    ) {\n      score += 5;\n    }\n  }\n\n  if (esFormacion) {\n    if (\n      contieneAlguna(pregunta, ['formacion', 'workshop', 'taller']) ||\n      contieneAlguna(respuesta, ['formacion', 'workshop', 'taller'])\n    ) {\n      score += 5;\n    }\n  }\n\n  if (esSoporte) {\n    if (\n      categoriaFaq.includes('soporte') ||\n      contieneAlguna(cuandoUsar, ['soporte', 'ayuda', 'problema', 'error', 'incidencia'])\n    ) {\n      score += 4;\n    }\n  }\n\n  if (esIA) {\n    if (\n      contieneAlguna(pregunta, ['ia', 'inteligencia artificial']) ||\n      contieneAlguna(respuesta, ['ia', 'inteligencia artificial'])\n    ) {\n      score += 3;\n    }\n  }\n\n  return score;\n}\n\nconst ctx = $('Build analysis context').first().json;\n\nconst text = limpiarTexto([\n  ctx.subject || '',\n  ctx.body || '',\n  ctx.resumen || '',\n  ctx.intencion || '',\n  ctx.categoria || ''\n].join(' '));\n\nconst categoriaEmail = limpiarTexto(ctx.categoria || '');\n\nconst scored = items\n  .filter(item =>\n    item.json.faq_id &&\n    item.json.pregunta_tipo &&\n    item.json.respuesta_oficial\n  )\n  .map(item => ({\n    json: {\n      ...item.json,\n      categoria: ctx.categoria,\n      prioridad: ctx.prioridad,\n      resumen: ctx.resumen,\n      intencion: ctx.intencion,\n      requiere_respuesta: ctx.requiere_respuesta,\n      subject: ctx.subject,\n      body: ctx.body,\n      texto_usado_para_buscar: text,\n      categoria_email: categoriaEmail,\n      score: puntuacionFaq(item.json, text, categoriaEmail)\n    }\n  }))\n  .sort((a, b) => b.json.score - a.json.score);\n\nconst relevantes = scored.filter(item => item.json.score > 0).slice(0, 3);\n\nif (relevantes.length > 0) {\n  return relevantes;\n}\n\n// fallback: devolver las 3 mejores aunque tengan score 0\nconst fallback = scored.slice(0, 3).map(item => ({\n  json: {\n    ...item.json,\n    faq_fallback: true\n  }\n}));\n\nif (fallback.length > 0) {\n  return fallback;\n}\n\n// fallback final: nunca devolver vacío\nreturn [\n  {\n    json: {\n      categoria: ctx.categoria,\n      prioridad: ctx.prioridad,\n      resumen: ctx.resumen,\n      intencion: ctx.intencion,\n      requiere_respuesta: ctx.requiere_respuesta,\n      subject: ctx.subject,\n      body: ctx.body,\n      faq_id: '',\n      pregunta_tipo: '',\n      respuesta_oficial: '',\n      score: 0,\n      faq_fallback: true,\n      sin_faqs_relevantes: true\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        13040,
+        -12192
+      ],
+      "id": "cc1c60c1-46d9-4e39-ad94-514c4eb342e4",
+      "name": "FAQs filtradas"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      client_id: $('Set Gmail').first().json.client_id,\n      client_name: $('Set Gmail').first().json.client_name,\n      mailbox_email: $('Set Gmail').first().json.mailbox_email,\n      review_email: $('Set Gmail').first().json.review_email,\n      gmail_credential_name: $('Set Gmail').first().json.gmail_credential_name,\n      from: $('Set Gmail').first().json.from,\n      to: $('Set Gmail').first().json.to,\n      subject: $('Set Gmail').first().json.subject,\n      body: $('Set Gmail').first().json.body,\n      messageId: $('Set Gmail').first().json.messageId,\n      threadId: $('Set Gmail').first().json.threadId,\n      receivedDate: $('Set Gmail').first().json.receivedDate,\n\n      categoria: $('Parse Analisis').first().json.categoria,\n      prioridad: $('Parse Analisis').first().json.prioridad,\n      resumen: $('Parse Analisis').first().json.resumen,\n      intencion: $('Parse Analisis').first().json.intencion,\n      requiere_respuesta: $('Parse Analisis').first().json.requiere_respuesta,\n      sentimiento: $('Parse Analisis').first().json.sentimiento || 'neutral',\n      urgente: $('Parse Analisis').first().json.urgente || false\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        10736,
+        -12096
+      ],
+      "id": "90107875-7da7-4152-8f90-fa6ae9e62672",
+      "name": "Build analysis context"
+    },
+    {
+      "parameters": {
+        "jsCode": "const faqsValidas = items.filter(item => item.json.faq_id && item.json.respuesta_oficial);\n\nif (faqsValidas.length === 0) {\n  return [\n    {\n      json: {\n        faqs_contexto: '',\n        faq_ids_usadas: '',\n        faqs_raw: [],\n        sin_faqs_relevantes: true\n      }\n    }\n  ];\n}\n\nconst faqIds = faqsValidas.map(item => item.json.faq_id).join(', ');\n\nconst faqsTexto = faqsValidas.map((item, i) => {\n  const faq = item.json;\n\n  return `FAQ ${i + 1}\nID: ${faq.faq_id || ''}\nCategoría origen: ${faq.categoria_origen || ''}\nPregunta tipo: ${faq.pregunta_tipo || ''}\nRespuesta oficial: ${faq.respuesta_oficial || ''}\nNivel de detalle: ${faq.nivel_detalle || ''}\nCuándo usar: ${faq.cuando_usar || ''}\nCuándo no usar: ${faq.cuando_no_usar || ''}\nÚltima actualización: ${faq.ultima_actualizacion || ''}\nNotas internas: ${faq.notas_internas || ''}\nScore: ${faq.score ?? ''}${faq.faq_fallback ? '\\nFAQ fallback: true' : ''}`;\n}).join('\\n\\n');\n\nreturn [\n  {\n    json: {\n      faqs_contexto: faqsTexto,\n      faq_ids_usadas: faqIds,\n      faqs_raw: faqsValidas.map(item => item.json),\n      sin_faqs_relevantes: false\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        13248,
+        -12192
+      ],
+      "id": "24dc11ef-4652-4ab1-a63d-13f2721ddbe7",
+      "name": "Construir contexto FAQs"
+    },
+    {
+      "parameters": {
+        "jsCode": "function limpiarTexto(texto) {\n  return (texto || '')\n    .toLowerCase()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '')\n    .replace(/[¿?.,;:()\"']/g, ' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nfunction contieneAlguna(texto, palabras) {\n  return palabras.some(p => texto.includes(p));\n}\n\nfunction scoreHistorico(item, ctx, text) {\n  let score = 0;\n\n  const categoriaHist = limpiarTexto(item.categoria || '');\n  const intencionHist = limpiarTexto(item.intencion || '');\n  const emailHist = limpiarTexto(item.email_original || '');\n  const tags = limpiarTexto(item.tags || '');\n\n  // Match por categoría\n  if (categoriaHist && categoriaHist.includes(ctx.categoria)) {\n    score += 5;\n  }\n\n  // Match por intención\n  if (intencionHist && intencionHist.includes(ctx.intencion)) {\n    score += 4;\n  }\n\n  // Coincidencias de palabras\n  const palabras = emailHist.split(' ').filter(p => p.length > 4);\n  for (const palabra of palabras) {\n    if (text.includes(palabra)) score += 1;\n  }\n\n  // Tags\n  const tagsList = tags.split(',').map(t => t.trim());\n  for (const tag of tagsList) {\n    if (text.includes(tag)) score += 2;\n  }\n\n  // Penalizar si no es reutilizable\n  if (item.reutilizable !== 'true' && item.reutilizable !== true) {\n    score -= 3;\n  }\n\n  return score;\n}\n\n// 🔥 contexto actual\nconst ctx = $('Build analysis context').first().json;\n\nconst text = limpiarTexto([\n  ctx.subject || '',\n  ctx.body || '',\n  ctx.resumen || '',\n  ctx.intencion || ''\n].join(' '));\n\nconst scored = items\n  .filter(item => item.json.id && item.json.respuesta_aprobada)\n  .map(item => {\n    const score = scoreHistorico(item.json, ctx, text);\n\n    return {\n      json: {\n        ...item.json,\n        score\n      }\n    };\n  })\n  .sort((a, b) => b.json.score - a.json.score);\n\n// respuestas relevantes\nconst relevantes = scored.filter(item => item.json.score > 0).slice(0, 3);\n\nif (relevantes.length > 0) {\n  return relevantes;\n}\n\n// fallback: mejores aunque score 0\nconst fallback = scored.slice(0, 2).map(item => ({\n  json: {\n    ...item.json,\n    historico_fallback: true\n  }\n}));\n\nif (fallback.length > 0) {\n  return fallback;\n}\n\n// fallback final\nreturn [\n  {\n    json: {\n      id: '',\n      respuesta_aprobada: '',\n      score: 0,\n      historico_fallback: true,\n      sin_historico_relevante: true\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        13056,
+        -12320
+      ],
+      "id": "5188aa4c-36a8-49ff-8c81-d1de7d0c94ea",
+      "name": "Filtrar Respuestas IA"
+    },
+    {
+      "parameters": {
+        "jsCode": "const historicoValido = items.filter(item =>\n  item.json.id && item.json.respuesta_aprobada\n);\n\nif (historicoValido.length === 0) {\n  return [\n    {\n      json: {\n        respuestas_historicas_contexto: '',\n        historial_ids_usados: '',\n        historico_raw: [],\n        sin_historico_relevante: true\n      }\n    }\n  ];\n}\n\nconst historialIds = historicoValido.map(item => item.json.id).join(', ');\n\nconst historicoTexto = historicoValido.map((item, i) => {\n  const h = item.json;\n\n  return `RESPUESTA HISTÓRICA ${i + 1}\nID: ${h.id || ''}\nCategoría: ${h.categoria || ''}\nIntención: ${h.intencion || ''}\nEmail original: ${h.email_original || ''}\nRespuesta aprobada: ${h.respuesta_aprobada || ''}\nAcción final: ${h.accion_final || ''}\nReutilizable: ${h.reutilizable || ''}\nTags: ${h.tags || ''}\nFecha: ${h.fecha || ''}\nScore: ${h.score ?? ''}${h.historico_fallback ? '\\nHistórico fallback: true' : ''}`;\n}).join('\\n\\n');\n\nreturn [\n  {\n    json: {\n      respuestas_historicas_contexto: historicoTexto,\n      historial_ids_usados: historialIds,\n      historico_raw: historicoValido.map(item => item.json),\n      sin_historico_relevante: false\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        13248,
+        -12320
+      ],
+      "id": "284d91d9-7ac2-49c7-90d0-0180c2fe564a",
+      "name": "Construir contexto historico"
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctx = $('Build analysis context').first().json;\n\nconst email = [\n  ctx.subject || '',\n  ctx.body || '',\n  ctx.resumen || '',\n  ctx.intencion || '',\n  ctx.categoria || ''\n].join(' ').toLowerCase();\n\nlet accion = 'to_reply';\nlet policy_id = 'default';\nlet motivo = 'Sin política especial aplicada';\n\nif (\n  email.includes('precio') ||\n  email.includes('coste') ||\n  email.includes('presupuesto') ||\n  email.includes('tarifa')\n) {\n  accion = 'to_waiting';\n  policy_id = 'POLICY_PRECIO';\n  motivo = 'Pregunta sobre precios o presupuesto';\n}\n\nif (\n  email.includes('datos') ||\n  email.includes('rgpd') ||\n  email.includes('privacidad') ||\n  email.includes('confidencial')\n) {\n  accion = 'to_sensitive';\n  policy_id = 'POLICY_DATOS';\n  motivo = 'Tema sensible relacionado con datos o privacidad';\n}\n\nreturn [\n  {\n    json: {\n      accion_final: accion,\n      policy_id,\n      policy_motivo: motivo\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        12624,
+        -11808
+      ],
+      "id": "1270e30a-9c82-4d7c-9af4-6ce05553b58c",
+      "name": "Evaluar acción"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bb8d38dd-3701-49f2-a283-3b05f668db7b",
+              "name": "client_id",
+              "value": "={{ $('Build analysis context').first().json.client_id }}",
+              "type": "string"
+            },
+            {
+              "id": "32958477-de94-47ea-b826-102381a4b2e5",
+              "name": "client_name",
+              "value": "={{ $('Build analysis context').first().json.client_name }}",
+              "type": "string"
+            },
+            {
+              "id": "46d8a616-cabe-4075-9b33-7574b26c3196",
+              "name": "mailbox_email",
+              "value": "={{ $('Build analysis context').first().json.mailbox_email }}",
+              "type": "string"
+            },
+            {
+              "id": "a81602b2-59dc-46df-b6cb-e83e91f2a486",
+              "name": "review_email",
+              "value": "={{ $('Build analysis context').first().json.review_email }}",
+              "type": "string"
+            },
+            {
+              "id": "13f79e7f-119d-46cf-9f03-d8e0a4a6976e",
+              "name": "gmail_credential_name",
+              "value": "={{ $('Build analysis context').first().json.gmail_credential_name }}",
+              "type": "string"
+            },
+            {
+              "id": "70ae99b3-84dd-49e7-a5c8-db94a11d2b8c",
+              "name": "from",
+              "value": "={{ $('Build analysis context').first().json.from }}",
+              "type": "string"
+            },
+            {
+              "id": "50667542-1483-4230-b556-50b3f90b97c1",
+              "name": "to",
+              "value": "={{ $('Build analysis context').first().json.to }}",
+              "type": "string"
+            },
+            {
+              "id": "e754293a-aa96-44d7-9159-e9245f322a5f",
+              "name": "subject",
+              "value": "={{ $('Build analysis context').first().json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "37ad2e64-2ab8-495f-a5ff-887dd7d78a19",
+              "name": "body",
+              "value": "={{ $('Build analysis context').first().json.body }}",
+              "type": "string"
+            },
+            {
+              "id": "a2fae9ff-f694-4863-b721-5800bee69606",
+              "name": "messageId",
+              "value": "={{ $('Build analysis context').first().json.messageId }}",
+              "type": "string"
+            },
+            {
+              "id": "3b68996c-9f2f-47c1-a3ec-5e766e13da23",
+              "name": "threadId",
+              "value": "={{ $('Build analysis context').first().json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "17436e0d-5e5e-4dfe-a1e4-e2d7d6f35dc0",
+              "name": "categoria",
+              "value": "={{ $('Build analysis context').first().json.categoria }}",
+              "type": "string"
+            },
+            {
+              "id": "e1edea0d-3927-44a7-9fc0-a07df0ef50de",
+              "name": "prioridad",
+              "value": "={{ $('Build analysis context').first().json.prioridad }}",
+              "type": "string"
+            },
+            {
+              "id": "bfd63c3e-45b3-4bf4-922e-3e1e45948992",
+              "name": "resumen",
+              "value": "={{ $('Build analysis context').first().json.resumen }}",
+              "type": "string"
+            },
+            {
+              "id": "5828f73b-ddcf-43bd-a8f5-6728aa45f456",
+              "name": "intencion",
+              "value": "={{ $('Build analysis context').first().json.intencion }}",
+              "type": "string"
+            },
+            {
+              "id": "b147b4c4-9be7-4eb5-aeae-65e04bdc76e3",
+              "name": "requiere_respuesta",
+              "value": "={{ $('Build analysis context').first().json.requiere_respuesta }}",
+              "type": "boolean"
+            },
+            {
+              "id": "2e2e3d9d-b565-4a6e-bb59-e9f08cf608fb",
+              "name": "sentimiento",
+              "value": "={{ $('Build analysis context').first().json.sentimiento }}",
+              "type": "string"
+            },
+            {
+              "id": "d0fbe7c4-2c53-4781-8238-3c8f206fae2a",
+              "name": "urgente",
+              "value": "={{ $('Build analysis context').first().json.urgente }}",
+              "type": "boolean"
+            },
+            {
+              "id": "b300783e-3d25-4fd3-aaa4-3bbb50aeb76b",
+              "name": "company_name",
+              "value": "={{ $('Parsear config').first().json.company_name || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "5936e10d-fc65-4229-9ebe-d1b22bccc732",
+              "name": "signature_name",
+              "value": "={{ $('Parsear config').first().json.signature_name || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "74d1017e-4220-4031-a663-041d525c41b4",
+              "name": "signature_closing",
+              "value": "={{ $('Parsear config').first().json.signature_closing || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "f0a3688b-b22a-4820-aef6-5752dc1efd35",
+              "name": "faqs_contexto",
+              "value": "={{ $('Construir contexto FAQs').first().json.faqs_contexto || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "7fc96529-074d-46b3-8e01-7f8308436468",
+              "name": "faq_ids_usadas",
+              "value": "={{ $('Construir contexto FAQs').first().json.faq_ids_usadas || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "9cb9a5b3-9bfb-4c5f-a422-2c7ce1292e32",
+              "name": "sin_faqs_relevantes",
+              "value": "={{ $('Construir contexto FAQs').first().json.sin_faqs_relevantes || false }}",
+              "type": "boolean"
+            },
+            {
+              "id": "0d6f0fac-4d7d-42db-818c-273409bf6a5a",
+              "name": "respuestas_historicas_contexto",
+              "value": "={{ $('Construir contexto historico').first().json.respuestas_historicas_contexto || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "8b878a1a-78ea-453b-8ff8-229af680509a",
+              "name": "historial_ids_usados",
+              "value": "={{ $('Construir contexto historico').first().json.historial_ids_usados || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "a41047b1-05da-4e78-8200-e30d7d578179",
+              "name": "sin_historico_relevante",
+              "value": "={{ $('Construir contexto historico').first().json.sin_historico_relevante || false }}",
+              "type": "boolean"
+            },
+            {
+              "id": "59c431cd-f865-4ca1-8508-40d13e6d4668",
+              "name": "accion_final",
+              "value": "={{ $('Evaluar acción').first().json.accion_final || 'to_reply' }}",
+              "type": "string"
+            },
+            {
+              "id": "8763411e-b941-4f9b-a2d6-ace6a12eab53",
+              "name": "policy_id",
+              "value": "={{ $('Evaluar acción').first().json.policy_id || 'default' }}",
+              "type": "string"
+            },
+            {
+              "id": "c7197f86-660a-473c-88c7-34d23038e606",
+              "name": "policy_motivo",
+              "value": "={{ $('Evaluar acción').first().json.policy_motivo || 'Sin motivo específico' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        14112,
+        -12016
+      ],
+      "id": "1944f424-5098-4274-a28a-4c814c9e2c2e",
+      "name": "Build IA context"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        13440,
+        -12256
+      ],
+      "id": "20fbd10a-0528-48ab-808d-17f9671cf55c",
+      "name": "Merge IA 1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        13664,
+        -12144
+      ],
+      "id": "d6b77b7d-65c4-42ee-b95b-3d69e11c65ea",
+      "name": "Merge IA 2"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        13888,
+        -12016
+      ],
+      "id": "ee6bfb97-880c-402c-a855-15a021cfafb1",
+      "name": "Merge IA 3"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.accion_final }}",
+                    "rightValue": "to_reply",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4bc32e2f-2e9a-4308-8e5c-40877d1d5d29"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "eff06c2a-c937-45a7-866b-69c5f67fe45b",
+                    "leftValue": "={{ $json.accion_final }}",
+                    "rightValue": "to_waiting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7f84842b-3955-47b8-9814-d085862cb195",
+                    "leftValue": "={{ $json.accion_final }}",
+                    "rightValue": "to_sensitive",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "8480a5d9-6bfc-4a57-8452-3ee971c22cb1",
+                    "leftValue": "={{ $json.accion_final }}",
+                    "rightValue": "to_done",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5f16fdcc-bdf7-48e5-811b-21c26a199b49",
+                    "leftValue": "={{ $json.accion_final }}",
+                    "rightValue": "to_fyi",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        14320,
+        -12064
+      ],
+      "id": "825861f8-2c58-411a-b170-5cf36d7fbb2e",
+      "name": "Switch accion_final"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un asistente de empresa que responde correos de forma profesional, clara, humana y personalizada.\n\nTu trabajo es redactar una respuesta basándote únicamente en la información disponible.\n\nDATOS DE EMPRESA:\n- Nombre de empresa: {{ $('Parsear config').item.json.company_name }}\n- Firma del equipo: {{ $('Parsear config').item.json.signature_name }}\n- Cierre habitual: {{ $('Parsear config').item.json.signature_closing }}\n\nEMAIL RECIBIDO:\nAsunto: {{ $('Set Gmail').item.json.subject }}\nRemitente: {{ $('Set Gmail').item.json.from }}\n\nContenido:\n{{ $('Set Gmail').item.json.body }}\n\nANÁLISIS DEL EMAIL:\n- Categoría: {{ $json.categoria }}\n- Prioridad: {{ $json.prioridad }}\n- Resumen: {{ $json.resumen }}\n- Intención: {{ $json.intencion }}\n\nBASE DE CONOCIMIENTO (FAQS RELEVANTES):\n{{ $json.faqs_contexto }}\n\nACCIÓN A REALIZAR:\n{{ $json.accion_final }}\n\nMOTIVO:\n{{ $json.policy_motivo }}\n\nINSTRUCCIONES IMPORTANTES:\n1. Usa SOLO la información disponible en las FAQs si aplica al correo.\n2. No inventes datos, condiciones, plazos, precios o detalles no confirmados.\n3. Si las FAQs no contienen la respuesta completa:\n   - responde de forma general y útil\n   - y pide el contexto mínimo necesario de forma natural\n4. Si la acción es \"to_waiting\":\n   - no des respuestas cerradas\n   - pide más información antes de avanzar\n5. Si el email trata sobre precios:\n   - no des cifras\n   - explica que depende del contexto\n   - invita a continuar la conversación\n6. Mantén un tono:\n   - profesional\n   - cercano\n   - claro\n   - directo\n   - no robótico\n7. No menciones:\n   - que eres una IA\n   - que estás usando FAQs\n   - que existen reglas internas\n8. NO incluyas nunca \"Asunto:\" dentro del cuerpo del correo.\n9. Empieza directamente por el saludo.\n10. Usa saltos de línea normales entre párrafos.\n11. La firma final debe usar el cierre y el nombre de equipo proporcionados.\n\nESTILO DE RESPUESTA:\n- Entre 80 y 170 palabras aprox.\n- 3 a 6 párrafos cortos\n- limpio y agradable de leer\n- sin relleno innecesario\n\nESTRUCTURA OBLIGATORIA:\n1. Saludo natural\n2. Frase breve de agradecimiento o acuse de recibo\n3. Respuesta principal\n4. Siguiente paso o petición de información, si aplica\n5. Despedida usando:\n   {{ $('Parsear config').item.json.signature_closing }},\n   {{ $('Parsear config').item.json.signature_name }}\n\nDevuelve solo el texto final del correo.",
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        14640,
+        -12080
+      ],
+      "id": "568ba432-af6a-467a-b445-1640927cac10",
+      "name": "Borrador"
+    },
+    {
+      "parameters": {
+        "jsCode": "const texto = $json.text || $json.response || $json.output || '';\n\nconst limpio = texto\n  .replace(/\\\\n/g, '\\n')\n  .replace(/\\n{3,}/g, '\\n\\n')\n  .replace(/=\\n/g, '')\n  .replace(/=/g, '')\n  .replace(/^Asunto:\\s.*$/gmi, '')\n  .trim();\n\nreturn [\n  {\n    json: {\n      ...$json,\n      draft_limpio: limpio\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        14944,
+        -12080
+      ],
+      "id": "674c9022-2cde-41fc-91e3-2696fa055dd5",
+      "name": "Formatear estilo"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3b96ddf3-7550-4450-aeb3-4a9ceca2b478",
+              "name": "draft",
+              "value": "={{ $('Formatear estilo').first().json.draft_limpio || ('Hola,\\n\\nGracias por tu mensaje.\\n\\nEstamos revisando tu consulta y te responderemos lo antes posible con más detalle.\\n\\n' + ($('Parsear config').first().json.signature_closing || 'Un saludo') + ',\\n' + ($('Parsear config').first().json.signature_name || 'Equipo de atención')) }}",
+              "type": "string"
+            },
+            {
+              "id": "b285db56-3f86-4c38-8b89-54f7ae2a284a",
+              "name": "approveUrl",
+              "value": "={{ $execution.resumeUrl + '?decision=approve' }}",
+              "type": "string"
+            },
+            {
+              "id": "ec922202-64e2-4f75-a7fb-88fd35b01daa",
+              "name": "rejectUrl",
+              "value": "={{ $execution.resumeUrl + '?decision=reject' }}",
+              "type": "string"
+            },
+            {
+              "id": "4a1e9d7d-fee0-4a05-aaa9-595e35fe84b5",
+              "name": "internalSubject",
+              "value": "={{ '[Revisión IA][' + ($json.categoria || 'otro') + '] ' + $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "33780003-5a52-4b73-9d50-f109efeabe61",
+              "name": "internalBody",
+              "value": "={{ 'Cliente: ' + ($json.client_name || '') + '\\n' + 'Correo recibido de: ' + ($json.from || '') + '\\n\\n' + 'Asunto: ' + ($json.subject || '') + '\\n\\n' + 'Categoría: ' + ($json.categoria || '') + '\\n' + 'Prioridad: ' + ($json.prioridad || '') + '\\n' + 'Resumen: ' + ($json.resumen || '') + '\\n' + 'Intención: ' + ($json.intencion || '') + '\\n' + 'Acción final: ' + ($json.accion_final || 'sin definir') + '\\n' + 'Motivo: ' + ($json.policy_motivo || 'sin motivo') + '\\n\\n' + 'Borrador propuesto:\\n\\n' + ($json.draft || '') + '\\n\\n' + 'Aprobar:\\n' + ($json.approveUrl || '') + '\\n\\n' + 'Rechazar:\\n' + ($json.rejectUrl || '') }}",
+              "type": "string"
+            },
+            {
+              "id": "fdce56db-b6c9-454b-ba6d-99fc7210c859",
+              "name": "categoria",
+              "value": "={{ $('Build analysis context').first().json.categoria }}",
+              "type": "string"
+            },
+            {
+              "id": "afbc5595-4719-41f7-adf3-2db5a9d24840",
+              "name": "messageId",
+              "value": "={{ $('Set Gmail').item.json.messageId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        15152,
+        -12080
+      ],
+      "id": "24b634e8-fad8-4581-ae03-8bb8eef57376",
+      "name": "Preparar revisión"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "096ba154-6c27-4255-aa43-06ac812d9b6f",
+              "name": "send_status",
+              "value": "unsupported_review_credential",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        15920,
+        -11936
+      ],
+      "id": "b88f24ad-edfe-44d7-a2a7-1e004c3c8a50",
+      "name": "Unsupported review credential"
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 3,
+        "output": "={{ String($json.review_credential_final || '').trim() === 'gmail_cliente_1' ? 0 : String($json.review_credential_final || '').trim() === 'gmail_cliente_2' ? 1 : 2 }}"
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        15712,
+        -12080
+      ],
+      "id": "f781b8c2-e27e-418a-8105-71d84462d74d",
+      "name": "Switch send review credential"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cb22cf4d-148e-4703-bbe9-530cde8c55b7",
+              "name": "=categoria",
+              "value": "={{ $json.categoria }}",
+              "type": "string"
+            },
+            {
+              "id": "c38d479c-2189-4a5e-a645-756e25345faa",
+              "name": "internalSubject",
+              "value": "={{ $json.internalSubject }}",
+              "type": "string"
+            },
+            {
+              "id": "7af79c1c-4f95-42b0-be15-a969ad94b2e3",
+              "name": "internalBody",
+              "value": "={{ \n'Correo recibido de: ' + $json.from +\n'\\n\\nAsunto: ' + $json.subject +\n'\\n\\nCategoría: ' + $json.categoria +\n'\\nPrioridad: ' + $json.prioridad +\n'\\nResumen: ' + $json.resumen +\n'\\nAcción final: ' + ($json.accion_final || 'sin definir') +\n'\\nMotivo: ' + ($json.policy_motivo || 'sin motivo') +\n'\\n\\nBorrador propuesto:\\n\\n' + ($json.draft || 'No se ha generado borrador automático.') +\n'\\n\\nAprobar:\\n' + $json.approveUrl +\n'\\n\\nRechazar:\\n' + $json.rejectUrl \n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        15328,
+        -12080
+      ],
+      "id": "9e1f8d15-8f51-48a3-8ca7-4b739df8ed45",
+      "name": "ConstruirCorreoRevision"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener categoría del email actual\nconst categoria = $json.categoria || 'otros';\n\n// Obtener configuración del cliente\nconst clientConfig = $('Filter client routing').first().json;\n\n// Construir nombre del campo dinámicamente\nconst emailField = `review_email_${categoria}`;\n\n// Obtener email específico, con fallback a review_email genérico\nconst reviewEmail = clientConfig[emailField] || clientConfig.review_email || 'agusmadevelop@gmail.com';\n\n// Obtener credencial para enviar la revisión\nconst reviewCredential = clientConfig.review_credential_name || clientConfig.gmail_credential_name || 'gmail_cliente_1';\n\nreturn [{\n  json: {\n    ...$input.item.json,\n    review_email_final: reviewEmail,\n    review_credential_final: reviewCredential\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        15520,
+        -12080
+      ],
+      "id": "c9eb4407-12a1-447d-a6b6-58e17d9e4bf0",
+      "name": "Calculate review email"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "httpMethod": "=GET",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        16336,
+        -12096
+      ],
+      "id": "68d90bb4-4d36-465c-abc0-63505b76c5ac",
+      "name": "Wait",
+      "webhookId": "25bf9149-4507-40a2-a24d-928815a088fc"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.review_email_final }}",
+        "subject": "={{ $json.internalSubject }}",
+        "message": "={{ '<div style=\"font-family: Arial, sans-serif; white-space: pre-wrap;\">' + ($json.internalBody || '') + '</div>' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        15920,
+        -12208
+      ],
+      "id": "0f2d28f3-2158-420e-be91-a257cbde45a9",
+      "name": "Send category review cred 1",
+      "webhookId": "b9b5ca85-9bcf-4b75-aaf5-9f968f18db9d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Agus sodire"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.review_email_final }}",
+        "subject": "={{ $json.internalSubject }}",
+        "message": "={{ '<div style=\"font-family: Arial, sans-serif; white-space: pre-wrap;\">' + ($json.internalBody || '') + '</div>' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        15920,
+        -12080
+      ],
+      "id": "48cde53f-aa6c-4d49-b088-0524f31facdc",
+      "name": "Send category review cred 2",
+      "webhookId": "b9b5ca85-9bcf-4b75-aaf5-9f968f18db9d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dvBhGCLeFHEywhpt",
+          "name": "sodire ventas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5c6755e2-e987-404a-b11e-cf0b0876bd4b",
+              "leftValue": "={{ $json.query.decision }}",
+              "rightValue": "approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        16528,
+        -12096
+      ],
+      "id": "a048134c-a7a4-401f-9b1d-23c861faa6ff",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "removeLabels",
+        "messageId": "={{ $('Set gmail').item.json.messageId }}",
+        "labelIds": [
+          "INBOX"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        16944,
+        -12000
+      ],
+      "id": "4f91e86a-7b97-44c9-9c4b-274419e1d768",
+      "name": "Remove label from message1",
+      "webhookId": "d14e9c3f-b425-4729-8e2a-9707953e4e74",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Agus sodire"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "agustin.sodire@gmail.com",
+        "subject": "={{ '[Rechazado] ' + $('PrepararRevision').item.json.messageId }}",
+        "message": "={{  'El borrador generado por la IA ha sido rechazado.\\n\\n' + 'Correo original:\\n' + $('PrepararRevision').item.json.subject + '\\n\\n' + 'Revisar manualmente.' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        16768,
+        -12000
+      ],
+      "id": "524af7d1-66c4-40f9-b41d-f6167a2ec1ad",
+      "name": "Send a message1",
+      "webhookId": "feaa08f7-d78c-4286-b889-663bda1ec944",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Agus sodire"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1x6ZssuHLmfIvrOtHeIABbgNvJrYlo79LtdlqLxR0dFQ/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1696153562,
+          "mode": "list",
+          "cachedResultName": "Respuestas_IA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1x6ZssuHLmfIvrOtHeIABbgNvJrYlo79LtdlqLxR0dFQ/edit#gid=1696153562"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Preparar revisión').item.json.messageId }}",
+            "fecha": "={{ $now }}",
+            "client_id": "={{ $('Build IA context').item.json.client_id }}",
+            "categoria": "={{ $('Preparar revisión').item.json.categoria }}",
+            "intencion": "={{ $('Build IA context').item.json.intencion }}",
+            "email_original": "={{ $('Set Gmail').item.json.body }}",
+            "respuesta_aprobada": "={{ $('Preparar revisión').item.json.draft }}",
+            "accion_final": "={{ $('Preparar revisión').item.json.accion_final || 'to_reply' }}",
+            "reutilizable": "true",
+            "tags": "={{ (($('Build IA context').item.json.categoria || 'general') + ',' + ($('Build IA context').item.json.intencion || '')).trim() }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "client_id",
+              "displayName": "client_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "categoria",
+              "displayName": "categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "intencion",
+              "displayName": "intencion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email_original",
+              "displayName": "email_original",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "respuesta_aprobada",
+              "displayName": "respuesta_aprobada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "accion_final",
+              "displayName": "accion_final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reutilizable",
+              "displayName": "reutilizable",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tags",
+              "displayName": "tags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        16912,
+        -12224
+      ],
+      "id": "8bf93dc4-f277-4099-b782-8e68ce4f9328",
+      "name": "Guardar Respuesta IA",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PGtualgb4ukwEdaI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Preparar revisión').item.json.messageId }}",
+        "labelIds": [
+          "Label_8091616593185746588"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        17120,
+        -12224
+      ],
+      "id": "44e71a10-1741-4039-b66a-fefc1bba0a2e",
+      "name": "Add label to message",
+      "webhookId": "ce772794-039c-4426-bbdf-1e6604d9e5c1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Agus sodire"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Preparar revisión').item.json.messageId }}",
+        "message": "={{ '<div style=\"font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #222;\">' + '<p>' + $('Preparar revisión').item.json.draft.replace(/\\n\\n/g, '</p><p>').replace(/\\n/g, '<br>') + '</p>' + '</div>' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        16704,
+        -12224
+      ],
+      "id": "9f355465-50e2-424c-9dbf-ad243c588b29",
+      "name": "Reply to a message",
+      "webhookId": "ab0d36d0-a5cb-4b46-b3a8-92d3ce9ae7a2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Agus sodire"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 3,
+        "output": "={{ String($json.gmail_credential_name || '').trim() === 'gmail_cliente_1' ? 0 : String($json.gmail_credential_name || '').trim() === 'gmail_cliente_2' ? 1 : 2 }}"
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        11008,
+        -12160
+      ],
+      "id": "a1a4329a-fdd4-4d33-aae5-907141ee0367",
+      "name": "Switch get labels credential"
+    },
+    {
+      "parameters": {
+        "resource": "label",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        11280,
+        -12400
+      ],
+      "id": "4b90f0e7-e685-4ac3-bdbb-15a140766d63",
+      "name": "Get all labels cred 1",
+      "webhookId": "aaaabbbb-cccc-dddd-eeee-ffff0000aaaa",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Agus sodire"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "label",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        11280,
+        -12224
+      ],
+      "id": "bb58eae3-71eb-4e55-8f39-11517c93c780",
+      "name": "Get all labels cred 2",
+      "webhookId": "bbbbcccc-dddd-eeee-ffff-0000aaaabbbb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dvBhGCLeFHEywhpt",
+          "name": "sodire ventas"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        11456,
+        -12288
+      ],
+      "id": "223801b7-c682-46c9-a6fa-afeafbf1a7a7",
+      "name": "Merge labels"
+    },
+    {
+      "parameters": {
+        "jsCode": "const categoria = $('Build analysis context').first().json.categoria || 'otros';\n\nconst allLabels = items || [];\n\nlet foundLabelId = '';\nlet labelName = '';\nlet labelFound = false;\n\n// Buscar label que coincida con la categoría\nfor (const item of allLabels) {\n  const name = (item.json.name || '').toLowerCase().trim();\n  \n  if (name === categoria) {\n    foundLabelId = item.json.id || '';\n    labelName = item.json.name || '';\n    labelFound = true;\n    break;\n  }\n}\n\nreturn [{\n  json: {\n    ...$('Build analysis context').first().json,\n    category_label_id: foundLabelId,\n    category_label_name: labelName,\n    label_found: labelFound\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        11616,
+        -12208
+      ],
+      "id": "16fb38e5-8678-4544-8916-7c245d33428d",
+      "name": "Find label by category"
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 3,
+        "output": "={{ String($json.gmail_credential_name || '').trim() === 'gmail_cliente_1' ? 0 : String($json.gmail_credential_name || '').trim() === 'gmail_cliente_2' ? 1 : 2 }}"
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        11808,
+        -12208
+      ],
+      "id": "cc239b54-636a-4f90-90bb-589d7c80aa5a",
+      "name": "Switch apply label credential"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.messageId }}",
+        "labelIds": "={{ $json.label_found ? [ $json.category_label_id ] : [] }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        12000,
+        -12416
+      ],
+      "id": "08dbea96-457e-45dc-b44f-ddee548788ab",
+      "name": "Apply category label cred 1",
+      "webhookId": "ccccdddd-eeee-ffff-0000-aaaabbbbcccc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Agus sodire"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.messageId }}",
+        "labelIds": "={{ $json.label_found ? [ $json.category_label_id ] : [] }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        12016,
+        -12176
+      ],
+      "id": "6136136c-28f3-47c7-9958-59ec111b87b4",
+      "name": "Apply category label cred 2",
+      "webhookId": "ddddeeee-ffff-0000-aaaa-bbbbccccdddd",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dvBhGCLeFHEywhpt",
+          "name": "sodire ventas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "99887766-5544-3322-1100-ffeeddccbbaa",
+              "name": "label_status",
+              "value": "label_not_found_or_unsupported_credential",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        12064,
+        -11856
+      ],
+      "id": "869ca103-406e-4e0c-b399-c2d56f2e6e60",
+      "name": "Skip category label"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        12240,
+        -12192
+      ],
+      "id": "e5626ee5-81ee-4093-8fe3-50c0fe0942f7",
+      "name": "Merge after labeling"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "client_id": "cliente_001",
+          "client_name": "McMoose Consulting",
+          "mailbox_email": "agustin.sodire@gmail.com",
+          "review_email": "agusmadevelop@gmail.com",
+          "source_type": "gmail_oauth",
+          "gmail_credential_name": "gmail_cliente_1",
+          "gmail_message_id": "19d90feac4d54f02",
+          "thread_id": "19d90feac4d54f02",
+          "subject": "Duda sobre una factura reciente",
+          "from": "\"Agustín Morcillo Aguado\" <agustin.morcillo1912@gmail.com>",
+          "to": "agustin.sodire@gmail.com",
+          "snippet": "Hola, He recibido la última factura y me surge una duda sobre uno de los cargos que aparece. No tengo claro a qué corresponde exactamente. ¿Podríais aclarármelo? Gracias de antemano, María López",
+          "collector_status": "email_fetched"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Set Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Gmail": {
+      "main": [
+        [
+          {
+            "node": "Load Classification Rules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Classification Rules": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Rules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Rules": {
+      "main": [
+        [
+          {
+            "node": "Classification Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classification Decision": {
+      "main": [
+        [
+          {
+            "node": "Use Rule Classification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analisis IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Use Rule Classification": {
+      "main": [
+        [
+          {
+            "node": "Parse Analisis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter client routing": {
+      "main": [
+        [
+          {
+            "node": "Config empresa",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "FAQs",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Respuestas IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get client routing": {
+      "main": [
+        [
+          {
+            "node": "Filter client routing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analisis IA",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Borrador",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analisis IA": {
+      "main": [
+        [
+          {
+            "node": "Parse Analisis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config empresa": {
+      "main": [
+        [
+          {
+            "node": "Parsear config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FAQs": {
+      "main": [
+        [
+          {
+            "node": "FAQs filtradas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respuestas IA": {
+      "main": [
+        [
+          {
+            "node": "Filtrar Respuestas IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Analisis": {
+      "main": [
+        [
+          {
+            "node": "Build analysis context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear config": {
+      "main": [
+        [
+          {
+            "node": "Merge IA 2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Build analysis context": {
+      "main": [
+        [
+          {
+            "node": "Switch get labels credential",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FAQs filtradas": {
+      "main": [
+        [
+          {
+            "node": "Construir contexto FAQs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar Respuestas IA": {
+      "main": [
+        [
+          {
+            "node": "Construir contexto historico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construir contexto historico": {
+      "main": [
+        [
+          {
+            "node": "Merge IA 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construir contexto FAQs": {
+      "main": [
+        [
+          {
+            "node": "Merge IA 1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Evaluar acción": {
+      "main": [
+        [
+          {
+            "node": "Merge IA 3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Build IA context": {
+      "main": [
+        [
+          {
+            "node": "Switch accion_final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge IA 1": {
+      "main": [
+        [
+          {
+            "node": "Merge IA 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge IA 2": {
+      "main": [
+        [
+          {
+            "node": "Merge IA 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge IA 3": {
+      "main": [
+        [
+          {
+            "node": "Build IA context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch accion_final": {
+      "main": [
+        [
+          {
+            "node": "Borrador",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Borrador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Borrador": {
+      "main": [
+        [
+          {
+            "node": "Formatear estilo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear estilo": {
+      "main": [
+        [
+          {
+            "node": "Preparar revisión",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar revisión": {
+      "main": [
+        [
+          {
+            "node": "ConstruirCorreoRevision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ConstruirCorreoRevision": {
+      "main": [
+        [
+          {
+            "node": "Calculate review email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate review email": {
+      "main": [
+        [
+          {
+            "node": "Switch send review credential",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch send review credential": {
+      "main": [
+        [
+          {
+            "node": "Send category review cred 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send category review cred 2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unsupported review credential",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send category review cred 1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send category review cred 2": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unsupported review credential": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Remove label from message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Respuesta IA": {
+      "main": [
+        [
+          {
+            "node": "Add label to message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a message": {
+      "main": [
+        [
+          {
+            "node": "Guardar Respuesta IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch get labels credential": {
+      "main": [
+        [
+          {
+            "node": "Get all labels cred 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get all labels cred 2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip category label",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get all labels cred 1": {
+      "main": [
+        [
+          {
+            "node": "Merge labels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get all labels cred 2": {
+      "main": [
+        [
+          {
+            "node": "Merge labels",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge labels": {
+      "main": [
+        [
+          {
+            "node": "Find label by category",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find label by category": {
+      "main": [
+        [
+          {
+            "node": "Switch apply label credential",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch apply label credential": {
+      "main": [
+        [
+          {
+            "node": "Apply category label cred 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Apply category label cred 2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip category label",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply category label cred 1": {
+      "main": [
+        [
+          {
+            "node": "Merge after labeling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply category label cred 2": {
+      "main": [
+        [
+          {
+            "node": "Merge after labeling",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge after labeling": {
+      "main": [
+        [
+          {
+            "node": "Evaluar acción",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get client routing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "1a012856-52e5-47d8-9f08-e5dc4f140633",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ce30596c2036c9787cf7de133bdf9beb7ac4721aa6f313e72b19791ad015b927"
+  },
+  "id": "iT16kHr62aklmT1u",
+  "tags": [
+    {
+      "updatedAt": "2026-04-16T08:45:56.942Z",
+      "createdAt": "2026-04-16T08:45:56.942Z",
+      "id": "2gN2jOrZMkY26AUb",
+      "name": "Agustín"
+    },
+    {
+      "updatedAt": "2026-04-19T07:54:57.103Z",
+      "createdAt": "2026-04-19T07:54:57.103Z",
+      "id": "rdJHkSaxEUnpr4Dc",
+      "name": "Prueba"
+    }
+  ]
+}

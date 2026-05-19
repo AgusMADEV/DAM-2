@@ -1,0 +1,970 @@
+{
+  "name": "EMAIL_GENERATOR_DEMO",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "id": "manual-trigger-1",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generador de correos de ejemplo para todas las categorías\n\nconst emailTemplates = [\n  // CATEGORÍA: CLIENT (Cliente)\n  {\n    category: \"client\",\n    from: \"maria.garcia@cliente.com\",\n    to: \"info@sodire.es\",\n    subject: \"Cambio de cita para la próxima semana\",\n    body: \"Buenos días,\\n\\nNecesito cambiar mi cita del próximo martes a jueves si es posible. Tengo un imprevisto laboral y no puedo asistir ese día.\\n\\nGracias por vuestra comprensión.\\n\\nSaludos,\\nMaría García\"\n  },\n  {\n    category: \"client\",\n    from: \"juan.martinez@empresa.com\",\n    to: \"info@sodire.es\",\n    subject: \"Problema con mi pedido #12345\",\n    body: \"Hola,\\n\\nTengo un problema con mi pedido realizado la semana pasada. No he recibido la documentación completa que solicité.\\n\\n¿Podrían enviármela lo antes posible?\\n\\nUn saludo,\\nJuan Martínez\"\n  },\n  {\n    category: \"client\",\n    from: \"ana.lopez@correo.com\",\n    to: \"info@sodire.es\",\n    subject: \"Seguimiento de mi solicitud\",\n    body: \"Buenas tardes,\\n\\nLes escribo para hacer seguimiento de mi solicitud enviada hace dos semanas. ¿Podrían darme alguna actualización?\\n\\nAdjunto documentación adicional que me solicitaron.\\n\\nGracias,\\nAna López\"\n  },\n  {\n    category: \"client\",\n    from: \"carlos.ruiz@mail.com\",\n    to: \"info@sodire.es\",\n    subject: \"Incidencia con el servicio contratado\",\n    body: \"Estimados,\\n\\nTengo una incidencia con el servicio contratado. Desde ayer no puedo acceder al portal y necesito revisarlo urgentemente.\\n\\n¿Pueden ayudarme?\\n\\nSaludos,\\nCarlos Ruiz\"\n  },\n\n  // CATEGORÍA: BILLING (Facturas)\n  {\n    category: \"billing\",\n    from: \"contabilidad@proveedor.com\",\n    to: \"info@sodire.es\",\n    subject: \"Factura #2024-0456 - Servicios Enero\",\n    body: \"Buenos días,\\n\\nAdjunto la factura correspondiente a los servicios prestados durante el mes de enero.\\n\\nImporte total: 1.250€\\nVencimiento: 15/02/2024\\n\\nQuedo a su disposición para cualquier aclaración.\\n\\nSaludos,\\nDpto. Contabilidad\"\n  },\n  {\n    category: \"billing\",\n    from: \"admin@proveedorit.com\",\n    to: \"info@sodire.es\",\n    subject: \"Presupuesto servicios mantenimiento 2024\",\n    body: \"Estimados,\\n\\nTal como solicitaron, les envío el presupuesto para los servicios de mantenimiento anual.\\n\\nPresupuesto adjunto en PDF.\\n\\nPlazo de validez: 30 días\\n\\nUn saludo,\\nJosé Fernández\\nProveedor IT\"\n  },\n  {\n    category: \"billing\",\n    from: \"facturacion@suministros.com\",\n    to: \"info@sodire.es\",\n    subject: \"Abono factura #2023-1234\",\n    body: \"Buenos días,\\n\\nLes informo que hemos procesado el abono de la factura #2023-1234 por el importe de 320€ tal como acordamos.\\n\\nAdjunto documento de abono.\\n\\nSaludos cordiales,\\nDpto. Facturación\"\n  },\n  {\n    category: \"billing\",\n    from: \"pagos@cliente-corporativo.com\",\n    to: \"info@sodire.es\",\n    subject: \"Confirmación de pago - Ref: PAG-2024-089\",\n    body: \"Estimados,\\n\\nConfirmamos el pago de las facturas pendientes mediante transferencia bancaria.\\n\\nRef: PAG-2024-089\\nImporte: 2.850€\\nFecha: 18/01/2024\\n\\nAdjunto recibo bancario.\\n\\nSaludos,\\nDpto. Pagos\"\n  },\n\n  // CATEGORÍA: LEAD (Potenciales clientes)\n  {\n    category: \"lead\",\n    from: \"info@empresanueva.com\",\n    to: \"info@sodire.es\",\n    subject: \"Solicitud de información sobre sus servicios\",\n    body: \"Buenos días,\\n\\nSomos una empresa del sector tecnológico y estamos interesados en conocer más sobre sus servicios.\\n\\n¿Podrían enviarnos información detallada y tarifas?\\n\\nQuedamos a la espera de su respuesta.\\n\\nAtentamente,\\nPedro Sánchez\\nDirector Comercial\\nEmpresa Nueva SL\"\n  },\n  {\n    category: \"lead\",\n    from: \"laura.jimenez@startup.io\",\n    to: \"info@sodire.es\",\n    subject: \"Consulta: ¿Cómo funciona su servicio?\",\n    body: \"Hola,\\n\\nMe interesa saber cómo funciona exactamente su servicio. Estamos buscando un proveedor para nuestra startup y nos gustaría saber:\\n\\n- Precios\\n- Tiempos de implementación\\n- Soporte incluido\\n\\n¿Podríamos agendar una llamada?\\n\\nGracias,\\nLaura Jiménez\"\n  },\n  {\n    category: \"lead\",\n    from: \"director@pymeinnovadora.com\",\n    to: \"info@sodire.es\",\n    subject: \"Presupuesto para contratar sus servicios\",\n    body: \"Estimados,\\n\\nQueremos solicitar un presupuesto para contratar sus servicios para nuestra empresa.\\n\\nSomos una PYME de 25 empleados y necesitamos:\\n- Servicio A\\n- Servicio B\\n- Soporte técnico\\n\\n¿Cuál sería la tarifa mensual?\\n\\nSaludos,\\nRoberto Gómez\\nDirector General\"\n  },\n  {\n    category: \"lead\",\n    from: \"marta.serrano@consulta.com\",\n    to: \"info@sodire.es\",\n    subject: \"Me interesa su producto - Quisiera saber más\",\n    body: \"Buenos días,\\n\\nHe visto su página web y me interesa mucho su producto. Quisiera saber más detalles sobre:\\n\\n1. Funcionalidades principales\\n2. Precio y planes disponibles\\n3. Periodo de prueba\\n\\n¿Tienen algún catálogo o demo disponible?\\n\\nGracias,\\nMarta Serrano\"\n  },\n\n  // CATEGORÍA: INTERNAL (Internos)\n  {\n    category: \"internal\",\n    from: \"equipo@sodire.es\",\n    to: \"info@sodire.es\",\n    subject: \"Reunión de equipo - Viernes 10:00h\",\n    body: \"Hola equipo,\\n\\nRecordatorio de la reunión de este viernes a las 10:00h.\\n\\nTemas a tratar:\\n- Revisión objetivos Q1\\n- Actualización proyectos en curso\\n- Planificación siguiente sprint\\n\\nNos vemos el viernes.\\n\\nSaludos,\\nDirección\"\n  },\n  {\n    category: \"internal\",\n    from: \"desarrollo@sodire.es\",\n    to: \"info@sodire.es\",\n    subject: \"Actualización sistema - Pendiente de revisar\",\n    body: \"Buenas,\\n\\nHe subido la actualización del sistema al servidor de testing.\\n\\n¿Podéis revisar que todo funciona correctamente antes del deploy a producción?\\n\\nTarea pendiente en Jira: DEV-234\\n\\nGracias,\\nEquipo Dev\"\n  },\n  {\n    category: \"internal\",\n    from: \"administracion@sodire.es\",\n    to: \"info@sodire.es\",\n    subject: \"Seguimiento tareas administrativas\",\n    body: \"Hola,\\n\\nRecordatorio de las tareas administrativas pendientes para esta semana:\\n\\n- Revisar facturas proveedores\\n- Actualizar registros\\n- Enviar informes mensuales\\n\\n¿Alguien puede encargarse del último punto?\\n\\nGracias,\\nAdmin\"\n  },\n\n  // CATEGORÍA: SPAM\n  {\n    category: \"spam\",\n    from: \"marketing@agenciaseo.com\",\n    to: \"info@sodire.es\",\n    subject: \"🚀 Mejora tu posicionamiento SEO - Oferta especial\",\n    body: \"¡Hola!\\n\\n¿Quieres aparecer en la primera página de Google?\\n\\nNuestra agencia de SEO puede ayudarte a mejorar tu posicionamiento en solo 30 días.\\n\\n✅ Posicionamiento garantizado\\n✅ Más tráfico web\\n✅ Oferta especial 50% descuento\\n\\nNo pierdas esta oportunidad única.\\n\\nContacta ahora: www.agenciaseo.com\\n\\nPara darte de baja haz click aquí: unsubscribe\"\n  },\n  {\n    category: \"spam\",\n    from: \"ventas@publicidadmasiva.com\",\n    to: \"info@sodire.es\",\n    subject: \"Promoción exclusiva - Marketing Digital\",\n    body: \"Estimado/a,\\n\\nTe ofrecemos servicios de marketing digital a precios inmejorables.\\n\\n🎯 Publicidad en redes sociales\\n🎯 Campañas de email masivo\\n🎯 Diseño web profesional\\n\\n¡TODO POR SOLO 99€/MES!\\n\\nOferta válida solo hoy. ¡No la dejes escapar!\\n\\nLlámanos: 900 XXX XXX\\nWeb: www.publicidadmasiva.com\\n\\n---\\nSi no deseas recibir más emails, haz click aquí\"\n  },\n  {\n    category: \"spam\",\n    from: \"ofertas@cursosgratis.com\",\n    to: \"info@sodire.es\",\n    subject: \"Curso GRATIS de Marketing Digital + Certificado\",\n    body: \"¡ÚLTIMA OPORTUNIDAD!\\n\\nAccede GRATIS a nuestro curso de Marketing Digital valorado en 299€\\n\\n✨ 100% Online\\n✨ Certificado oficial\\n✨ Acceso inmediato\\n✨ GRATIS por tiempo limitado\\n\\nMás de 10.000 alumnos ya se han inscrito.\\n\\n👉 INSCRÍBETE AHORA: www.cursosgratis.com\\n\\nNo esperes más, las plazas son limitadas.\\n\\n---\\nDeja de recibir estos correos: unsubscribe link\"\n  },\n  {\n    category: \"spam\",\n    from: \"promo@descuentos-empresa.com\",\n    to: \"info@sodire.es\",\n    subject: \"💰 Ahorra hasta un 70% en suministros de oficina\",\n    body: \"¡Descuentos increíbles!\\n\\nSuministros de oficina con hasta 70% de descuento.\\n\\n📌 Papel, bolígrafos, carpetas\\n📌 Equipos informáticos\\n📌 Mobiliario de oficina\\n\\nPROMOCIÓN ESPECIAL SOLO ESTA SEMANA\\n\\nVer catálogo: www.descuentos-empresa.com\\n\\n¡Compra ahora y ahorra!\\n\\nUnsubscribe | Política de privacidad\"\n  }\n];\n\n// Retornar todos los correos como items separados\nreturn emailTemplates.map((email, index) => ({\n  json: {\n    id: `demo-${index + 1}`,\n    category: email.category,\n    from: email.from,\n    to: email.to,\n    subject: email.subject,\n    body: email.body,\n    date: new Date().toISOString(),\n    messageId: `<demo-${index + 1}-${Date.now()}@generator.local>`,\n    threadId: `thread-demo-${index + 1}`\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        300
+      ],
+      "id": "code-generator-1",
+      "name": "Generate Demo Emails"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "category-client",
+              "leftValue": "={{ $json.category }}",
+              "rightValue": "client",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        640,
+        180
+      ],
+      "id": "if-client",
+      "name": "If CLIENT"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "category-billing",
+              "leftValue": "={{ $json.category }}",
+              "rightValue": "billing",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        640,
+        400
+      ],
+      "id": "if-billing",
+      "name": "If BILLING"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "category-lead",
+              "leftValue": "={{ $json.category }}",
+              "rightValue": "lead",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        640,
+        620
+      ],
+      "id": "if-lead",
+      "name": "If LEAD"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "category-internal",
+              "leftValue": "={{ $json.category }}",
+              "rightValue": "internal",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        640,
+        840
+      ],
+      "id": "if-internal",
+      "name": "If INTERNAL"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "category-spam",
+              "leftValue": "={{ $json.category }}",
+              "rightValue": "spam",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        640,
+        1060
+      ],
+      "id": "if-spam",
+      "name": "If SPAM"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "assign-category-name",
+              "name": "category_name",
+              "value": "CLIENTE",
+              "type": "string"
+            },
+            {
+              "id": "assign-color",
+              "name": "color",
+              "value": "🔵",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        840,
+        80
+      ],
+      "id": "set-client",
+      "name": "Label: CLIENTE"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "assign-category-name",
+              "name": "category_name",
+              "value": "FACTURAS",
+              "type": "string"
+            },
+            {
+              "id": "assign-color",
+              "name": "color",
+              "value": "💰",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        840,
+        300
+      ],
+      "id": "set-billing",
+      "name": "Label: FACTURAS"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "assign-category-name",
+              "name": "category_name",
+              "value": "LEAD",
+              "type": "string"
+            },
+            {
+              "id": "assign-color",
+              "name": "color",
+              "value": "🟢",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        840,
+        520
+      ],
+      "id": "set-lead",
+      "name": "Label: LEAD"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "assign-category-name",
+              "name": "category_name",
+              "value": "INTERNO",
+              "type": "string"
+            },
+            {
+              "id": "assign-color",
+              "name": "color",
+              "value": "🟡",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        840,
+        740
+      ],
+      "id": "set-internal",
+      "name": "Label: INTERNO"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "assign-category-name",
+              "name": "category_name",
+              "value": "SPAM",
+              "type": "string"
+            },
+            {
+              "id": "assign-color",
+              "name": "color",
+              "value": "🔴",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        840,
+        960
+      ],
+      "id": "set-spam",
+      "name": "Label: SPAM"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1040,
+        500
+      ],
+      "id": "merge-all",
+      "name": "Merge All Categories"
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json.date }}",
+        "format": "custom",
+        "customFormat": "yyyy-MM-dd HH:mm:ss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1240,
+        500
+      ],
+      "id": "format-date",
+      "name": "Format Date"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "summary",
+              "name": "summary",
+              "value": "={{ $json.color }} {{ $json.category_name }} | De: {{ $json.from }} | Asunto: {{ $json.subject }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1440,
+        500
+      ],
+      "id": "create-summary",
+      "name": "Create Summary"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "options": {
+          "format": true
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1640,
+        400
+      ],
+      "id": "convert-to-json",
+      "name": "Export as JSON"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Agrupar emails por categoría y crear resumen\nconst items = $input.all();\n\nconst categories = {\n  client: { name: 'CLIENTE 🔵', emails: [], count: 0 },\n  billing: { name: 'FACTURAS 💰', emails: [], count: 0 },\n  lead: { name: 'LEAD 🟢', emails: [], count: 0 },\n  internal: { name: 'INTERNO 🟡', emails: [], count: 0 },\n  spam: { name: 'SPAM 🔴', emails: [], count: 0 }\n};\n\n// Agrupar por categoría\nitems.forEach(item => {\n  const cat = item.json.category;\n  if (categories[cat]) {\n    categories[cat].count++;\n    categories[cat].emails.push({\n      from: item.json.from,\n      subject: item.json.subject,\n      preview: item.json.body.substring(0, 100) + '...'\n    });\n  }\n});\n\n// Crear resumen\nlet summary = '\\n═══════════════════════════════════════════════\\n';\nsummary += '    📧 GENERADOR DE EMAILS DEMO - RESUMEN\\n';\nsummary += '═══════════════════════════════════════════════\\n\\n';\nsummary += `Total de emails generados: ${items.length}\\n\\n`;\n\nObject.entries(categories).forEach(([key, cat]) => {\n  if (cat.count > 0) {\n    summary += `\\n${cat.name}\\n`;\n    summary += `${'─'.repeat(40)}\\n`;\n    summary += `Cantidad: ${cat.count} emails\\n\\n`;\n    \n    cat.emails.forEach((email, idx) => {\n      summary += `  ${idx + 1}. ${email.subject}\\n`;\n      summary += `     De: ${email.from}\\n`;\n      summary += `     Preview: ${email.preview}\\n\\n`;\n    });\n  }\n});\n\nsummary += '\\n═══════════════════════════════════════════════\\n';\nsummary += 'Para enviar estos emails, conecta un nodo Gmail\\n';\nsummary += 'o utilízalos para testing del workflow principal\\n';\nsummary += '═══════════════════════════════════════════════\\n';\n\nreturn [{\n  json: {\n    total_emails: items.length,\n    categories: {\n      client: categories.client.count,\n      billing: categories.billing.count,\n      lead: categories.lead.count,\n      internal: categories.internal.count,\n      spam: categories.spam.count\n    },\n    summary: summary,\n    all_emails: items.map(i => i.json)\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1640,
+        600
+      ],
+      "id": "create-report",
+      "name": "Generate Report"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        500
+      ],
+      "id": "schedule-trigger",
+      "name": "Schedule (Optional)",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "send-emails-config",
+              "name": "SEND_EMAILS",
+              "value": "false",
+              "type": "string"
+            },
+            {
+              "id": "target-email-config",
+              "name": "TARGET_EMAIL",
+              "value": "test@example.com",
+              "type": "string"
+            },
+            {
+              "id": "delay-seconds",
+              "name": "DELAY_SECONDS",
+              "value": "2",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1840,
+        500
+      ],
+      "id": "email-config",
+      "name": "⚙️ Config Email Sender",
+      "notes": "Configura:\n- SEND_EMAILS: true/false para activar envío\n- TARGET_EMAIL: email destino para testing\n- DELAY_SECONDS: segundos entre cada envío"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "check-send-enabled",
+              "leftValue": "={{ $json.SEND_EMAILS }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2040,
+        500
+      ],
+      "id": "if-send-enabled",
+      "name": "¿Enviar emails?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "prepare-to",
+              "name": "to_email",
+              "value": "={{ $('⚙️ Config Email Sender').first().json.TARGET_EMAIL }}",
+              "type": "string"
+            },
+            {
+              "id": "prepare-subject",
+              "name": "email_subject",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "prepare-body",
+              "name": "email_body",
+              "value": "={{ $json.body }}",
+              "type": "string"
+            },
+            {
+              "id": "prepare-from-original",
+              "name": "original_from",
+              "value": "={{ $json.from }}",
+              "type": "string"
+            },
+            {
+              "id": "prepare-category",
+              "name": "category_label",
+              "value": "={{ $json.color }} {{ $json.category_name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2240,
+        400
+      ],
+      "id": "prepare-email-data",
+      "name": "Prepare Email Data"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Delay configurable entre envíos para no saturar\nconst delaySeconds = parseInt($('⚙️ Config Email Sender').first().json.DELAY_SECONDS) || 2;\nawait new Promise(resolve => setTimeout(resolve, delaySeconds * 1000));\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2440,
+        400
+      ],
+      "id": "delay-between-sends",
+      "name": "Delay Between Sends",
+      "notes": "Evita saturar el servidor de correo"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to_email }}",
+        "subject": "=🧪 [DEMO] {{ $json.category_label }} - {{ $json.email_subject }}",
+        "emailType": "text",
+        "message": "=━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📧 EMAIL DE PRUEBA GENERADO AUTOMÁTICAMENTE\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n🏷️  CATEGORÍA: {{ $json.category_label }}\n📤 Remitente original: {{ $json.original_from }}\n📋 Asunto: {{ $json.email_subject }}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nCONTENIDO DEL EMAIL:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n{{ $json.email_body }}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n⚙️  Este es un email de prueba generado por:\n    EMAIL_GENERATOR_DEMO workflow\n    \n🎯 Propósito: Testing del sistema de clasificación\n📅 Generado: {{ $now.format('yyyy-MM-dd HH:mm:ss') }}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2640,
+        400
+      ],
+      "id": "gmail-send",
+      "name": "📧 Gmail Send",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1",
+          "name": "Gmail account"
+        }
+      },
+      "notes": "Configura tus credenciales de Gmail aquí"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "sent-status",
+              "name": "status",
+              "value": "sent",
+              "type": "string"
+            },
+            {
+              "id": "sent-to",
+              "name": "sent_to",
+              "value": "={{ $json.to_email }}",
+              "type": "string"
+            },
+            {
+              "id": "sent-subject",
+              "name": "subject",
+              "value": "={{ $json.email_subject }}",
+              "type": "string"
+            },
+            {
+              "id": "sent-category",
+              "name": "category",
+              "value": "={{ $json.category_label }}",
+              "type": "string"
+            },
+            {
+              "id": "sent-time",
+              "name": "sent_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2840,
+        400
+      ],
+      "id": "track-sent",
+      "name": "Track Sent Emails"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        3040,
+        500
+      ],
+      "id": "merge-results",
+      "name": "Merge Results"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generar reporte final de envío\nconst sentItems = $input.first().json.status ? [$input.first()] : [];\nconst notSentItems = $input.last().json.status ? [] : $input.all();\n\nconst totalSent = sentItems.length;\nconst totalNotSent = notSentItems.length;\n\nlet report = '\\n';\nreport += '╔══════════════════════════════════════════════════════╗\\n';\nreport += '║       📧 REPORTE DE ENVÍO DE EMAILS DEMO           ║\\n';\nreport += '╚══════════════════════════════════════════════════════╝\\n';\nreport += '\\n';\n\nif (totalSent > 0) {\n  report += `✅ EMAILS ENVIADOS: ${totalSent}\\n`;\n  report += `${'─'.repeat(54)}\\n`;\n  sentItems.forEach((item, idx) => {\n    report += `  ${idx + 1}. ${item.json.category} - ${item.json.subject}\\n`;\n    report += `     📤 Enviado a: ${item.json.sent_to}\\n`;\n    report += `     🕐 ${item.json.sent_at}\\n\\n`;\n  });\n} else {\n  report += '❌ No se enviaron emails\\n';\n  report += '   (SEND_EMAILS está configurado como \"false\")\\n\\n';\n  report += '💡 Para activar el envío:\\n';\n  report += '   1. Edita el nodo \"⚙️ Config Email Sender\"\\n';\n  report += '   2. Cambia SEND_EMAILS a \"true\"\\n';\n  report += '   3. Configura TARGET_EMAIL con tu email\\n';\n  report += '   4. Configura credenciales de Gmail\\n';\n}\n\nreport += '\\n';\nreport += `${'═'.repeat(54)}\\n`;\nreport += `📊 Total emails generados: ${totalSent + totalNotSent}\\n`;\nreport += `📤 Enviados: ${totalSent}\\n`;\nreport += `📥 No enviados: ${totalNotSent}\\n`;\nreport += `${'═'.repeat(54)}\\n`;\n\nreturn [{\n  json: {\n    report: report,\n    total_generated: totalSent + totalNotSent,\n    total_sent: totalSent,\n    total_not_sent: totalNotSent,\n    sent_emails: sentItems.map(i => i.json),\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3240,
+        500
+      ],
+      "id": "final-report",
+      "name": "📊 Final Send Report"
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Generate Demo Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Demo Emails": {
+      "main": [
+        [
+          {
+            "node": "If CLIENT",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If BILLING",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If LEAD",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If INTERNAL",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If SPAM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If CLIENT": {
+      "main": [
+        [
+          {
+            "node": "Label: CLIENTE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If BILLING": {
+      "main": [
+        [
+          {
+            "node": "Label: FACTURAS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If LEAD": {
+      "main": [
+        [
+          {
+            "node": "Label: LEAD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If INTERNAL": {
+      "main": [
+        [
+          {
+            "node": "Label: INTERNO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If SPAM": {
+      "main": [
+        [
+          {
+            "node": "Label: SPAM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Label: CLIENTE": {
+      "main": [
+        [
+          {
+            "node": "Merge All Categories",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Label: FACTURAS": {
+      "main": [
+        [
+          {
+            "node": "Merge All Categories",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Label: LEAD": {
+      "main": [
+        [
+          {
+            "node": "Merge All Categories",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Label: INTERNO": {
+      "main": [
+        [
+          {
+            "node": "Merge All Categories",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Label: SPAM": {
+      "main": [
+        [
+          {
+            "node": "Merge All Categories",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Merge All Categories": {
+      "main": [
+        [
+          {
+            "node": "Format Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Date": {
+      "main": [
+        [
+          {
+            "node": "Create Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Summary": {
+      "main": [
+        [
+          {
+            "node": "Export as JSON",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Report",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "⚙️ Config Email Sender",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule (Optional)": {
+      "main": [
+        [
+          {
+            "node": "Generate Demo Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ Config Email Sender": {
+      "main": [
+        [
+          {
+            "node": "¿Enviar emails?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Enviar emails?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Email Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge Results",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Prepare Email Data": {
+      "main": [
+        [
+          {
+            "node": "Delay Between Sends",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delay Between Sends": {
+      "main": [
+        [
+          {
+            "node": "📧 Gmail Send",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📧 Gmail Send": {
+      "main": [
+        [
+          {
+            "node": "Track Sent Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Sent Emails": {
+      "main": [
+        [
+          {
+            "node": "Merge Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Results": {
+      "main": [
+        [
+          {
+            "node": "📊 Final Send Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-04-23T00:00:00.000Z",
+  "versionId": "1"
+}

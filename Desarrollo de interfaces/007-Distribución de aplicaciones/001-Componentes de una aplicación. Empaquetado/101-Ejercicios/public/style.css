@@ -1,0 +1,229 @@
+:root {
+  --background: #121212;
+  --panel: #252526;
+  --border: #333;
+  --text: #eeeeee;
+  --text-muted: #aaaaaa;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--background);
+  font-family: "Ubuntu Mono", monospace;
+}
+
+ion-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--background);
+}
+
+/* Layout principal */
+#layout {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+/* Panel izquierdo */
+#sidebar {
+  width: 260px;
+  min-width: 140px;
+  max-width: 600px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  overflow: auto;
+}
+
+/* Separador */
+#divider {
+  width: 4px;
+  background: #3a3a3a;
+  cursor: col-resize;
+}
+
+body.resizing,
+body.resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+/* Árbol */
+#tree {
+  padding: 4px 0;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.tree-node {
+}
+
+.tree-row {
+  display: flex;
+  align-items: center;
+  padding: 2px 4px;
+  cursor: default;
+  user-select: none;
+  color: var(--text);
+}
+
+.tree-row:hover {
+  background: #2a2d2e;
+}
+
+.tree-row .twisty {
+  width: 14px;
+  display: inline-block;
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.tree-row .icon {
+  width: 18px;
+  margin-right: 4px;
+  text-align: center;
+  font-size: 11px;
+}
+
+.tree-row .label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tree-children {
+  margin-left: 18px;
+  padding-left: 0;
+  border-left: none;
+}
+
+/* Panel derecho */
+#editor-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Pestañas */
+#tabs {
+  height: 30px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-end;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  margin-right: 2px;
+  font-size: 13px;
+  cursor: default;
+  user-select: none;
+  background: #2d2d2d;
+  color: #cccccc;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--panel);
+}
+
+.tab.active {
+  background: #1e1e1e;
+  color: #ffffff;
+  border-bottom-color: #1e1e1e;
+}
+
+.tab .tab-name {
+  max-width: 180px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.tab .tab-close {
+  margin-left: 8px;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.tab .tab-close:hover {
+  opacity: 1;
+}
+
+/* CodeMirror */
+#editor {
+  flex: 1;
+  min-height: 0;
+  background: #1e1e1e;
+}
+
+.CodeMirror {
+  height: 100%;
+  background-color: #1e1e1e;
+  color: var(--text);
+  font-family: "Ubuntu Mono", monospace;
+  font-size: 13px;
+}
+
+/* Menú contextual */
+#context-menu {
+  position: fixed;
+  display: none;
+  background: #252526;
+  border: 1px solid #555;
+  z-index: 1000;
+  min-width: 180px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+#context-menu.visible {
+  display: block;
+}
+
+.context-item {
+  padding: 4px 12px;
+  font-size: 13px;
+  color: #eee;
+  cursor: default;
+  white-space: nowrap;
+}
+
+.context-item:hover {
+  background: #3a3d41;
+}
+
+.context-separator {
+  height: 1px;
+  background: #555;
+  margin: 4px 0;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+::-webkit-scrollbar-thumb {
+  background: #3a3a3a;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+.CodeMirror{
+  font-size:20px;
+}
+

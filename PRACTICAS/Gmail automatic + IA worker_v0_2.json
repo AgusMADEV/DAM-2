@@ -1,0 +1,1446 @@
+{
+  "name": "Gmail automatic + IA worker",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1216,
+        -128
+      ],
+      "id": "0cc62c0c-d7bd-4d26-a274-7963508cf13b",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        416
+      ],
+      "id": "f894905d-2ef7-49d6-8771-61dfa1394cce",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "GI9POaOJpONaymbM",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.text || $json.response || $json.output || '';\nconst match = raw.match(/\\{[\\s\\S]*\\}/);\n\nif (!match) {\n  return [{\n    json: {\n      categoria: 'otro',\n      prioridad: 'media',\n      resumen: 'No se pudo analizar el correo automáticamente.',\n      intencion: 'Revisión manual',\n      requiere_respuesta: true\n    }\n  }];\n}\n\nlet parsed;\ntry {\n  parsed = JSON.parse(match[0]);\n} catch {\n  parsed = {\n    categoria: 'otro',\n    prioridad: 'media',\n    resumen: 'JSON inválido devuelto por el modelo.',\n    intencion: 'Revisión manual',\n    requiere_respuesta: true\n  };\n}\n\nconst categoriasValidas = ['ventas', 'soporte', 'facturacion', 'incidencias', 'otro'];\nconst prioridadesValidas = ['baja', 'media', 'alta'];\n\nparsed.categoria = categoriasValidas.includes(parsed.categoria) ? parsed.categoria : 'otro';\nparsed.prioridad = prioridadesValidas.includes(parsed.prioridad) ? parsed.prioridad : 'media';\nparsed.resumen = parsed.resumen || 'Sin resumen';\nparsed.intencion = parsed.intencion || 'Sin intención clara';\nparsed.requiere_respuesta = typeof parsed.requiere_respuesta === 'boolean' ? parsed.requiere_respuesta : true;\n\nreturn [{ json: parsed }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -432,
+        -128
+      ],
+      "id": "00a443bc-eaa7-40b7-8fb5-3907a5464fb6",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un asistente de empresa que responde correos de forma profesional, clara, humana y personalizada.\n\nTu trabajo es redactar una respuesta basándote únicamente en la información disponible.\n\nDATOS DE EMPRESA:\n- Nombre de empresa: {{ $('Parsear config').item.json.company_name }}\n- Firma del equipo: {{ $('Parsear config').item.json.signature_name }}\n- Cierre habitual: {{ $('Parsear config').item.json.signature_closing }}\n\nEMAIL RECIBIDO:\nAsunto: {{ $('Set gmail').item.json.subject }}\nRemitente: {{ $('Set gmail').item.json.from }}\n\nContenido:\n{{ $('Set gmail').item.json.body }}\n\nANÁLISIS DEL EMAIL:\n- Categoría: {{ $json.categoria }}\n- Prioridad: {{ $json.prioridad }}\n- Resumen: {{ $json.resumen }}\n- Intención: {{ $json.intencion }}\n\nBASE DE CONOCIMIENTO (FAQS RELEVANTES):\n{{ $json.faqs_contexto }}\n\nACCIÓN A REALIZAR:\n{{ $json.accion_final }}\n\nMOTIVO:\n{{ $json.policy_motivo }}\n\nINSTRUCCIONES IMPORTANTES:\n1. Usa SOLO la información disponible en las FAQs si aplica al correo.\n2. No inventes datos, condiciones, plazos, precios o detalles no confirmados.\n3. Si las FAQs no contienen la respuesta completa:\n   - responde de forma general y útil\n   - y pide el contexto mínimo necesario de forma natural\n4. Si la acción es \"to_waiting\":\n   - no des respuestas cerradas\n   - pide más información antes de avanzar\n5. Si el email trata sobre precios:\n   - no des cifras\n   - explica que depende del contexto\n   - invita a continuar la conversación\n6. Mantén un tono:\n   - profesional\n   - cercano\n   - claro\n   - directo\n   - no robótico\n7. No menciones:\n   - que eres una IA\n   - que estás usando FAQs\n   - que existen reglas internas\n8. NO incluyas nunca \"Asunto:\" dentro del cuerpo del correo.\n9. Empieza directamente por el saludo.\n10. Usa saltos de línea normales entre párrafos.\n11. La firma final debe usar el cierre y el nombre de equipo proporcionados.\n\nESTILO DE RESPUESTA:\n- Entre 80 y 170 palabras aprox.\n- 3 a 6 párrafos cortos\n- limpio y agradable de leer\n- sin relleno innecesario\n\nESTRUCTURA OBLIGATORIA:\n1. Saludo natural\n2. Frase breve de agradecimiento o acuse de recibo\n3. Respuesta principal\n4. Siguiente paso o petición de información, si aplica\n5. Despedida usando:\n   {{ $('Parsear config').item.json.signature_closing }},\n   {{ $('Parsear config').item.json.signature_name }}\n\nDevuelve solo el texto final del correo.",
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1120,
+        -272
+      ],
+      "id": "02df550a-cc7d-4d40-8a6d-22542507af18",
+      "name": "Borrador"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un asistente que clasifica correos de empresa.\n\nTu tarea es analizar el email y devolver EXCLUSIVAMENTE un JSON válido, completo y bien formado.\n\n⚠️ IMPORTANTE:\n- Devuelve SOLO el JSON.\n- No añadas texto antes ni después.\n- No uses markdown.\n- No expliques nada.\n- Asegúrate de cerrar correctamente todas las llaves {}.\n- El JSON debe ser parseable sin errores.\n\nEstructura exacta:\n\n{\n  \"categoria\": \"ventas|soporte|facturacion|incidencias|otro\",\n  \"prioridad\": \"baja|media|alta\",\n  \"resumen\": \"string breve\",\n  \"intencion\": \"string breve\",\n  \"requiere_respuesta\": true\n}\n\nReglas de clasificación:\n\n- ventas → interés en comprar, presupuestos, productos\n- soporte → dudas, ayuda, consultas generales\n- facturacion → pagos, facturas, cobros\n- incidencias → errores, fallos, problemas técnicos\n- otro → cualquier caso no claro\n\nReglas adicionales:\n- \"resumen\" → máximo 1 frase clara\n- \"intencion\" → qué quiere el usuario en una frase\n- \"requiere_respuesta\" → true si espera respuesta, false si no\n\nEmail:\n\nAsunto: {{ $json.subject }}\nRemitente: {{ $json.from }}\nContenido:\n{{ $json.body }}",
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -720,
+        -128
+      ],
+      "id": "6d686150-46a8-4bcf-9bc1-40d720d69380",
+      "name": "Analisis"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2096,
+        -144
+      ],
+      "id": "d90dd427-2546-4c9f-b64f-40ac11d2fc81",
+      "name": "Wait",
+      "webhookId": "e1adf97e-267b-44d8-b39a-4cbae81fe0bd"
+    },
+    {
+      "parameters": {
+        "sendTo": "agusmadevelop@gmail.com",
+        "subject": "={{ $json.internalSubject }}",
+        "message": "={{ '<div style=\"font-family: Arial, sans-serif; white-space: pre-wrap;\">' + ($json.internalBody || '') + '</div>' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1936,
+        -144
+      ],
+      "id": "45dc8441-f505-418b-a2b6-7c4da5975847",
+      "name": "Send a message",
+      "webhookId": "8f4a8b73-bcc9-44ca-b7e9-eb391d167683",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7c056bfe-9ee8-47df-9905-8467db57d6bf",
+              "name": "from",
+              "value": "={{ $json.from.text }}",
+              "type": "string"
+            },
+            {
+              "id": "ac6653a0-2829-42c4-b93c-8e955392defd",
+              "name": "subject",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "68cbb92e-394a-4c7c-8100-779fc74b7de4",
+              "name": "body",
+              "value": "={{ ($json.text || '').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "f91ba66f-45aa-4ab1-b636-db2bcb81deef",
+              "name": "messageId",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "906cd896-c630-453a-a9c8-93a5ec53a5d1",
+              "name": "threadId",
+              "value": "={{ $json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "dfd4c109-62cc-4324-acc1-bc93f55a416b",
+              "name": "headerMessageId",
+              "value": "={{ $json.messageId }}",
+              "type": "string"
+            },
+            {
+              "id": "15da1edd-f6a1-48ce-b8ae-d344ac152c16",
+              "name": "receivedDate",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1056,
+        -128
+      ],
+      "id": "586cc653-dee1-4ca1-828a-8a08f8c76939",
+      "name": "Set gmail"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4736bfab-697d-40c0-936e-9758fa5ac1b5",
+              "name": "draft",
+              "value": "={{ $json.draft_limpio || ('Hola,\\n\\nGracias por tu mensaje.\\n\\nEstamos revisando tu consulta y te responderemos lo antes posible con más detalle.\\n\\n' + ($('Parsear config').item.json.signature_closing || 'Un saludo') + ',\\n' + ($('Parsear config').item.json.signature_name || 'Equipo de atención')) }}",
+              "type": "string"
+            },
+            {
+              "id": "ba13d6a5-c67e-4f3f-997b-a78dbeca4362",
+              "name": "=approveUrl",
+              "value": "={{ $execution.resumeUrl + '?decision=approve' }}",
+              "type": "string"
+            },
+            {
+              "id": "15efbe84-4eef-46f2-b097-fd8469fc2f59",
+              "name": "rejectUrl",
+              "value": "={{ $execution.resumeUrl + '?decision=reject' }}",
+              "type": "string"
+            },
+            {
+              "id": "2d07d873-8934-483a-b7a4-5a852ce3113e",
+              "name": "from",
+              "value": "={{ $('Set gmail').item.json.from }}",
+              "type": "string"
+            },
+            {
+              "id": "365ee0e3-874d-4d30-a224-faa07d490635",
+              "name": "subject",
+              "value": "={{ $('Set gmail').item.json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "58d3e1eb-6f2e-45a0-b094-60d95a311d28",
+              "name": "categoria",
+              "value": "={{ $('Code in JavaScript').item.json.categoria }}",
+              "type": "string"
+            },
+            {
+              "id": "019157ed-cb59-4e5f-9a68-371a1162c642",
+              "name": "prioridad",
+              "value": "={{ $('Code in JavaScript').item.json.prioridad }}",
+              "type": "string"
+            },
+            {
+              "id": "6d3e09ae-878b-4762-be54-967834c9ff32",
+              "name": "resumen",
+              "value": "={{ $('Code in JavaScript').item.json.resumen }}",
+              "type": "string"
+            },
+            {
+              "id": "73f8718b-f84e-499d-bec4-05581a6a3f17",
+              "name": "=messageId",
+              "value": "={{ $('Set gmail').item.json.messageId }}",
+              "type": "string"
+            },
+            {
+              "id": "02ef542c-a62d-43eb-bf5d-59d847cb1774",
+              "name": "internalSubject",
+              "value": "={{ '[Revisión IA] ' + $('Set gmail').item.json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "d6bc001f-dc41-44b8-bffb-a2900376e049",
+              "name": "accion_final",
+              "value": "={{ $json.accion_final || 'to_reply' }}",
+              "type": "string"
+            },
+            {
+              "id": "41fba6b4-53e0-4fc7-ba41-c80a6e5d1d1b",
+              "name": "policy_motivo",
+              "value": "={{ $json.policy_motivo || 'Sin motivo específico' }}",
+              "type": "string"
+            },
+            {
+              "id": "41d76597-3c6a-4180-a327-695b1ccdb5c8",
+              "name": "intencion",
+              "value": "={{ $('Code in JavaScript').item.json.intencion }}",
+              "type": "string"
+            },
+            {
+              "id": "1c46daf6-2b73-4678-8a5e-ca8f1d54e622",
+              "name": "client_id",
+              "value": "={{ $('Parsear config').item.json.client_id \n\n 'default' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1568,
+        -32
+      ],
+      "id": "0545a19a-e92d-4cce-a69a-c7a90ceabeae",
+      "name": "PrepararRevision"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c38d479c-2189-4a5e-a645-756e25345faa",
+              "name": "internalSubject",
+              "value": "={{ $json.internalSubject }}",
+              "type": "string"
+            },
+            {
+              "id": "7af79c1c-4f95-42b0-be15-a969ad94b2e3",
+              "name": "internalBody",
+              "value": "={{ \n'Correo recibido de: ' + $json.from +\n'\\n\\nAsunto: ' + $json.subject +\n'\\n\\nCategoría: ' + $json.categoria +\n'\\nPrioridad: ' + $json.prioridad +\n'\\nResumen: ' + $json.resumen +\n'\\nAcción final: ' + ($json.accion_final || 'sin definir') +\n'\\nMotivo: ' + ($json.policy_motivo || 'sin motivo') +\n'\\n\\nBorrador propuesto:\\n\\n' + ($json.draft || 'No se ha generado borrador automático.') +\n'\\n\\nAprobar:\\n' + $json.approveUrl +\n'\\n\\nRechazar:\\n' + $json.rejectUrl \n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1760,
+        -144
+      ],
+      "id": "a7e2e3a0-3c7a-4d86-bcc1-0258895422d2",
+      "name": "ConstruirCorreoRevision"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5c6755e2-e987-404a-b11e-cf0b0876bd4b",
+              "leftValue": "={{ $json.query.decision }}",
+              "rightValue": "approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2288,
+        -144
+      ],
+      "id": "ed6611d2-942c-4aa7-99a7-af27796955ca",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('PrepararRevision').item.json.messageId }}",
+        "message": "={{ '<div style=\"font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #222;\">' + '<p>' + $('PrepararRevision').item.json.draft.replace(/\\n\\n/g, '</p><p>').replace(/\\n/g, '<br>') + '</p>' + '</div>' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2480,
+        -320
+      ],
+      "id": "e7b9f082-b995-4491-8a03-5544ff35ae0f",
+      "name": "Reply to a message",
+      "webhookId": "aac5d7a2-1f97-4cae-ab11-41c1ebb04af7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('PrepararRevision').item.json.messageId }}",
+        "labelIds": [
+          "Label_8091616593185746588"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2896,
+        -320
+      ],
+      "id": "777a48ff-dec2-44cb-84da-82b5983e8b3a",
+      "name": "Add label to message",
+      "webhookId": "b1426180-c62e-4450-a591-7e46cd12fe82",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "agustin.sodire@gmail.com",
+        "subject": "={{ '[Rechazado] ' + $('PrepararRevision').item.json.messageId }}",
+        "message": "={{  'El borrador generado por la IA ha sido rechazado.\\n\\n' + 'Correo original:\\n' + $('PrepararRevision').item.json.subject + '\\n\\n' + 'Revisar manualmente.' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2496,
+        -48
+      ],
+      "id": "02ab4198-7eb5-41fa-b992-156887b6927b",
+      "name": "Send a message1",
+      "webhookId": "af9ad7a7-92ea-406f-9b6d-a4007fb3d326",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4ad1156c-771c-454f-96d3-38c2e4655a1a",
+              "leftValue": true,
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        288,
+        -784
+      ],
+      "id": "91722f25-e90c-4982-9087-5d17849d155b",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Set gmail').item.json.messageId }}",
+        "labelIds": [
+          "Label_5298530767740082081"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1216,
+        224
+      ],
+      "id": "559d5724-d17e-4e57-ab08-e3b3b2778f28",
+      "name": "Add label to message1",
+      "webhookId": "13ead6e3-23a9-4d11-bea4-485a9b6f5a1c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "removeLabels",
+        "messageId": "={{ $('Set gmail').item.json.messageId }}",
+        "labelIds": [
+          "INBOX"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1424,
+        224
+      ],
+      "id": "7695ab39-2c56-4ae0-80cf-1a2daa256be1",
+      "name": "Remove label from message",
+      "webhookId": "fde1402e-03a0-416f-9356-f8dbcc8214ab",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const email = ($json.body || '').toLowerCase();\n\nlet accion = \"to_reply\";\nlet policy_id = \"default\";\nlet motivo = \"Sin política especial aplicada\";\n\nif (email.includes(\"precio\") || email.includes(\"coste\") || email.includes(\"presupuesto\") || email.includes(\"tarifa\")) {\n  accion = \"to_waiting\";\n  policy_id = \"POLICY_PRECIO\";\n  motivo = \"Pregunta sobre precios o presupuesto\";\n}\n\nif (email.includes(\"datos\") || email.includes(\"rgpd\") || email.includes(\"privacidad\") || email.includes(\"confidencial\")) {\n  accion = \"to_sensitive\";\n  policy_id = \"POLICY_DATOS\";\n  motivo = \"Tema sensible relacionado con datos o privacidad\";\n}\n\nreturn [\n  {\n    json: {\n      ...$json,\n      accion_final: accion,\n      policy_id,\n      policy_motivo: motivo\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        496
+      ],
+      "id": "fa4aef04-f570-4d30-951d-fb89bc319d5a",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1x6ZssuHLmfIvrOtHeIABbgNvJrYlo79LtdlqLxR0dFQ/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1921131902,
+          "mode": "list",
+          "cachedResultName": "Políticas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1x6ZssuHLmfIvrOtHeIABbgNvJrYlo79LtdlqLxR0dFQ/edit#gid=1921131902"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        160,
+        496
+      ],
+      "id": "cfde7b04-3858-4525-9275-252129a74363",
+      "name": "Politicas",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PGtualgb4ukwEdaI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1x6ZssuHLmfIvrOtHeIABbgNvJrYlo79LtdlqLxR0dFQ/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "FAQs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1x6ZssuHLmfIvrOtHeIABbgNvJrYlo79LtdlqLxR0dFQ/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -192,
+        -80
+      ],
+      "id": "c5e80f2f-3477-4eae-8a0e-a02484e25e14",
+      "name": "FAQs",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PGtualgb4ukwEdaI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -848,
+        368
+      ],
+      "id": "2e28d46a-16df-4ae5-8000-6372822fded0",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "function limpiarTexto(texto) {\n  return (texto || '')\n    .toLowerCase()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '')\n    .replace(/[¿?.,;:()\"']/g, ' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nfunction contieneAlguna(texto, palabras) {\n  return palabras.some(p => texto.includes(p));\n}\n\nfunction puntuacionFaq(faq, text, categoriaEmail) {\n  let score = 0;\n\n  const pregunta = limpiarTexto(faq.pregunta_tipo);\n  const respuesta = limpiarTexto(faq.respuesta_oficial);\n  const cuandoUsar = limpiarTexto(faq.cuando_usar);\n  const cuandoNoUsar = limpiarTexto(faq.cuando_no_usar);\n  const categoriaFaq = limpiarTexto(faq.categoria_origen);\n\n  const bloques = [pregunta, respuesta, cuandoUsar, cuandoNoUsar, categoriaFaq];\n\n  for (const bloque of bloques) {\n    const palabras = bloque.split(' ').filter(p => p.length > 3);\n    for (const palabra of palabras) {\n      if (text.includes(palabra)) score += 1;\n    }\n  }\n\n  if (categoriaEmail && categoriaFaq.includes(categoriaEmail)) {\n    score += 4;\n  }\n\n  const esFacturacion = contieneAlguna(text, [\n    'factura', 'facturacion', 'cargo', 'cobro', 'pago', 'importe', 'recibo'\n  ]);\n\n  const esPrecio = contieneAlguna(text, [\n    'precio', 'presupuesto', 'coste', 'tarifa'\n  ]);\n\n  const esFormacion = contieneAlguna(text, [\n    'formacion', 'workshop', 'workshops', 'taller'\n  ]);\n\n  const esSoporte = contieneAlguna(text, [\n    'soporte', 'ayuda', 'problema', 'error', 'incidencia'\n  ]);\n\n  const esIA = contieneAlguna(text, [\n    'ia', 'inteligencia artificial'\n  ]);\n\n  if (esFacturacion) {\n    if (\n      contieneAlguna(pregunta, ['factura', 'facturacion', 'cargo', 'cobro', 'pago']) ||\n      contieneAlguna(respuesta, ['factura', 'facturacion', 'cargo', 'cobro', 'pago']) ||\n      contieneAlguna(cuandoUsar, ['factura', 'facturacion', 'cargo', 'cobro', 'pago']) ||\n      categoriaFaq.includes('facturacion')\n    ) {\n      score += 6;\n    }\n\n    if (categoriaFaq.includes('lead') || categoriaFaq.includes('ventas')) {\n      score -= 4;\n    }\n  }\n\n  if (esPrecio) {\n    if (\n      contieneAlguna(pregunta, ['precio', 'tarifa', 'coste', 'presupuesto']) ||\n      contieneAlguna(respuesta, ['precio', 'tarifa', 'coste', 'presupuesto'])\n    ) {\n      score += 5;\n    }\n  }\n\n  if (esFormacion) {\n    if (\n      contieneAlguna(pregunta, ['formacion', 'workshop', 'taller']) ||\n      contieneAlguna(respuesta, ['formacion', 'workshop', 'taller'])\n    ) {\n      score += 5;\n    }\n  }\n\n  if (esSoporte) {\n    if (\n      categoriaFaq.includes('soporte') ||\n      contieneAlguna(cuandoUsar, ['soporte', 'ayuda', 'problema', 'error', 'incidencia'])\n    ) {\n      score += 4;\n    }\n  }\n\n  if (esIA) {\n    if (\n      contieneAlguna(pregunta, ['ia', 'inteligencia artificial']) ||\n      contieneAlguna(respuesta, ['ia', 'inteligencia artificial'])\n    ) {\n      score += 3;\n    }\n  }\n\n  return score;\n}\n\nconst analisis = $('Code in JavaScript').first().json;\nconst gmail = $('Set gmail').first().json;\n\nconst text = limpiarTexto([\n  gmail.subject || '',\n  gmail.body || '',\n  analisis.resumen || '',\n  analisis.intencion || '',\n  analisis.categoria || ''\n].join(' '));\n\nconst categoriaEmail = limpiarTexto(analisis.categoria || '');\n\nconst resultados = items\n  .filter(item =>\n    item.json.faq_id &&\n    item.json.pregunta_tipo &&\n    item.json.respuesta_oficial\n  )\n  .map(item => {\n    return {\n      json: {\n        ...item.json,\n        categoria: analisis.categoria,\n        prioridad: analisis.prioridad,\n        resumen: analisis.resumen,\n        intencion: analisis.intencion,\n        requiere_respuesta: analisis.requiere_respuesta,\n        subject: gmail.subject,\n        body: gmail.body,\n        texto_usado_para_buscar: text,\n        categoria_email: categoriaEmail,\n        score: puntuacionFaq(item.json, text, categoriaEmail)\n      }\n    };\n  })\n  .filter(item => item.json.score > 0)\n  .sort((a, b) => b.json.score - a.json.score)\n  .slice(0, 3);\n\nif (resultados.length === 0) {\n  return [\n    {\n      json: {\n        categoria: analisis.categoria,\n        prioridad: analisis.prioridad,\n        resumen: analisis.resumen,\n        intencion: analisis.intencion,\n        requiere_respuesta: analisis.requiere_respuesta,\n        subject: gmail.subject,\n        body: gmail.body,\n        faqs_contexto: '',\n        faq_ids_usadas: '',\n        sin_faqs_relevantes: true\n      }\n    }\n  ];\n}\n\nreturn resultados;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        -112
+      ],
+      "id": "99bec6a2-7b4c-4052-aecb-286d14ed01eb",
+      "name": "FAQs filtradas"
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = items[0]?.json || {};\nconst faqIds = items.map(item => item.json.faq_id).join(', ');\n\nconst faqsTexto = items.map((item, i) => {\n  const faq = item.json;\n  return `FAQ ${i + 1}\nID: ${faq.faq_id}\nPregunta tipo: ${faq.pregunta_tipo}\nRespuesta oficial: ${faq.respuesta_oficial}\nCuándo usar: ${faq.cuando_usar}\nCuándo no usar: ${faq.cuando_no_usar}\nNotas internas: ${faq.notas_internas}`;\n}).join('\\n\\n');\n\nreturn [\n  {\n    json: {\n      ...base,\n      faqs_contexto: faqsTexto,\n      faq_ids_usadas: faqIds\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        -176
+      ],
+      "id": "36d1693f-8505-4bc3-adf4-71491c49ba13",
+      "name": "Construir contexto FAQs"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.accion_final }}",
+                    "rightValue": "to_reply",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4bc32e2f-2e9a-4308-8e5c-40877d1d5d29"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "eff06c2a-c937-45a7-866b-69c5f67fe45b",
+                    "leftValue": "={{ $json.accion_final }}",
+                    "rightValue": "to_waiting",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7f84842b-3955-47b8-9814-d085862cb195",
+                    "leftValue": "={{ $json.accion_final }}",
+                    "rightValue": "to_sensitive",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "8480a5d9-6bfc-4a57-8452-3ee971c22cb1",
+                    "leftValue": "={{ $json.accion_final }}",
+                    "rightValue": "to_done",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5f16fdcc-bdf7-48e5-811b-21c26a199b49",
+                    "leftValue": "={{ $json.accion_final }}",
+                    "rightValue": "to_fyi",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        -160
+      ],
+      "id": "f2c8dbed-145d-47fe-9f34-78804b9a63da",
+      "name": "Switch accion_final"
+    },
+    {
+      "parameters": {
+        "jsCode": "const email = [\n  $json.subject || '',\n  $json.body || '',\n  $json.resumen || '',\n  $json.intencion || ''\n].join(' ').toLowerCase();\n\nlet accion = \"to_reply\";\nlet policy_id = \"default\";\nlet motivo = \"Sin política especial aplicada\";\n\nif (\n  email.includes(\"precio\") ||\n  email.includes(\"coste\") ||\n  email.includes(\"presupuesto\") ||\n  email.includes(\"tarifa\")\n) {\n  accion = \"to_waiting\";\n  policy_id = \"POLICY_PRECIO\";\n  motivo = \"Pregunta sobre precios o presupuesto\";\n}\n\nif (\n  email.includes(\"datos\") ||\n  email.includes(\"rgpd\") ||\n  email.includes(\"privacidad\") ||\n  email.includes(\"confidencial\")\n) {\n  accion = \"to_sensitive\";\n  policy_id = \"POLICY_DATOS\";\n  motivo = \"Tema sensible relacionado con datos o privacidad\";\n}\n\nreturn [\n  {\n    json: {\n      ...$json,\n      accion_final: accion,\n      policy_id,\n      policy_motivo: motivo\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        -128
+      ],
+      "id": "0ba1895f-201b-445f-9c3d-2dbe2e9fb7c4",
+      "name": "Evaluar acción"
+    },
+    {
+      "parameters": {
+        "jsCode": "const texto = $json.text || $json.response || $json.output || '';\n\nconst limpio = texto\n  .replace(/\\\\n/g, '\\n')\n  .replace(/\\n{3,}/g, '\\n\\n')\n  .replace(/=\\n/g, '')\n  .replace(/=/g, '')\n  .replace(/^Asunto:\\s.*$/gmi, '')\n  .trim();\n\nreturn [\n  {\n    json: {\n      ...$json,\n      draft_limpio: limpio\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1408,
+        -160
+      ],
+      "id": "47b6e0c1-c380-494b-ac58-92f75f4ccaf0",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1x6ZssuHLmfIvrOtHeIABbgNvJrYlo79LtdlqLxR0dFQ/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 589191177,
+          "mode": "list",
+          "cachedResultName": "Config",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1x6ZssuHLmfIvrOtHeIABbgNvJrYlo79LtdlqLxR0dFQ/edit#gid=589191177"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -144,
+        -288
+      ],
+      "id": "db2ea6cd-5b26-4de1-b346-68caf505817f",
+      "name": "Config empresa",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PGtualgb4ukwEdaI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const config = {};\n\nfor (const item of items) {\n  const clave = item.json.clave;\n  const valor = item.json.valor;\n\n  if (clave) {\n    config[clave] = valor || '';\n  }\n}\n\nreturn [\n  {\n    json: config\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        -288
+      ],
+      "id": "a80e53ec-d0ef-457b-9d0a-d879e5966d5f",
+      "name": "Parsear config"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        592,
+        -80
+      ],
+      "id": "d278cb5d-f8dc-4e75-8934-5ac35e71a391",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1x6ZssuHLmfIvrOtHeIABbgNvJrYlo79LtdlqLxR0dFQ/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1696153562,
+          "mode": "list",
+          "cachedResultName": "Respuestas_IA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1x6ZssuHLmfIvrOtHeIABbgNvJrYlo79LtdlqLxR0dFQ/edit#gid=1696153562"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('PrepararRevision').item.json.messageId }}",
+            "fecha": "={{ $now }}",
+            "client_id": "={{ $('PrepararRevision').item.json.client_id }}",
+            "categoria": "={{ $('PrepararRevision').item.json.categoria }}",
+            "intencion": "={{ $('PrepararRevision').item.json.intencion }}",
+            "email_original": "={{ $('Set gmail').item.json.body }}",
+            "respuesta_aprobada": "={{ $('PrepararRevision').item.json.draft }}",
+            "accion_final": "={{ $('PrepararRevision').item.json.accion_final || 'to_reply' }}",
+            "reutilizable": "true",
+            "tags": "={{ (($('PrepararRevision').item.json.categoria || 'general') + ',' + ($('Code in JavaScript').item.json.intencion || '')).trim() }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "client_id",
+              "displayName": "client_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "categoria",
+              "displayName": "categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "intencion",
+              "displayName": "intencion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email_original",
+              "displayName": "email_original",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "respuesta_aprobada",
+              "displayName": "respuesta_aprobada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "accion_final",
+              "displayName": "accion_final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reutilizable",
+              "displayName": "reutilizable",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tags",
+              "displayName": "tags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2688,
+        -320
+      ],
+      "id": "8c0ae589-dc9d-4d2d-9767-c3b9d1221995",
+      "name": "Guardar Respuesta IA",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PGtualgb4ukwEdaI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1x6ZssuHLmfIvrOtHeIABbgNvJrYlo79LtdlqLxR0dFQ/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1696153562,
+          "mode": "list",
+          "cachedResultName": "Respuestas_IA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1x6ZssuHLmfIvrOtHeIABbgNvJrYlo79LtdlqLxR0dFQ/edit#gid=1696153562"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -176,
+        -560
+      ],
+      "id": "1eaba10d-0d7b-4870-938b-27a368693999",
+      "name": "Respuestas IA",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PGtualgb4ukwEdaI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function limpiarTexto(texto) {\n  return (texto || '')\n    .toLowerCase()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '')\n    .replace(/[¿?.,;:()\"]/g, ' ')\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nfunction scoreHistorico(item, text) {\n  let score = 0;\n\n  const categoria = limpiarTexto(item.categoria);\n  const intencion = limpiarTexto(item.intencion);\n  const emailOriginal = limpiarTexto(item.email_original);\n  const respuesta = limpiarTexto(item.respuesta_aprobada);\n  const tags = limpiarTexto(item.tags);\n\n  const bloques = [categoria, intencion, emailOriginal, respuesta, tags];\n\n  for (const bloque of bloques) {\n    const palabras = bloque.split(' ').filter(p => p.length > 3);\n    for (const palabra of palabras) {\n      if (text.includes(palabra)) score += 1;\n    }\n  }\n\n  if (\n    text.includes('precio') ||\n    text.includes('presupuesto') ||\n    text.includes('coste') ||\n    text.includes('tarifa')\n  ) {\n    if (\n      emailOriginal.includes('precio') ||\n      respuesta.includes('tarifa') ||\n      tags.includes('precio')\n    ) {\n      score += 5;\n    }\n  }\n\n  if (\n    text.includes('formacion') ||\n    text.includes('workshop') ||\n    text.includes('workshops')\n  ) {\n    if (\n      emailOriginal.includes('formacion') ||\n      respuesta.includes('workshop') ||\n      tags.includes('formacion')\n    ) {\n      score += 5;\n    }\n  }\n\n  if (\n    text.includes('soporte') ||\n    text.includes('ayuda') ||\n    text.includes('problema') ||\n    text.includes('error')\n  ) {\n    if (\n      categoria.includes('soporte') ||\n      tags.includes('soporte')\n    ) {\n      score += 4;\n    }\n  }\n\n  return score;\n}\n\nconst email = $('Code in JavaScript').first().json;\nconst text = limpiarTexto([\n  $('Set gmail').first().json.subject || '',\n  $('Set gmail').first().json.body || '',\n  email.resumen || '',\n  email.intencion || '',\n  email.categoria || ''\n].join(' '));\n\nreturn items\n  .filter(item => {\n    const row = item.json;\n    const reutilizable = String(row.reutilizable || '').toLowerCase();\n    return reutilizable === 'true' || reutilizable === '1' || reutilizable === 'yes';\n  })\n  .map(item => {\n    return {\n      json: {\n        ...item.json,\n        score: scoreHistorico(item.json, text)\n      }\n    };\n  })\n  .sort((a, b) => b.json.score - a.json.score)\n  .slice(0, 2);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32,
+        -560
+      ],
+      "id": "d967fe22-626f-4465-b2c4-9dcd4dc1103b",
+      "name": "Filtrar Respuestas IA"
+    },
+    {
+      "parameters": {
+        "jsCode": "const texto = items.map((item, i) => {\n  const r = item.json;\n  return `RESPUESTA HISTÓRICA ${i + 1}\nCategoría: ${r.categoria || ''}\nIntención: ${r.intencion || ''}\nEmail original: ${r.email_original || ''}\nRespuesta aprobada: ${r.respuesta_aprobada || ''}\nAcción final: ${r.accion_final || ''}`;\n}).join('\\n\\n');\n\nreturn [\n  {\n    json: {\n      respuestas_historicas_contexto: texto\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        -512
+      ],
+      "id": "59f0b051-eced-4228-8dfc-e9268352098e",
+      "name": "Construir contexto historico"
+    },
+    {
+      "parameters": {
+        "operation": "removeLabels",
+        "messageId": "={{ $('Set gmail').item.json.messageId }}",
+        "labelIds": [
+          "INBOX"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2672,
+        -48
+      ],
+      "id": "84d3bb1d-2fac-4a23-83dc-138f63f298d7",
+      "name": "Remove label from message1",
+      "webhookId": "fde1402e-03a0-416f-9356-f8dbcc8214ab",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analisis",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Borrador",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "FAQs",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Config empresa",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Respuestas IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analisis": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Borrador": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set gmail": {
+      "main": [
+        [
+          {
+            "node": "Analisis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PrepararRevision": {
+      "main": [
+        [
+          {
+            "node": "ConstruirCorreoRevision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ConstruirCorreoRevision": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a message": {
+      "main": [
+        [
+          {
+            "node": "Guardar Respuesta IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "Add label to message1": {
+      "main": [
+        [
+          {
+            "node": "Remove label from message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Politicas": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FAQs": {
+      "main": [
+        [
+          {
+            "node": "FAQs filtradas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        []
+      ]
+    },
+    "FAQs filtradas": {
+      "main": [
+        [
+          {
+            "node": "Construir contexto FAQs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construir contexto FAQs": {
+      "main": [
+        [
+          {
+            "node": "Evaluar acción",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch accion_final": {
+      "main": [
+        [
+          {
+            "node": "Borrador",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Borrador",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "PrepararRevision",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add label to message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add label to message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluar acción": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "PrepararRevision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config empresa": {
+      "main": [
+        [
+          {
+            "node": "Parsear config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear config": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Switch accion_final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Respuesta IA": {
+      "main": [
+        [
+          {
+            "node": "Add label to message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respuestas IA": {
+      "main": [
+        [
+          {
+            "node": "Filtrar Respuestas IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar Respuestas IA": {
+      "main": [
+        [
+          {
+            "node": "Construir contexto historico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Remove label from message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7a97addb-0ada-4a8e-bf8a-31580833dbdf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ce30596c2036c9787cf7de133bdf9beb7ac4721aa6f313e72b19791ad015b927"
+  },
+  "id": "7a5Z8nS1SxwAp0T9",
+  "tags": []
+}

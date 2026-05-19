@@ -1,0 +1,46 @@
+{
+    "version": 2,
+    "createdAt": 1765904167,
+    "updatedAt": 1765905397,
+    "status": "closed",
+    "currentQuestionId": "q_c4758166157d",
+    "resultsPublished": true,
+    "questions": [
+        {
+            "id": "q_0865759e2207",
+            "text": "Que es PHP",
+            "options": [
+                "Lenguaje del lado del servidor",
+                "Elefante",
+                "Perro",
+                "Avion"
+            ],
+            "correctIndex": 0,
+            "createdAt": 1765904183
+        },
+        {
+            "id": "q_65ae7a3ce9bd",
+            "text": "Que es Javascript",
+            "options": [
+                "Lenguaje del lado del cliente",
+                "Perro",
+                "Elefante",
+                "Caramelo"
+            ],
+            "correctIndex": 0,
+            "createdAt": 1765904232
+        },
+        {
+            "id": "q_c4758166157d",
+            "text": "Que es Python",
+            "options": [
+                "Lenguaje de programacion",
+                "Elefante",
+                "Manzana",
+                "Camello"
+            ],
+            "correctIndex": 0,
+            "createdAt": 1765905368
+        }
+    ]
+}

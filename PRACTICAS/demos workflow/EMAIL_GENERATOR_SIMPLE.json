@@ -1,0 +1,120 @@
+{
+  "name": "EMAIL_GENERATOR_WITH_SENDER",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "id": "manual-trigger",
+      "name": "▶️ Start"
+    },
+    {
+      "parameters": {
+        "jsCode": "const emailTemplates = [\n  {category: \"client\", from: \"maria.garcia@cliente.com\", to: \"info@sodire.es\", subject: \"Cambio de cita para la próxima semana\", body: \"Buenos días,\\n\\nNecesito cambiar mi cita del próximo martes a jueves si es posible. Tengo un imprevisto laboral y no puedo asistir ese día.\\n\\nGracias por vuestra comprensión.\\n\\nSaludos,\\nMaría García\"},\n  {category: \"client\", from: \"juan.martinez@empresa.com\", to: \"info@sodire.es\", subject: \"Problema con mi pedido #12345\", body: \"Hola,\\n\\nTengo un problema con mi pedido realizado la semana pasada. No he recibido la documentación completa que solicité.\\n\\n¿Podrían enviármela lo antes posible?\\n\\nUn saludo,\\nJuan Martínez\"},\n  {category: \"client\", from: \"ana.lopez@correo.com\", to: \"info@sodire.es\", subject: \"Seguimiento de mi solicitud\", body: \"Buenas tardes,\\n\\nLes escribo para hacer seguimiento de mi solicitud enviada hace dos semanas. ¿Podrían darme alguna actualización?\\n\\nAdjunto documentación adicional que me solicitaron.\\n\\nGracias,\\nAna López\"},\n  {category: \"client\", from: \"carlos.ruiz@mail.com\", to: \"info@sodire.es\", subject: \"Incidencia con el servicio contratado\", body: \"Estimados,\\n\\nTengo una incidencia con el servicio contratado. Desde ayer no puedo acceder al portal y necesito revisarlo urgentemente.\\n\\n¿Pueden ayudarme?\\n\\nSaludos,\\nCarlos Ruiz\"},\n  {category: \"billing\", from: \"contabilidad@proveedor.com\", to: \"info@sodire.es\", subject: \"Factura #2024-0456 - Servicios Enero\", body: \"Buenos días,\\n\\nAdjunto la factura correspondiente a los servicios prestados durante el mes de enero.\\n\\nImporte total: 1.250€\\nVencimiento: 15/02/2024\\n\\nQuedo a su disposición para cualquier aclaración.\\n\\nSaludos,\\nDpto. Contabilidad\"},\n  {category: \"billing\", from: \"admin@proveedorit.com\", to: \"info@sodire.es\", subject: \"Presupuesto servicios mantenimiento 2024\", body: \"Estimados,\\n\\nTal como solicitaron, les envío el presupuesto para los servicios de mantenimiento anual.\\n\\nPresupuesto adjunto en PDF.\\n\\nPlazo de validez: 30 días\\n\\nUn saludo,\\nJosé Fernández\\nProveedor IT\"},\n  {category: \"billing\", from: \"facturacion@suministros.com\", to: \"info@sodire.es\", subject: \"Abono factura #2023-1234\", body: \"Buenos días,\\n\\nLes informo que hemos procesado el abono de la factura #2023-1234 por el importe de 320€ tal como acordamos.\\n\\nAdjunto documento de abono.\\n\\nSaludos cordiales,\\nDpto. Facturación\"},\n  {category: \"billing\", from: \"pagos@cliente-corporativo.com\", to: \"info@sodire.es\", subject: \"Confirmación de pago - Ref: PAG-2024-089\", body: \"Estimados,\\n\\nConfirmamos el pago de las facturas pendientes mediante transferencia bancaria.\\n\\nRef: PAG-2024-089\\nImporte: 2.850€\\nFecha: 18/01/2024\\n\\nAdjunto recibo bancario.\\n\\nSaludos,\\nDpto. Pagos\"},\n  {category: \"lead\", from: \"info@empresanueva.com\", to: \"info@sodire.es\", subject: \"Solicitud de información sobre sus servicios\", body: \"Buenos días,\\n\\nSomos una empresa del sector tecnológico y estamos interesados en conocer más sobre sus servicios.\\n\\n¿Podrían enviarnos información detallada y tarifas?\\n\\nQuedamos a la espera de su respuesta.\\n\\nAtentamente,\\nPedro Sánchez\\nDirector Comercial\\nEmpresa Nueva SL\"},\n  {category: \"lead\", from: \"laura.jimenez@startup.io\", to: \"info@sodire.es\", subject: \"Consulta: ¿Cómo funciona su servicio?\", body: \"Hola,\\n\\nMe interesa saber cómo funciona exactamente su servicio. Estamos buscando un proveedor para nuestra startup y nos gustaría saber:\\n\\n- Precios\\n- Tiempos de implementación\\n- Soporte incluido\\n\\n¿Podríamos agendar una llamada?\\n\\nGracias,\\nLaura Jiménez\"},\n  {category: \"lead\", from: \"director@pymeinnovadora.com\", to: \"info@sodire.es\", subject: \"Presupuesto para contratar sus servicios\", body: \"Estimados,\\n\\nQueremos solicitar un presupuesto para contratar sus servicios para nuestra empresa.\\n\\nSomos una PYME de 25 empleados y necesitamos:\\n- Servicio A\\n- Servicio B\\n- Soporte técnico\\n\\n¿Cuál sería la tarifa mensual?\\n\\nSaludos,\\nRoberto Gómez\\nDirector General\"},\n  {category: \"lead\", from: \"marta.serrano@consulta.com\", to: \"info@sodire.es\", subject: \"Me interesa su producto - Quisiera saber más\", body: \"Buenos días,\\n\\nHe visto su página web y me interesa mucho su producto. Quisiera saber más detalles sobre:\\n\\n1. Funcionalidades principales\\n2. Precio y planes disponibles\\n3. Periodo de prueba\\n\\n¿Tienen algún catálogo o demo disponible?\\n\\nGracias,\\nMarta Serrano\"},\n  {category: \"internal\", from: \"equipo@sodire.es\", to: \"info@sodire.es\", subject: \"Reunión de equipo - Viernes 10:00h\", body: \"Hola equipo,\\n\\nRecordatorio de la reunión de este viernes a las 10:00h.\\n\\nTemas a tratar:\\n- Revisión objetivos Q1\\n- Actualización proyectos en curso\\n- Planificación siguiente sprint\\n\\nNos vemos el viernes.\\n\\nSaludos,\\nDirección\"},\n  {category: \"internal\", from: \"desarrollo@sodire.es\", to: \"info@sodire.es\", subject: \"Actualización sistema - Pendiente de revisar\", body: \"Buenas,\\n\\nHe subido la actualización del sistema al servidor de testing.\\n\\n¿Podéis revisar que todo funciona correctamente antes del deploy a producción?\\n\\nTarea pendiente en Jira: DEV-234\\n\\nGracias,\\nEquipo Dev\"},\n  {category: \"internal\", from: \"administracion@sodire.es\", to: \"info@sodire.es\", subject: \"Seguimiento tareas administrativas\", body: \"Hola,\\n\\nRecordatorio de las tareas administrativas pendientes para esta semana:\\n\\n- Revisar facturas proveedores\\n- Actualizar registros\\n- Enviar informes mensuales\\n\\n¿Alguien puede encargarse del último punto?\\n\\nGracias,\\nAdmin\"},\n  {category: \"spam\", from: \"marketing@agenciaseo.com\", to: \"info@sodire.es\", subject: \"🚀 Mejora tu posicionamiento SEO - Oferta especial\", body: \"¡Hola!\\n\\n¿Quieres aparecer en la primera página de Google?\\n\\nNuestra agencia de SEO puede ayudarte a mejorar tu posicionamiento en solo 30 días.\\n\\n✅ Posicionamiento garantizado\\n✅ Más tráfico web\\n✅ Oferta especial 50% descuento\\n\\nNo pierdas esta oportunidad única.\\n\\nContacta ahora: www.agenciaseo.com\\n\\nPara darte de baja haz click aquí: unsubscribe\"},\n  {category: \"spam\", from: \"ventas@publicidadmasiva.com\", to: \"info@sodire.es\", subject: \"Promoción exclusiva - Marketing Digital\", body: \"Estimado/a,\\n\\nTe ofrecemos servicios de marketing digital a precios inmejorables.\\n\\n🎯 Publicidad en redes sociales\\n🎯 Campañas de email masivo\\n🎯 Diseño web profesional\\n\\n¡TODO POR SOLO 99€/MES!\\n\\nOferta válida solo hoy. ¡No la dejes escapar!\\n\\nLlámanos: 900 XXX XXX\\nWeb: www.publicidadmasiva.com\\n\\n---\\nSi no deseas recibir más emails, haz click aquí\"},\n  {category: \"spam\", from: \"ofertas@cursosgratis.com\", to: \"info@sodire.es\", subject: \"Curso GRATIS de Marketing Digital + Certificado\", body: \"¡ÚLTIMA OPORTUNIDAD!\\n\\nAccede GRATIS a nuestro curso de Marketing Digital valorado en 299€\\n\\n✨ 100% Online\\n✨ Certificado oficial\\n✨ Acceso inmediato\\n✨ GRATIS por tiempo limitado\\n\\nMás de 10.000 alumnos ya se han inscrito.\\n\\n👉 INSCRÍBETE AHORA: www.cursosgratis.com\\n\\nNo esperes más, las plazas son limitadas.\\n\\n---\\nDeja de recibir estos correos: unsubscribe link\"},\n  {category: \"spam\", from: \"promo@descuentos-empresa.com\", to: \"info@sodire.es\", subject: \"💰 Ahorra hasta un 70% en suministros de oficina\", body: \"¡Descuentos increíbles!\\n\\nSuministros de oficina con hasta 70% de descuento.\\n\\n📌 Papel, bolígrafos, carpetas\\n📌 Equipos informáticos\\n📌 Mobiliario de oficina\\n\\nPROMOCIÓN ESPECIAL SOLO ESTA SEMANA\\n\\nVer catálogo: www.descuentos-empresa.com\\n\\n¡Compra ahora y ahorra!\\n\\nUnsubscribe | Política de privacidad\"}\n];\n\nreturn emailTemplates.map((email, index) => ({\n  json: {\n    id: `demo-${index + 1}`,\n    category: email.category,\n    from: email.from,\n    to: email.to,\n    subject: email.subject,\n    body: email.body,\n    date: new Date().toISOString(),\n    messageId: `<demo-${index + 1}-${Date.now()}@generator.local>`,\n    threadId: `thread-demo-${index + 1}`\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300],
+      "id": "generate-emails",
+      "name": "📧 Generate 19 Emails"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ⚙️ CONFIGURACIÓN - CAMBIAR AQUÍ\nconst SEND_EMAILS = \"true\";  // \"true\" para enviar, \"false\" solo mostrar\nconst TARGET_EMAIL = \"agustin.sodire@gmail.com\";\nconst DELAY_SECONDS = 2;\n\nconst items = $input.all();\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    config: {\n      sendEmails: SEND_EMAILS === \"true\",\n      targetEmail: TARGET_EMAIL,\n      delaySeconds: DELAY_SECONDS\n    }\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [640, 300],
+      "id": "config-sender",
+      "name": "⚙️ Config Sender"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.config.sendEmails }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [840, 300],
+      "id": "if-send",
+      "name": "❓ Send Emails?"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.config.delaySeconds }}",
+        "unit": "seconds"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1040, 200],
+      "id": "delay-node",
+      "name": "⏱️ Delay"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.config.targetEmail }}",
+        "subject": "=[DEMO {{ $json.category.toUpperCase() }}] {{ $json.subject }}",
+        "message": "=📧 EMAIL DE PRUEBA - Categoría: {{ $json.category }}\\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\n\\nDE: {{ $json.from }}\\nPARA: {{ $json.to }}\\nASUNTO: {{ $json.subject }}\\n\\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\n\\n{{ $json.body }}\\n\\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\\n🤖 Este es un email de demostración generado automáticamente\\n📅 Fecha: {{ $json.date }}\\n🆔 ID: {{ $json.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1240, 200],
+      "id": "gmail-send",
+      "name": "✉️ Gmail Send",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "TU_CREDENTIAL_ID",
+          "name": "Gmail OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst stats = {\n  client: 0,\n  billing: 0,\n  lead: 0,\n  internal: 0,\n  spam: 0\n};\n\nlet sent = 0;\nlet notSent = 0;\n\nitems.forEach(item => {\n  if (stats[item.json.category] !== undefined) {\n    stats[item.json.category]++;\n  }\n  \n  // Check if email was sent\n  if (item.json.config && item.json.config.sendEmails) {\n    sent++;\n  } else {\n    notSent++;\n  }\n});\n\nlet summary = '\\n╔═══════════════════════════════════════╗\\n';\nsummary += '║  📧 GENERADOR DE EMAILS - REPORTE   ║\\n';\nsummary += '╚═══════════════════════════════════════╝\\n\\n';\nsummary += `Total generados: ${items.length} emails\\n`;\nsummary += `✅ Enviados: ${sent}\\n`;\nsummary += `⏸️  No enviados: ${notSent}\\n\\n`;\nsummary += '── Por categoría ──────────────────────\\n';\nsummary += `🔵 CLIENTE:   ${stats.client}\\n`;\nsummary += `💰 FACTURAS:  ${stats.billing}\\n`;\nsummary += `🟢 LEAD:      ${stats.lead}\\n`;\nsummary += `🟡 INTERNO:   ${stats.internal}\\n`;\nsummary += `🔴 SPAM:      ${stats.spam}\\n`;\nsummary += '\\n' + '═'.repeat(40) + '\\n';\n\nif (sent > 0 && items[0].json.config) {\n  summary += `\\n📬 Emails enviados a: ${items[0].json.config.targetEmail}\\n`;\n  summary += `⏱️  Delay entre envíos: ${items[0].json.config.delaySeconds}s\\n`;\n}\n\nconsole.log(summary);\n\nreturn [{\n  json: {\n    total: items.length,\n    sent: sent,\n    notSent: notSent,\n    stats: stats,\n    summary: summary,\n    config: items[0]?.json?.config || null,\n    emails: items.map(i => i.json)\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1440, 300],
+      "id": "final-report",
+      "name": "📊 Final Report"
+    }
+  ],
+  "connections": {
+    "▶️ Start": {
+      "main": [[{"node": "📧 Generate 19 Emails", "type": "main", "index": 0}]]
+    },
+    "📧 Generate 19 Emails": {
+      "main": [[{"node": "⚙️ Config Sender", "type": "main", "index": 0}]]
+    },
+    "⚙️ Config Sender": {
+      "main": [[{"node": "❓ Send Emails?", "type": "main", "index": 0}]]
+    },
+    "❓ Send Emails?": {
+      "main": [
+        [{"node": "⏱️ Delay", "type": "main", "index": 0}],
+        [{"node": "📊 Final Report", "type": "main", "index": 0}]
+      ]
+    },
+    "⏱️ Delay": {
+      "main": [[{"node": "✉️ Gmail Send", "type": "main", "index": 0}]]
+    },
+    "✉️ Gmail Send": {
+      "main": [[{"node": "📊 Final Report", "type": "main", "index": 0}]]
+    }
+  },
+  "pinData": {},
+  "settings": {"executionOrder": "v1"},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-04-23T00:00:00.000Z",
+  "versionId": "1"
+}

@@ -1,0 +1,386 @@
+[
+  {
+    "categories": {
+      "nombre": "Ana García",
+      "hobbie": "Fotografía",
+      "edad": 28,
+      "ciudad": "Valencia",
+      "profesion": "Diseñadora Gráfica",
+      "fecha": "2025-01-15",
+      "descripcion": "Documenté el atardecer más hermoso desde el Cabanyal"
+    },
+    "content": "<h2>Ana García (28)</h2><p><strong>Ciudad:</strong> Valencia<br><strong>Profesión:</strong> Diseñadora Gráfica<br><strong>Hobbie:</strong> Fotografía</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Ana García",
+      "hobbie": "Yoga",
+      "edad": 28,
+      "ciudad": "Valencia",
+      "profesion": "Diseñadora Gráfica",
+      "fecha": "2025-02-10",
+      "descripcion": "Primera clase de yoga matinal en el parque"
+    },
+    "content": "<h2>Ana García (28)</h2><p><strong>Ciudad:</strong> Valencia<br><strong>Profesión:</strong> Diseñadora Gráfica<br><strong>Hobbie:</strong> Yoga</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Carlos Martínez",
+      "hobbie": "Programación",
+      "edad": 32,
+      "ciudad": "Madrid",
+      "profesion": "Desarrollador Full Stack",
+      "fecha": "2024-11-20",
+      "descripcion": "Completé mi primer proyecto en React con TypeScript"
+    },
+    "content": "<h2>Carlos Martínez (32)</h2><p><strong>Ciudad:</strong> Madrid<br><strong>Profesión:</strong> Desarrollador Full Stack<br><strong>Hobbie:</strong> Programación</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Carlos Martínez",
+      "hobbie": "Gaming",
+      "edad": 32,
+      "ciudad": "Madrid",
+      "profesion": "Desarrollador Full Stack",
+      "fecha": "2025-01-05",
+      "descripcion": "Torneo de Rocket League con los compañeros del trabajo"
+    },
+    "content": "<h2>Carlos Martínez (32)</h2><p><strong>Ciudad:</strong> Madrid<br><strong>Profesión:</strong> Desarrollador Full Stack<br><strong>Hobbie:</strong> Gaming</p>"
+  },
+  {
+    "categories": {
+      "nombre": "María López",
+      "hobbie": "Cocina",
+      "edad": 26,
+      "ciudad": "Barcelona",
+      "profesion": "Chef",
+      "fecha": "2025-02-01",
+      "descripcion": "Inventé una receta de paella con un toque asiático"
+    },
+    "content": "<h2>María López (26)</h2><p><strong>Ciudad:</strong> Barcelona<br><strong>Profesión:</strong> Chef<br><strong>Hobbie:</strong> Cocina</p>"
+  },
+  {
+    "categories": {
+      "nombre": "María López",
+      "hobbie": "Senderismo",
+      "edad": 26,
+      "ciudad": "Barcelona",
+      "profesion": "Chef",
+      "fecha": "2024-12-15",
+      "descripcion": "Subí al Pedraforca por primera vez, vistas increíbles"
+    },
+    "content": "<h2>María López (26)</h2><p><strong>Ciudad:</strong> Barcelona<br><strong>Profesión:</strong> Chef<br><strong>Hobbie:</strong> Senderismo</p>"
+  },
+  {
+    "categories": {
+      "nombre": "David Ruiz",
+      "hobbie": "Música",
+      "edad": 29,
+      "ciudad": "Valencia",
+      "profesion": "Productor Musical",
+      "fecha": "2025-01-28",
+      "descripcion": "Grabé mi primer EP en el estudio casero"
+    },
+    "content": "<h2>David Ruiz (29)</h2><p><strong>Ciudad:</strong> Valencia<br><strong>Profesión:</strong> Productor Musical<br><strong>Hobbie:</strong> Música</p>"
+  },
+  {
+    "categories": {
+      "nombre": "David Ruiz",
+      "hobbie": "Fotografía",
+      "edad": 29,
+      "ciudad": "Valencia",
+      "profesion": "Productor Musical",
+      "fecha": "2024-10-12",
+      "descripcion": "Sesión de fotos de conciertos en el Palau de la Música"
+    },
+    "content": "<h2>David Ruiz (29)</h2><p><strong>Ciudad:</strong> Valencia<br><strong>Profesión:</strong> Productor Musical<br><strong>Hobbie:</strong> Fotografía</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Laura Sánchez",
+      "hobbie": "Lectura",
+      "edad": 24,
+      "ciudad": "Sevilla",
+      "profesion": "Bibliotecaria",
+      "fecha": "2025-02-08",
+      "descripcion": "Terminé la trilogía del Señor de los Anillos por tercera vez"
+    },
+    "content": "<h2>Laura Sánchez (24)</h2><p><strong>Ciudad:</strong> Sevilla<br><strong>Profesión:</strong> Bibliotecaria<br><strong>Hobbie:</strong> Lectura</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Laura Sánchez",
+      "hobbie": "Pintura",
+      "edad": 24,
+      "ciudad": "Sevilla",
+      "profesion": "Bibliotecaria",
+      "fecha": "2024-11-30",
+      "descripcion": "Mi primera exposición en la biblioteca local"
+    },
+    "content": "<h2>Laura Sánchez (24)</h2><p><strong>Ciudad:</strong> Sevilla<br><strong>Profesión:</strong> Bibliotecaria<br><strong>Hobbie:</strong> Pintura</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Javier Torres",
+      "hobbie": "Fútbol",
+      "edad": 35,
+      "ciudad": "Madrid",
+      "profesion": "Entrenador Deportivo",
+      "fecha": "2025-01-22",
+      "descripcion": "Mi equipo ganó el torneo regional sub-18"
+    },
+    "content": "<h2>Javier Torres (35)</h2><p><strong>Ciudad:</strong> Madrid<br><strong>Profesión:</strong> Entrenador Deportivo<br><strong>Hobbie:</strong> Fútbol</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Javier Torres",
+      "hobbie": "Running",
+      "edad": 35,
+      "ciudad": "Madrid",
+      "profesion": "Entrenador Deportivo",
+      "fecha": "2024-09-10",
+      "descripcion": "Completé mi primera maratón en menos de 4 horas"
+    },
+    "content": "<h2>Javier Torres (35)</h2><p><strong>Ciudad:</strong> Madrid<br><strong>Profesión:</strong> Entrenador Deportivo<br><strong>Hobbie:</strong> Running</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Elena Morales",
+      "hobbie": "Yoga",
+      "edad": 31,
+      "ciudad": "Barcelona",
+      "profesion": "Instructora de Yoga",
+      "fecha": "2025-01-18",
+      "descripcion": "Taller de mindfulness con 50 asistentes"
+    },
+    "content": "<h2>Elena Morales (31)</h2><p><strong>Ciudad:</strong> Barcelona<br><strong>Profesión:</strong> Instructora de Yoga<br><strong>Hobbie:</strong> Yoga</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Elena Morales",
+      "hobbie": "Meditación",
+      "edad": 31,
+      "ciudad": "Barcelona",
+      "profesion": "Instructora de Yoga",
+      "fecha": "2024-12-01",
+      "descripcion": "Retiro de silencio de 7 días en la montaña"
+    },
+    "content": "<h2>Elena Morales (31)</h2><p><strong>Ciudad:</strong> Barcelona<br><strong>Profesión:</strong> Instructora de Yoga<br><strong>Hobbie:</strong> Meditación</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Pablo Fernández",
+      "hobbie": "Ajedrez",
+      "edad": 27,
+      "ciudad": "Valencia",
+      "profesion": "Matemático",
+      "fecha": "2025-02-05",
+      "descripcion": "Gané mi primer torneo de ajedrez federado"
+    },
+    "content": "<h2>Pablo Fernández (27)</h2><p><strong>Ciudad:</strong> Valencia<br><strong>Profesión:</strong> Matemático<br><strong>Hobbie:</strong> Ajedrez</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Pablo Fernández",
+      "hobbie": "Programación",
+      "edad": 27,
+      "ciudad": "Valencia",
+      "profesion": "Matemático",
+      "fecha": "2024-11-11",
+      "descripcion": "Desarrollé un algoritmo para resolver sudokus"
+    },
+    "content": "<h2>Pablo Fernández (27)</h2><p><strong>Ciudad:</strong> Valencia<br><strong>Profesión:</strong> Matemático<br><strong>Hobbie:</strong> Programación</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Sofía Ramírez",
+      "hobbie": "Cine",
+      "edad": 30,
+      "ciudad": "Madrid",
+      "profesion": "Crítica de Cine",
+      "fecha": "2025-01-30",
+      "descripcion": "Asistí al Festival de Cine de Málaga como jurado"
+    },
+    "content": "<h2>Sofía Ramírez (30)</h2><p><strong>Ciudad:</strong> Madrid<br><strong>Profesión:</strong> Crítica de Cine<br><strong>Hobbie:</strong> Cine</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Sofía Ramírez",
+      "hobbie": "Escritura",
+      "edad": 30,
+      "ciudad": "Madrid",
+      "profesion": "Crítica de Cine",
+      "fecha": "2024-10-20",
+      "descripcion": "Publiqué mi primer libro sobre cine de autor"
+    },
+    "content": "<h2>Sofía Ramírez (30)</h2><p><strong>Ciudad:</strong> Madrid<br><strong>Profesión:</strong> Crítica de Cine<br><strong>Hobbie:</strong> Escritura</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Miguel Jiménez",
+      "hobbie": "Gaming",
+      "edad": 22,
+      "ciudad": "Barcelona",
+      "profesion": "Estudiante de Ingeniería",
+      "fecha": "2025-02-11",
+      "descripcion": "Alcancé el rango de Diamante en League of Legends"
+    },
+    "content": "<h2>Miguel Jiménez (22)</h2><p><strong>Ciudad:</strong> Barcelona<br><strong>Profesión:</strong> Estudiante de Ingeniería<br><strong>Hobbie:</strong> Gaming</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Miguel Jiménez",
+      "hobbie": "Programación",
+      "edad": 22,
+      "ciudad": "Barcelona",
+      "profesion": "Estudiante de Ingeniería",
+      "fecha": "2024-12-18",
+      "descripcion": "Hackathon de 48 horas, ganamos con una app de IA"
+    },
+    "content": "<h2>Miguel Jiménez (22)</h2><p><strong>Ciudad:</strong> Barcelona<br><strong>Profesión:</strong> Estudiante de Ingeniería<br><strong>Hobbie:</strong> Programación</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Carmen Vega",
+      "hobbie": "Jardinería",
+      "edad": 45,
+      "ciudad": "Sevilla",
+      "profesion": "Paisajista",
+      "fecha": "2025-01-25",
+      "descripcion": "Redesigné el jardín botánico de la ciudad"
+    },
+    "content": "<h2>Carmen Vega (45)</h2><p><strong>Ciudad:</strong> Sevilla<br><strong>Profesión:</strong> Paisajista<br><strong>Hobbie:</strong> Jardinería</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Carmen Vega",
+      "hobbie": "Fotografía",
+      "edad": 45,
+      "ciudad": "Sevilla",
+      "profesion": "Paisajista",
+      "fecha": "2024-09-15",
+      "descripcion": "Exposición fotográfica de flora andaluza"
+    },
+    "content": "<h2>Carmen Vega (45)</h2><p><strong>Ciudad:</strong> Sevilla<br><strong>Profesión:</strong> Paisajista<br><strong>Hobbie:</strong> Fotografía</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Raúl Navarro",
+      "hobbie": "Música",
+      "edad": 33,
+      "ciudad": "Valencia",
+      "profesion": "Guitarrista",
+      "fecha": "2025-02-02",
+      "descripcion": "Concierto en directo en el Jimmy Glass Jazz Club"
+    },
+    "content": "<h2>Raúl Navarro (33)</h2><p><strong>Ciudad:</strong> Valencia<br><strong>Profesión:</strong> Guitarrista<br><strong>Hobbie:</strong> Música</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Raúl Navarro",
+      "hobbie": "Viajes",
+      "edad": 33,
+      "ciudad": "Valencia",
+      "profesion": "Guitarrista",
+      "fecha": "2024-08-22",
+      "descripcion": "Gira por 10 ciudades europeas con la banda"
+    },
+    "content": "<h2>Raúl Navarro (33)</h2><p><strong>Ciudad:</strong> Valencia<br><strong>Profesión:</strong> Guitarrista<br><strong>Hobbie:</strong> Viajes</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Isabel Castro",
+      "hobbie": "Baile",
+      "edad": 26,
+      "ciudad": "Madrid",
+      "profesion": "Bailarina",
+      "fecha": "2025-01-12",
+      "descripcion": "Estreno de coreografía contemporánea en el Teatro Real"
+    },
+    "content": "<h2>Isabel Castro (26)</h2><p><strong>Ciudad:</strong> Madrid<br><strong>Profesión:</strong> Bailarina<br><strong>Hobbie:</strong> Baile</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Isabel Castro",
+      "hobbie": "Fitness",
+      "edad": 26,
+      "ciudad": "Madrid",
+      "profesion": "Bailarina",
+      "fecha": "2024-11-05",
+      "descripcion": "Completé el reto de 90 días de entrenamiento"
+    },
+    "content": "<h2>Isabel Castro (26)</h2><p><strong>Ciudad:</strong> Madrid<br><strong>Profesión:</strong> Bailarina<br><strong>Hobbie:</strong> Fitness</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Alberto Díaz",
+      "hobbie": "Cocina",
+      "edad": 38,
+      "ciudad": "Barcelona",
+      "profesion": "Chef Ejecutivo",
+      "fecha": "2025-02-07",
+      "descripcion": "Mi restaurante ganó su primera estrella Michelin"
+    },
+    "content": "<h2>Alberto Díaz (38)</h2><p><strong>Ciudad:</strong> Barcelona<br><strong>Profesión:</strong> Chef Ejecutivo<br><strong>Hobbie:</strong> Cocina</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Alberto Díaz",
+      "hobbie": "Vino",
+      "edad": 38,
+      "ciudad": "Barcelona",
+      "profesion": "Chef Ejecutivo",
+      "fecha": "2024-10-30",
+      "descripcion": "Curso de sumiller en la Rioja, experiencia única"
+    },
+    "content": "<h2>Alberto Díaz (38)</h2><p><strong>Ciudad:</strong> Barcelona<br><strong>Profesión:</strong> Chef Ejecutivo<br><strong>Hobbie:</strong> Vino</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Rosa Ortiz",
+      "hobbie": "Lectura",
+      "edad": 42,
+      "ciudad": "Sevilla",
+      "profesion": "Profesora de Literatura",
+      "fecha": "2025-01-20",
+      "descripcion": "Club de lectura en la biblioteca con 30 participantes"
+    },
+    "content": "<h2>Rosa Ortiz (42)</h2><p><strong>Ciudad:</strong> Sevilla<br><strong>Profesión:</strong> Profesora de Literatura<br><strong>Hobbie:</strong> Lectura</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Rosa Ortiz",
+      "hobbie": "Escritura",
+      "edad": 42,
+      "ciudad": "Sevilla",
+      "profesion": "Profesora de Literatura",
+      "fecha": "2024-07-14",
+      "descripcion": "Finalicé mi novela histórica sobre Al-Andalus"
+    },
+    "content": "<h2>Rosa Ortiz (42)</h2><p><strong>Ciudad:</strong> Sevilla<br><strong>Profesión:</strong> Profesora de Literatura<br><strong>Hobbie:</strong> Escritura</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Fernando Gil",
+      "hobbie": "Senderismo",
+      "edad": 36,
+      "ciudad": "Valencia",
+      "profesion": "Guía de Montaña",
+      "fecha": "2025-02-09",
+      "descripcion": "Ruta guiada por el Parque Natural de Chera-Sot"
+    },
+    "content": "<h2>Fernando Gil (36)</h2><p><strong>Ciudad:</strong> Valencia<br><strong>Profesión:</strong> Guía de Montaña<br><strong>Hobbie:</strong> Senderismo</p>"
+  },
+  {
+    "categories": {
+      "nombre": "Fernando Gil",
+      "hobbie": "Fotografía",
+      "edad": 36,
+      "ciudad": "Valencia",
+      "profesion": "Guía de Montaña",
+      "fecha": "2024-12-25",
+      "descripcion": "Capturé el amanecer desde el Montgó, mágico"
+    },
+    "content": "<h2>Fernando Gil (36)</h2><p><strong>Ciudad:</strong> Valencia<br><strong>Profesión:</strong> Guía de Montaña<br><strong>Hobbie:</strong> Fotografía</p>"
+  }
+]

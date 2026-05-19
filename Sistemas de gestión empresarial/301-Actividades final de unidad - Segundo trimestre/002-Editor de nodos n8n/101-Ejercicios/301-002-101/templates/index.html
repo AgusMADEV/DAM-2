@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Gestión Empresarial - Editor de Procesos</title>
+  <link rel="stylesheet" href="https://jocarsa.github.io/cssreset/cssreset.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  
+  <!-- Barra superior -->
+  <header>
+    <div class="header-left">
+      <h1>🏢 Sistema de Gestión Empresarial</h1>
+      <span class="subtitle">Editor Visual de Procesos</span>
+    </div>
+    <div class="header-center">
+      <button id="play" class="btn btn-primary" title="Ejecutar el flujo completo">
+        ▶ Ejecutar Flujo
+      </button>
+      <button id="deleteNode" class="btn btn-danger" title="Eliminar nodo seleccionado (Supr)">
+        🗑 Eliminar
+      </button>
+      <button id="clearAll" class="btn" title="Limpiar todo el lienzo">
+        🧹 Limpiar Todo
+      </button>
+    </div>
+    <div class="header-right">
+      <div class="help-text">
+        💡 Arrastra nodos desde la barra lateral<br>
+        🔗 Conecta salida → entrada<br>
+        🖱️ Ctrl + rueda = zoom
+      </div>
+    </div>
+  </header>
+
+  <!-- Panel de herramientas (izquierda) -->
+  <aside id="tools">
+    <h3>📦 Herramientas</h3>
+    <div class="tools-info">
+      Arrastra estos nodos al lienzo para crear tu flujo de trabajo
+    </div>
+    <div id="tools-list">
+      <div class="muted">⏳ Cargando herramientas…</div>
+    </div>
+  </aside>
+
+  <!-- Área de trabajo (centro) -->
+  <main id="centro" aria-label="área de trabajo">
+    <div id="mundo">
+      <!-- SVG para las conexiones -->
+      <svg id="edges" viewBox="0 0 4000 3000" preserveAspectRatio="none"></svg>
+      
+      <!-- Los nodos se añadirán aquí dinámicamente -->
+    </div>
+    
+    <!-- Mensaje de ayuda -->
+    <div id="hint">
+      👋 ¡Bienvenido! Arrastra nodos desde el panel izquierdo para comenzar
+    </div>
+  </main>
+
+  <!-- Panel de consola (derecha) -->
+  <aside id="console">
+    <h3>📊 Consola de Ejecución</h3>
+    <div class="console-controls">
+      <button id="clearLog" class="btn-small">Limpiar</button>
+    </div>
+    <pre id="log">Sistema listo. Esperando ejecución...</pre>
+  </aside>
+
+  <!-- Script principal -->
+  <script src="{{ url_for('static', filename='app.js') }}" type="module"></script>
+  
+</body>
+</html>

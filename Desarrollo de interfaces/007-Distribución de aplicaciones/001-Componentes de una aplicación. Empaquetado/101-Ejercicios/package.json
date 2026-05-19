@@ -1,0 +1,46 @@
+{
+  "name": "jocarsa-editor-electron",
+  "version": "1.0.0",
+  "description": "jocarsa | editor standalone desktop application using Electron",
+  "author": "Jose Vicente Carratalá",
+  "license": "MIT",
+  "main": "electron-main.js",
+  "scripts": {
+  "start": "ELECTRON_DISABLE_SANDBOX=1 electron .",
+  "web": "node server.js",
+  "dist": "electron-builder",
+  "dist:win": "electron-builder --win nsis",
+  "pack": "electron-builder --dir"
+}
+,
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+  "appId": "com.jocarsa.editor",
+  "productName": "jocarsa editor",
+  "files": [
+    "**/*"
+  ],
+  "asar": true,
+  "directories": {
+    "output": "dist"
+  },
+  "linux": {
+    "category": "Utility",
+    "target": ["AppImage"],
+    "icon": "build/icon.png"
+  },
+  "win": {
+    "target": ["nsis"],
+    "icon": "build/icon.ico"
+  }
+}
+
+
+}
+

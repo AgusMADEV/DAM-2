@@ -1,0 +1,46 @@
+{
+  "informes_generados": [
+    {
+      "id": 1,
+      "tipo": "integracion",
+      "fecha_generacion": "2026-02-18T20:00:00",
+      "contenido": {
+        "tipo": "Informe de Integración",
+        "clientes_totales": 3,
+        "clientes_con_proyectos": 2,
+        "proyectos_totales": 2,
+        "formularios_vinculados_crm": 1,
+        "formularios_vinculados_proyectos": 1,
+        "tasa_integracion_clientes": 66.67
+      },
+      "generado_por": "Sistema"
+    },
+    {
+      "id": 2,
+      "tipo": "general",
+      "fecha_generacion": "2026-02-18T23:18:30.296363",
+      "contenido": {
+        "tipo": "Informe General",
+        "clientes_totales": 1,
+        "proyectos_totales": 3,
+        "formularios_activos": 1,
+        "oportunidades_abiertas": 1
+      },
+      "generado_por": "Sistema"
+    },
+    {
+      "id": 3,
+      "tipo": "ventas",
+      "fecha_generacion": "2026-02-18T23:18:34.288724",
+      "contenido": {
+        "tipo": "Informe de Ventas",
+        "total_oportunidades": 1,
+        "valor_pipeline": 109.99,
+        "oportunidades_ganadas": 0,
+        "valor_ganado": 0,
+        "tasa_conversion": 0.0
+      },
+      "generado_por": "Sistema"
+    }
+  ]
+}

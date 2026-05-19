@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>jocarsa | ux – CRUD con FK</title>
+  <style>
+    :root{
+      --bg:#f6f7fb; --line:#e5e7eb; --text:#0f172a; --muted:#6b7280; --accent:#dc143c; --panel:#ffffff;
+    }
+    * { box-sizing:border-box; }
+    body{ margin:0; font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial; color:var(--text); background:var(--bg); }
+    header{ display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--line); background:#fff; position:sticky; top:0; z-index:10; }
+    header .brand{ font-weight:800; letter-spacing:.3px; }
+    header .dot{ width:8px; height:8px; border-radius:50%; background:var(--accent); display:inline-block; margin:0 6px; }
+    .layout{ display:grid; grid-template-columns:260px 1fr; min-height:calc(100dvh - 57px); }
+    aside{ border-right:1px solid var(--line); background:var(--panel); }
+    main{ background:var(--bg); padding:16px 0; }
+    #left{ height:100%; overflow:auto; }
+    #main{ max-width:1200px; margin:0 auto; padding:0 12px; }
+    .empty{ margin:24px; padding:18px; border:1px dashed var(--line); background:var(--panel); color:var(--muted); border-radius:12px; }
+    @media (max-width: 900px){ .layout{ grid-template-columns:1fr; } aside{ position:sticky; top:57px; z-index:5; } }
+  </style>
+  <script defer src="/static/jocarsaux.js"></script>
+</head>
+<body>
+  <header>
+    <div class="brand">jocarsa<span class="dot"></span>ux</div>
+    <div style="color:var(--muted);">Dashboard + CRUD con FK</div>
+  </header>
+
+  <div class="layout">
+    <aside><div id="left"></div></aside>
+    <main>
+      <div id="main">
+        <div class="empty" id="empty-state">Cargando…</div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const ux = new JocarsaUX();
+
+    // Render menu: first a fixed "Dashboard", then the DB tables
+    const tablas = await fetch('/tablas',{headers:{Accept:'application/json'}}).then(r=>r.json()).catch(()=>[]);
+    const items = [{ label:'📊 Dashboard', value:'__dashboard__' }]
+      .concat((Array.isArray(tablas)?tablas:[]).map(t=>t.tabla||t).map(n=>({label:n, value:n})));
+
+    ux.menuRenderer({
+      target:'#left',
+      title:'Navegación',
+      items,
+      onItemClick:(value)=>{
+        const empty = document.getElementById('empty-state'); if (empty) empty.remove();
+        if (value==='__dashboard__') {
+          ux.dashboardRenderer({ target:'#main' });           // NEW
+        } else {
+          ux.openTable({ target:'#main', tabla:value, rowsPerPage:10 })
+            .catch(err => console.error('Error abriendo tabla', err));
+        }
+      }
+    });
+
+    // Auto-open first table if available; else open dashboard
+    const first = items.find(i=>i.value!=='__dashboard__');
+    const empty = document.getElementById('empty-state'); if (empty) empty.remove();
+    if (first) { ux.openTable({ target:'#main', tabla:first.value, rowsPerPage:10 }); }
+    else       { ux.dashboardRenderer({ target:'#main' }); }
+  });
+  </script>
+</body>
+</html>
+ 

@@ -1,0 +1,872 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sistema de gestión de tareas con interfaces naturales: reconocimiento de voz y gestos">
+  <title>Sistema de Gestión Natural - Voz y Gestos</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #f8f9fa;
+      --bg-secondary: #ffffff;
+      --bg-glass: rgba(255, 255, 255, 0.7);
+      --border-color: rgba(0, 0, 0, 0.08);
+      --text-primary: #1a1a1a;
+      --text-secondary: #6b7280;
+      --text-tertiary: #9ca3af;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --success: #10b981;
+      --danger: #ef4444;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --radius: 12px;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      min-height: 100vh;
+      padding: 40px 20px;
+      color: var(--text-primary);
+      line-height: 1.6;
+      font-weight: 400;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 24px;
+    }
+
+    h1 {
+      color: var(--text-primary);
+      margin-bottom: 40px;
+      font-size: 2em;
+      text-align: center;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+    }
+    
+    .panel {
+      background: var(--bg-glass);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-radius: var(--radius);
+      padding: 32px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-md);
+      transition: all 0.2s ease;
+    }
+
+    .panel:hover {
+      box-shadow: var(--shadow-lg);
+    }
+    
+    h2 {
+      color: var(--text-primary);
+      margin-bottom: 24px;
+      font-size: 1.25em;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    
+    button {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.875em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+    }
+    
+    button:hover {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button.listening {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+      animation: pulseOpacity 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulseOpacity {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+    
+    #statusVoz, #statusGestos {
+      padding: 16px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      margin-bottom: 24px;
+      min-height: 56px;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-size: 0.875em;
+      display: flex;
+      align-items: center;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+    
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+    }
+    
+    th {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.75em;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 0.875em;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    tbody tr {
+      transition: background 0.15s ease;
+    }
+    
+    tbody tr:hover {
+      background: var(--bg-primary);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .video-container {
+      position: relative;
+      width: 100%;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+    }
+    
+    canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    video {
+      display: none;
+    }
+    
+    .gesture-info {
+      margin-top: 20px;
+      padding: 20px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+    
+    .gesture-info h3 {
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      font-weight: 600;
+      font-size: 0.95em;
+    }
+    
+    .gesture-info ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    
+    .gesture-info li {
+      padding: 12px 0;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.875em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: color 0.15s ease;
+    }
+
+    .gesture-info li:hover {
+      color: var(--text-primary);
+    }
+    
+    .gesture-info li:last-child {
+      border-bottom: none;
+    }
+
+    .gesture-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1em;
+      font-weight: 600;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+    
+    .comando-ejemplo {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-left: 3px solid var(--accent);
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 0.875em;
+    }
+
+    .comando-ejemplo strong {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .comando-ejemplo div {
+      line-height: 1.8;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-tertiary);
+    }
+
+    .empty-state-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 16px;
+      opacity: 0.3;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75em;
+      font-weight: 500;
+    }
+
+    .badge-success {
+      background: #d1fae5;
+      color: var(--success);
+    }
+
+    .badge-pending {
+      background: #fef3c7;
+      color: #d97706;
+    }
+    
+    @media (max-width: 1200px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+
+      body {
+        padding: 30px 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        gap: 20px;
+      }
+
+      .panel {
+        padding: 24px;
+      }
+
+      h1 {
+        font-size: 1.75em;
+      }
+
+      h2 {
+        font-size: 1.125em;
+      }
+    }
+  </style>
+  
+  <!-- MediaPipe Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+</head>
+<body>
+  <h1>Sistema de Gestión con Interfaces Naturales</h1>
+  
+  <div class="container">
+    <!-- Panel Principal de Datos -->
+    <div class="panel">
+      <h2>
+        <svg class="icon" viewBox="0 0 24 24">
+          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+        </svg>
+        Gestión de Tareas
+      </h2>
+      
+      <div class="controls">
+        <button id="btnEscuchar">
+          <svg class="icon" width="16" height="16" viewBox="0 0 24 24">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+          Escuchar
+        </button>
+        <button id="btnLimpiar">
+          <svg class="icon" width="16" height="16" viewBox="0 0 24 24">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Limpiar
+        </button>
+      </div>
+      
+      <div id="statusVoz">Pulsa "Escuchar" para dar órdenes por voz...</div>
+      
+      <div id="contenedorTabla"></div>
+      
+      <div class="comando-ejemplo">
+        <strong>Comandos de voz disponibles</strong>
+        <div style="margin-top: 8px; line-height: 1.8;">
+          • "<strong>agregar [tarea]</strong>" - Añade una nueva tarea<br>
+          • "<strong>eliminar [número]</strong>" - Elimina tarea por índice<br>
+          • "<strong>completar [número]</strong>" - Marca tarea como completada<br>
+          • "<strong>leer tareas</strong>" - Lee todas las tareas en voz alta<br>
+          • "<strong>limpiar todo</strong>" - Elimina todas las tareas
+        </div>
+      </div>
+    </div>
+    
+    <!-- Panel de Cámara y Gestos -->
+    <div class="panel">
+      <h2>
+        <svg class="icon" viewBox="0 0 24 24">
+          <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path>
+        </svg>
+        Control por Gestos
+      </h2>
+      
+      <div class="video-container">
+        <video class="input_video" autoplay playsinline muted></video>
+        <canvas class="output_canvas" width="400" height="300"></canvas>
+      </div>
+      
+      <div id="statusGestos">Iniciando cámara y reconocimiento de gestos...</div>
+      
+      <div class="gesture-info">
+        <h3>Gestos Disponibles</h3>
+        <ul>
+          <li>
+            <div class="gesture-icon">II</div>
+            <div><strong>Dos dedos:</strong> Añadir tarea aleatoria</div>
+          </li>
+          <li>
+            <div class="gesture-icon">↑</div>
+            <div><strong>Pulgar arriba:</strong> Completar última tarea</div>
+          </li>
+          <li>
+            <div class="gesture-icon">●</div>
+            <div><strong>Puño cerrado:</strong> Eliminar última tarea</div>
+          </li>
+          <li>
+            <div class="gesture-icon">▢</div>
+            <div><strong>Mano abierta:</strong> Leer tareas por voz</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    // DATOS Y ESTADO DE LA APLICACIÓN
+    // ============================================
+    let tareas = [
+      {"id": 1, "titulo": "Estudiar interfaces naturales", "completada": false},
+      {"id": 2, "titulo": "Practicar reconocimiento de voz", "completada": false},
+      {"id": 3, "titulo": "Desarrollar proyecto final", "completada": false}
+    ];
+    
+    let contadorId = 4;
+    let lastGestureTime = 0;
+    const GESTURE_COOLDOWN = 2000; // 2 segundos entre gestos
+    
+    // ============================================
+    // FUNCIONES DE INTERFAZ Y DATOS
+    // ============================================
+    function pintaTabla() {
+      if (tareas.length === 0) {
+        document.querySelector("#contenedorTabla").innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">
+              <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" fill="none">
+                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+            </div>
+            <p style="font-size: 1.1em; margin-bottom: 8px;">No hay tareas aún</p>
+            <p style="font-size: 0.9em; opacity: 0.8;">Usa comandos de voz o gestos para agregar tareas</p>
+          </div>
+        `;
+        return;
+      }
+
+      let cadena = `
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 60px;">#</th>
+              <th>Tarea</th>
+              <th style="width: 100px; text-align: center;">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      tareas.forEach((tarea, index) => {
+        const estado = tarea.completada 
+          ? '<svg viewBox="0 0 24 24" width="16" height="16" style="stroke: #10b981; fill: none; stroke-width: 2;"><polyline points="20 6 9 17 4 12"></polyline></svg>' 
+          : '<svg viewBox="0 0 24 24" width="16" height="16" style="stroke: #94a3b8; fill: none; stroke-width: 2;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+        const estilo = tarea.completada ? 'style="text-decoration: line-through; opacity: 0.6;"' : '';
+        cadena += `
+          <tr ${estilo}>
+            <td>${index}</td>
+            <td>${tarea.titulo}</td>
+            <td style="text-align: center;">${estado}</td>
+          </tr>
+        `;
+      });
+      
+      cadena += "</tbody></table>";
+      document.querySelector("#contenedorTabla").innerHTML = cadena;
+    }
+    
+    function agregarTarea(titulo) {
+      if (!titulo || titulo.trim() === '') {
+        hablar("No puedo agregar una tarea vacía");
+        return;
+      }
+      tareas.push({
+        id: contadorId++,
+        titulo: titulo.trim(),
+        completada: false
+      });
+      pintaTabla();
+      hablar(`Tarea agregada: ${titulo}`);
+    }
+    
+    function eliminarTarea(indice) {
+      if (indice >= 0 && indice < tareas.length) {
+        const tareaEliminada = tareas[indice];
+        tareas.splice(indice, 1);
+        pintaTabla();
+        hablar(`Tarea eliminada: ${tareaEliminada.titulo}`);
+      } else {
+        hablar("Índice de tarea no válido");
+      }
+    }
+    
+    function completarTarea(indice) {
+      if (indice >= 0 && indice < tareas.length) {
+        tareas[indice].completada = true;
+        pintaTabla();
+        hablar(`Tarea completada: ${tareas[indice].titulo}`);
+      } else {
+        hablar("Índice de tarea no válido");
+      }
+    }
+    
+    function leerTodasLasTareas() {
+      if (tareas.length === 0) {
+        hablar("No hay tareas en la lista");
+        return;
+      }
+      
+      let mensaje = `Tienes ${tareas.length} tareas. `;
+      tareas.forEach((tarea, index) => {
+        const estado = tarea.completada ? "completada" : "pendiente";
+        mensaje += `Tarea ${index}: ${tarea.titulo}, ${estado}. `;
+      });
+      hablar(mensaje);
+    }
+    
+    function limpiarTodas() {
+      tareas = [];
+      pintaTabla();
+      hablar("Todas las tareas han sido eliminadas");
+    }
+    
+    // ============================================
+    // SÍNTESIS DE VOZ
+    // ============================================
+    let voices = [];
+    
+    function cargarVoces() {
+      voices = speechSynthesis.getVoices();
+    }
+    
+    function elegirVoz() {
+      const voz = voices.find(v => /es-|Spanish/i.test(v.lang)) || voices[0];
+      return voz || null;
+    }
+    
+    function hablar(texto) {
+      const utterance = new SpeechSynthesisUtterance(texto);
+      const voz = elegirVoz();
+      if (voz) utterance.voice = voz;
+      utterance.lang = (voz && voz.lang) || 'es-ES';
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utterance);
+    }
+    
+    cargarVoces();
+    speechSynthesis.onvoiceschanged = cargarVoces;
+    
+    // ============================================
+    // RECONOCIMIENTO DE VOZ
+    // ============================================
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (SpeechRecognition) {
+      const reconocimiento = new SpeechRecognition();
+      reconocimiento.lang = "es-ES";
+      reconocimiento.interimResults = false;
+      reconocimiento.continuous = false;
+      
+      reconocimiento.onstart = function() {
+        document.getElementById("btnEscuchar").classList.add("listening");
+        document.getElementById("statusVoz").textContent = "🎤 Escuchando... Habla ahora";
+      };
+      
+      reconocimiento.onend = function() {
+        document.getElementById("btnEscuchar").classList.remove("listening");
+      };
+      
+      reconocimiento.onresult = function(event) {
+        const textoReconocido = event.results[0][0].transcript.toLowerCase();
+        document.getElementById("statusVoz").textContent = `📝 Comando: "${textoReconocido}"`;
+        
+        procesarComandoVoz(textoReconocido);
+      };
+      
+      reconocimiento.onerror = function(event) {
+        document.getElementById("statusVoz").textContent = `❌ Error: ${event.error}`;
+        document.getElementById("btnEscuchar").classList.remove("listening");
+      };
+      
+      document.getElementById("btnEscuchar").onclick = function() {
+        reconocimiento.start();
+      };
+    } else {
+      document.getElementById("statusVoz").textContent = "❌ Tu navegador no soporta reconocimiento de voz";
+      document.getElementById("btnEscuchar").disabled = true;
+    }
+    
+    function procesarComandoVoz(comando) {
+      const palabras = comando.split(" ");
+      const accion = palabras[0];
+      
+      switch(accion) {
+        case "agregar":
+        case "añadir":
+        case "crear":
+          const tarea = palabras.slice(1).join(" ");
+          agregarTarea(tarea);
+          break;
+          
+        case "eliminar":
+        case "borrar":
+          const num = convertirNumeroTexto(palabras[1]);
+          if (num !== null) {
+            eliminarTarea(num);
+          } else {
+            hablar("No entendí el número de la tarea");
+          }
+          break;
+          
+        case "completar":
+        case "terminar":
+          const numCompletar = convertirNumeroTexto(palabras[1]);
+          if (numCompletar !== null) {
+            completarTarea(numCompletar);
+          } else {
+            hablar("No entendí el número de la tarea");
+          }
+          break;
+          
+        case "leer":
+          leerTodasLasTareas();
+          break;
+          
+        case "limpiar":
+          limpiarTodas();
+          break;
+          
+        default:
+          hablar("Comando no reconocido. Intenta con agregar, eliminar, completar, leer o limpiar");
+      }
+    }
+    
+    function convertirNumeroTexto(texto) {
+      const numeros = {
+        "cero": 0, "uno": 1, "dos": 2, "tres": 3, "cuatro": 4,
+        "cinco": 5, "seis": 6, "siete": 7, "ocho": 8, "nueve": 9,
+        "diez": 10
+      };
+      
+      if (numeros.hasOwnProperty(texto)) {
+        return numeros[texto];
+      }
+      
+      const numeroDigito = parseInt(texto);
+      if (!isNaN(numeroDigito)) {
+        return numeroDigito;
+      }
+      
+      return null;
+    }
+    
+    // ============================================
+    // RECONOCIMIENTO DE GESTOS CON MEDIAPIPE
+    // ============================================
+    const video = document.querySelector('.input_video');
+    const canvas = document.querySelector('.output_canvas');
+    const ctx = canvas.getContext('2d');
+    
+    function detectarGesto(landmarks) {
+      if (!landmarks || landmarks.length === 0) return null;
+      
+      // Obtener posiciones clave de los dedos
+      const pulgar = landmarks[4];
+      const indicePunta = landmarks[8];
+      const medioTip = landmarks[12];
+      const anularTip = landmarks[16];
+      const meniqueTip = landmarks[20];
+      const muneca = landmarks[0];
+      
+      // Calcular si los dedos están extendidos
+      function dedoExtendido(punta, base) {
+        return punta.y < base.y;
+      }
+      
+      const indiceExtendido = dedoExtendido(indicePunta, landmarks[6]);
+      const medioExtendido = dedoExtendido(medioTip, landmarks[10]);
+      const anularExtendido = dedoExtendido(anularTip, landmarks[14]);
+      const meniqueExtendido = dedoExtendido(meniqueTip, landmarks[18]);
+      const pulgarExtendido = pulgar.x < landmarks[3].x;
+      
+      const dedosExtendidos = [
+        indiceExtendido,
+        medioExtendido,
+        anularExtendido,
+        meniqueExtendido
+      ].filter(Boolean).length;
+      
+      // Detectar gestos específicos
+      if (indiceExtendido && medioExtendido && !anularExtendido && !meniqueExtendido) {
+        return "dos_dedos"; // ✌️
+      }
+      
+      if (pulgarExtendido && !indiceExtendido && !medioExtendido && !anularExtendido && !meniqueExtendido) {
+        return "pulgar_arriba"; // 👍
+      }
+      
+      if (!indiceExtendido && !medioExtendido && !anularExtendido && !meniqueExtendido) {
+        return "puno"; // ✊
+      }
+      
+      if (dedosExtendidos >= 4) {
+        return "mano_abierta"; // 🖐️
+      }
+      
+      return null;
+    }
+    
+    function ejecutarAccionGesto(gesto) {
+      const ahora = Date.now();
+      if (ahora - lastGestureTime < GESTURE_COOLDOWN) {
+        return; // Cooldown activo
+      }
+      
+      lastGestureTime = ahora;
+      
+      const tareasAleatorias = [
+        "Revisar correo electrónico",
+        "Hacer ejercicio",
+        "Leer un libro",
+        "Preparar presentación",
+        "Llamar a un amigo",
+        "Organizar escritorio",
+        "Aprender algo nuevo"
+      ];
+      
+      switch(gesto) {
+        case "dos_dedos":
+          const tareaAleatoria = tareasAleatorias[Math.floor(Math.random() * tareasAleatorias.length)];
+          agregarTarea(tareaAleatoria);
+          document.getElementById("statusGestos").textContent = "✌️ Gesto: Dos dedos - Tarea añadida";
+          break;
+          
+        case "pulgar_arriba":
+          if (tareas.length > 0) {
+            const ultimaNoCompletada = tareas.findIndex(t => !t.completada);
+            if (ultimaNoCompletada !== -1) {
+              completarTarea(ultimaNoCompletada);
+              document.getElementById("statusGestos").textContent = "👍 Gesto: Pulgar arriba - Tarea completada";
+            }
+          }
+          break;
+          
+        case "puno":
+          if (tareas.length > 0) {
+            eliminarTarea(tareas.length - 1);
+            document.getElementById("statusGestos").textContent = "✊ Gesto: Puño - Última tarea eliminada";
+          }
+          break;
+          
+        case "mano_abierta":
+          leerTodasLasTareas();
+          document.getElementById("statusGestos").textContent = "🖐️ Gesto: Mano abierta - Leyendo tareas";
+          break;
+      }
+    }
+    
+    function onResults(results) {
+      ctx.save();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+      
+      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        for (const landmarks of results.multiHandLandmarks) {
+          drawConnectors(ctx, landmarks, HAND_CONNECTIONS, {color: '#00FF00', lineWidth: 2});
+          drawLandmarks(ctx, landmarks, {color: '#FF0000', lineWidth: 1, radius: 3});
+          
+          // Detectar y ejecutar gestos
+          const gesto = detectarGesto(landmarks);
+          if (gesto) {
+            ejecutarAccionGesto(gesto);
+          }
+        }
+      } else {
+        document.getElementById("statusGestos").textContent = "👋 Muestra tu mano a la cámara...";
+      }
+      
+      ctx.restore();
+    }
+    
+    const hands = new Hands({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+    });
+    
+    hands.setOptions({
+      maxNumHands: 1,
+      modelComplexity: 1,
+      minDetectionConfidence: 0.7,
+      minTrackingConfidence: 0.7
+    });
+    
+    hands.onResults(onResults);
+    
+    const camera = new Camera(video, {
+      onFrame: async () => {
+        await hands.send({image: video});
+      },
+      width: 400,
+      height: 300
+    });
+    
+    camera.start().then(() => {
+      document.getElementById("statusGestos").textContent = "✅ Cámara activa - Muestra gestos con tu mano";
+    });
+    
+    // ============================================
+    // EVENTOS DE BOTONES
+    // ============================================
+    document.getElementById("btnLimpiar").onclick = function() {
+      if (confirm("¿Estás seguro de eliminar todas las tareas?")) {
+        limpiarTodas();
+      }
+    };
+    
+    // ============================================
+    // INICIALIZACIÓN
+    // ============================================
+    pintaTabla();
+    hablar("Sistema de gestión con interfaces naturales iniciado. Puedes usar comandos de voz o gestos con las manos");
+    
+  </script>
+</body>
+</html>

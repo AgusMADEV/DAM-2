@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgusmaLab v1.0 - Demo Básica</title>
+  
+  <!-- Cargar nuestra librería de estilos -->
+  <link rel="stylesheet" href="agusmalab.css">
+  
+  <style>
+    /* Estilos adicionales para la demo */
+    body {
+      margin: 0;
+      padding: 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    .demo-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .demo-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 3rem;
+    }
+    
+    .demo-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .demo-header p {
+      font-size: 1.125rem;
+      opacity: 0.9;
+    }
+    
+    .demo-section {
+      margin-bottom: 3rem;
+    }
+    
+    .section-title {
+      color: white;
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+    
+    /* Grid de tarjetas */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    /* Tabla */
+    .table-container {
+      margin-bottom: 2rem;
+    }
+    
+    /* Footer */
+    .demo-footer {
+      text-align: center;
+      color: white;
+      padding: 2rem;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-container">
+    <!-- Header -->
+    <div class="demo-header">
+      <h1>🎨 AgusmaLab v1.0</h1>
+      <p>Librería Personal de Componentes UI - Versión Básica</p>
+    </div>
+
+    <!-- Sección: Tarjetas de Estadísticas -->
+    <div class="demo-section">
+      <h2 class="section-title">📊 Tarjetas de Estadísticas</h2>
+      
+      <div class="stats-grid">
+        <div id="stat1"></div>
+        <div id="stat2"></div>
+        <div id="stat3"></div>
+        <div id="stat4"></div>
+      </div>
+    </div>
+
+    <!-- Sección: Tabla de Usuarios -->
+    <div class="demo-section">
+      <h2 class="section-title">👥 Tabla de Usuarios</h2>
+      
+      <div class="table-container">
+        <div id="tabla-usuarios"></div>
+      </div>
+    </div>
+
+    <!-- Sección: Tabla de Productos -->
+    <div class="demo-section">
+      <h2 class="section-title">📦 Tabla de Productos</h2>
+      
+      <div class="table-container">
+        <div id="tabla-productos"></div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="demo-footer">
+      <p>💡 Esta es la versión básica. Próximas mejoras: búsqueda, ordenamiento, paginación y más.</p>
+    </div>
+  </div>
+
+  <!-- Cargar nuestra librería JavaScript -->
+  <script src="agusmalab.js"></script>
+  
+  <!-- Inicializar componentes -->
+  <script>
+    // ========================================
+    // TARJETAS DE ESTADÍSTICAS
+    // ========================================
+    
+    new AgusmaLab.StatsCard('#stat1', {
+      titulo: 'Usuarios Totales',
+      valor: '1,234',
+      icono: '👥',
+      colorIcono: 'primary',
+      descripcion: '+12% desde el mes pasado'
+    });
+
+    new AgusmaLab.StatsCard('#stat2', {
+      titulo: 'Ventas del Mes',
+      valor: '€45,678',
+      icono: '💰',
+      colorIcono: 'success',
+      descripcion: '+23% de incremento'
+    });
+
+    new AgusmaLab.StatsCard('#stat3', {
+      titulo: 'Pedidos Pendientes',
+      valor: '89',
+      icono: '📋',
+      colorIcono: 'warning',
+      descripcion: 'Procesar hoy'
+    });
+
+    new AgusmaLab.StatsCard('#stat4', {
+      titulo: 'Productos Activos',
+      valor: '456',
+      icono: '📦',
+      colorIcono: 'info',
+      descripcion: 'En inventario'
+    });
+
+    // ========================================
+    // TABLA DE USUARIOS
+    // ========================================
+    
+    const tablaUsuarios = new MiLib.SimpleTable('#tabla-usuarios', {
+      titulo: 'Usuarios Registrados',
+      columnas: ['ID', 'Nombre', 'Email', 'Ciudad', 'Estado'],
+      datos: [
+        ['001', 'Ana García', 'ana.garcia@example.com', 'Madrid', 'Activo'],
+        ['002', 'Carlos López', 'carlos.lopez@example.com', 'Barcelona', 'Activo'],
+        ['003', 'María Fernández', 'maria.fernandez@example.com', 'Valencia', 'Activo'],
+        ['004', 'Juan Martínez', 'juan.martinez@example.com', 'Sevilla', 'Inactivo'],
+        ['005', 'Laura Sánchez', 'laura.sanchez@example.com', 'Bilbao', 'Activo'],
+        ['006', 'Pedro Gómez', 'pedro.gomez@example.com', 'Málaga', 'Activo'],
+        ['007', 'Isabel Ruiz', 'isabel.ruiz@example.com', 'Zaragoza', 'Activo'],
+        ['008', 'Miguel Torres', 'miguel.torres@example.com', 'Murcia', 'Inactivo']
+      ]
+    });
+
+    // ========================================
+    // TABLA DE PRODUCTOS
+    // ========================================
+    
+    const tablaProductos = new AgusmaLab.SimpleTable('#tabla-productos', {
+      titulo: 'Catálogo de Productos',
+      columnas: ['Código', 'Producto', 'Categoría', 'Precio', 'Stock'],
+      datos: [
+        ['P001', 'Laptop Dell XPS 15', 'Informática', '€1,299', '15 uds'],
+        ['P002', 'iPhone 14 Pro', 'Móviles', '€1,199', '23 uds'],
+        ['P003', 'Monitor Samsung 27"', 'Periféricos', '€349', '8 uds'],
+        ['P004', 'Teclado Mecánico RGB', 'Periféricos', '€129', '42 uds'],
+        ['P005', 'Ratón Logitech MX Master', 'Periféricos', '€99', '31 uds'],
+        ['P006', 'Auriculares Sony WH-1000XM5', 'Audio', '€379', '12 uds'],
+        ['P007', 'Tablet iPad Air', 'Tablets', '€699', '18 uds'],
+        ['P008', 'Webcam Logitech C920', 'Periféricos', '€89', '25 uds']
+      ]
+    });
+
+    // ========================================
+    // DEMOSTRACIÓN DE MÉTODOS
+    // ========================================
+    
+    // Ejemplo: Actualizar valor de una tarjeta después de 3 segundos
+    setTimeout(() => {
+      const stat1Element = document.querySelector('#stat1');
+      if (stat1Element) {
+        console.log('✨ Actualizando tarjeta de usuarios...');
+        // Nota: Necesitaríamos guardar la referencia al objeto para usar los métodos
+        // En v2 mejoraremos esto
+      }
+    }, 3000);
+
+    console.log('✅ AgusmaLab v1.0 cargada correctamente');
+    console.log('📦 Componentes disponibles:', Object.keys(AgusmaLab));
+    console.log('🔢 Versión:', AgusmaLab.version);
+  </script>
+</body>
+</html>
+

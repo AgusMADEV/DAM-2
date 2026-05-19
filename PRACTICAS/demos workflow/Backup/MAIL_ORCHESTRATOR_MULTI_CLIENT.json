@@ -1,0 +1,264 @@
+{
+  "name": "MAIL_ORCHESTRATOR_MULTI_CLIENT",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -576,
+        -96
+      ],
+      "id": "5139f561-4a5f-44cf-92a4-090f8001b8dd",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1XF01PDnsgCgGfQPGYTDdpPw73-WsrPPhYSEgBYQ1ajo/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "clients",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XF01PDnsgCgGfQPGYTDdpPw73-WsrPPhYSEgBYQ1ajo/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -432,
+        -96
+      ],
+      "id": "481738ed-635f-4b70-8317-2db36dbc74a7",
+      "name": "Get active clients",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PGtualgb4ukwEdaI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6601ec26-c4e6-42c5-b3dd-2b04ca4d005b",
+              "leftValue": "={{ String($json.active).toLowerCase() }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -288,
+        -96
+      ],
+      "id": "aa989b33-1b10-4a95-b298-e6c3a428b0a8",
+      "name": "Filter active clients"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "48043ffe-7023-49de-8b9f-aa64150c0872",
+              "name": "client_id",
+              "value": "={{ $json.client_id }}",
+              "type": "string"
+            },
+            {
+              "id": "ff0fcf4d-315a-436d-bbc1-8895b559b3a3",
+              "name": "client_name",
+              "value": "={{ $json.client_name }}",
+              "type": "string"
+            },
+            {
+              "id": "42d22b1b-19e9-4570-a7b5-421ebead1830",
+              "name": "mailbox_email",
+              "value": "={{ $json.mailbox_email }}",
+              "type": "string"
+            },
+            {
+              "id": "d38a6721-d397-4c22-ae10-3bfab632c4b5",
+              "name": "review_email",
+              "value": "={{ $json.review_email }}",
+              "type": "string"
+            },
+            {
+              "id": "8bc82330-0df5-4e48-bb6b-9e3bbc764d09",
+              "name": "processor_workflow_name",
+              "value": "={{ $json.processor_workflow_name }}",
+              "type": "string"
+            },
+            {
+              "id": "fc88f4bf-a1ab-4bd3-8644-4038f9eaedc5",
+              "name": "source_type",
+              "value": "={{ $json.source_type }}",
+              "type": "string"
+            },
+            {
+              "id": "5d249906-f6d9-4baf-86cd-588fc9e9c776",
+              "name": "orchestrated_at",
+              "value": "={{ $now }}",
+              "type": "string"
+            },
+            {
+              "id": "bbd035f7-12e5-452a-b298-fc2c93d4402d",
+              "name": "gmail_credential_name",
+              "value": "={{ $json.gmail_credential_name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -128,
+        -96
+      ],
+      "id": "a52e4f19-b822-43cb-bc15-f6bb4f2f2ec4",
+      "name": "Set client context"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "1EflS9wDsjQyxgwG",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/1EflS9wDsjQyxgwG",
+          "cachedResultName": "MAILBOX_COLLECTOR_SINGLE_CLIENT"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "client_id": "={{ $json.client_id }}",
+            "client_name": "={{ $json.client_name }}",
+            "mailbox_email": "={{ $json.mailbox_email }}",
+            "review_email": "={{ $json.review_email }}",
+            "processor_workflow_name": "={{ $json.processor_workflow_name }}",
+            "source_type": "={{ $json.source_type }}",
+            "orchestatred_at": "={{ $json.orchestrated_at }}",
+            "gmail_credential_name": "={{ $json.gmail_credential_name }}"
+          },
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        -96
+      ],
+      "id": "7b95d8e1-b7fc-4fbf-8c77-a11ee1330c50",
+      "name": "Call mailbox collector"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get active clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get active clients": {
+      "main": [
+        [
+          {
+            "node": "Filter active clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter active clients": {
+      "main": [
+        [
+          {
+            "node": "Set client context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set client context": {
+      "main": [
+        [
+          {
+            "node": "Call mailbox collector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "d47db125-b33a-4c0d-b47a-0ec0307a9e02",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ce30596c2036c9787cf7de133bdf9beb7ac4721aa6f313e72b19791ad015b927"
+  },
+  "id": "U3TWUX56d0Lgy2ww",
+  "tags": [
+    {
+      "updatedAt": "2026-04-16T08:45:56.942Z",
+      "createdAt": "2026-04-16T08:45:56.942Z",
+      "id": "2gN2jOrZMkY26AUb",
+      "name": "Agustín"
+    }
+  ]
+}

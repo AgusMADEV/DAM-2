@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>jocarsa | ux – CRUD con FK</title>
+  <style>
+    :root{
+      --bg:#f6f7fb; --line:#e5e7eb; --text:#0f172a; --muted:#6b7280; --accent:#dc143c; --panel:#ffffff;
+    }
+    * { box-sizing:border-box; }
+    body{ margin:0; font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial; color:var(--text); background:var(--bg); }
+    header{ display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--line); background:#fff; position:sticky; top:0; z-index:10; }
+    header .brand{ font-weight:800; letter-spacing:.3px; }
+    header .dot{ width:8px; height:8px; border-radius:50%; background:var(--accent); display:inline-block; margin:0 6px; }
+    .layout{ display:grid; grid-template-columns:260px 1fr; min-height:calc(100dvh - 57px); }
+    aside{ border-right:1px solid var(--line); background:var(--accent); color:#fff; }
+    main{ background:var(--bg); padding:16px 0; }
+    /* host containers for JocarsaUX */
+    #left{ height:100%; overflow:auto; }
+    #main{ max-width:1200px; margin:0 auto; padding:0 12px; }
+    /* small helper for empty states */
+    .empty{
+      margin:24px; padding:18px; border:1px dashed var(--line); background:var(--panel);
+      color:var(--muted); border-radius:12px;
+    }
+    @media (max-width: 900px){
+      .layout{ grid-template-columns:1fr; }
+      aside{ position:sticky; top:57px; z-index:5; }
+    }
+  </style>
+  <!-- Your UX library -->
+  <script defer src="/static/jocarsaux.js"></script>
+</head>
+<body>
+  <header>
+    <div class="brand">jocarsa<span class="dot"></span>ux</div>
+    <div style="color:var(--muted);">CRUD con FK + formularios</div>
+  </header>
+
+  <div class="layout">
+    <aside>
+      <!-- Left nav rendered by ux.menuRenderer / ux.loadTablesMenu -->
+      <div id="left"></div>
+    </aside>
+
+    <main>
+      <!-- Main table / forms area -->
+      <div id="main">
+        <div class="empty" id="empty-state">
+          Cargando tablas… Si no aparece nada, comprueba que <code>/tablas</code> responde y que
+          has incluido <code>static/jocarsaux.js</code>.
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Wait until jocarsaux.js is loaded (defer) and DOM is ready
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Prefer the class API; you can also use the singleton window.jocarsaux
+      const ux = new JocarsaUX();
+
+      // 1) Render the left menu from backend and wire clicks to open tables on the right
+      ux.loadTablesMenu({
+        target: '#left',
+        title: 'Tablas',
+        onItemClick: (tabla) => {
+          // Clear empty state if visible
+          const empty = document.getElementById('empty-state');
+          if (empty) empty.remove();
+          // Render selected table with FK-aware CRUD
+          ux.openTable({ target: '#main', tabla, rowsPerPage: 10 })
+            .catch(err => console.error('Error abriendo tabla', err));
+        }
+      }).catch(err => {
+        console.error('Error cargando /tablas:', err);
+        const empty = document.getElementById('empty-state');
+        if (empty) empty.textContent = 'No se pudo cargar /tablas. Revisa la consola y el backend.';
+      });
+
+      // 2) Auto-open the first table (optional but handy)
+      try {
+        const tablas = await fetch('/tablas', { headers: { 'Accept': 'application/json' } }).then(r => r.json());
+        const first = Array.isArray(tablas) && tablas.length ? (tablas[0].tabla || tablas[0]) : null;
+        if (first) {
+          // Simulate clicking the first menu item: open immediately
+          const empty = document.getElementById('empty-state');
+          if (empty) empty.remove();
+          ux.openTable({ target: '#main', tabla: first, rowsPerPage: 10 });
+          // Also mark first button active when it appears
+          setTimeout(() => {
+            const btn = document.querySelector('#left button');
+            if (btn) btn.classList.add('jux-menu-btn-active');
+          }, 50);
+        } else {
+          const empty = document.getElementById('empty-state');
+          if (empty) empty.textContent = 'No hay tablas disponibles en /tablas.';
+        }
+      } catch (e) {
+        console.error('Error precargando primera tabla:', e);
+      }
+    });
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,468 @@
+/* ===== Variables CSS ===== */
+:root {
+  --sidebar-width: 300px;
+  --console-width: 360px;
+  --header-height: 80px;
+  --gap: 12px;
+  
+  --nodo-min-w: 240px;
+  --nodo-min-h: 140px;
+  --port-size: 16px;
+  
+  /* Colores principales */
+  --primary: #2563eb;
+  --primary-light: #3b82f6;
+  --primary-dark: #1e40af;
+  --secondary: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  
+  /* Colores de fondo */
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-hover: #f1f5f9;
+  
+  /* Colores de texto */
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  
+  /* Bordes */
+  --border-color: #e2e8f0;
+  --border-radius: 12px;
+  
+  /* Sombras */
+  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.08);
+  --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.12);
+  --shadow-lg: 0 8px 32px rgba(15, 23, 42, 0.16);
+}
+
+/* ===== Reset y base ===== */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  line-height: 1.6;
+  
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr var(--console-width);
+  grid-template-rows: var(--header-height) 1fr;
+  gap: var(--gap);
+  padding: var(--gap);
+  min-height: 100vh;
+}
+
+/* ===== Header ===== */
+header {
+  grid-column: 1 / -1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 16px 20px;
+  box-shadow: var(--shadow-sm);
+  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.header-left h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.header-center {
+  display: flex;
+  gap: 10px;
+}
+
+.header-right {
+  text-align: right;
+}
+
+.help-text {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+/* ===== Botones ===== */
+.btn {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  background: var(--bg-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary-dark);
+}
+
+.btn-primary:hover {
+  background: var(--primary-light);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+  border-color: var(--danger);
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+.btn-small {
+  padding: 4px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+/* ===== Paneles laterales ===== */
+#tools, #console {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+#tools h3, #console h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tools-info {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 8px;
+  background: var(--bg-hover);
+  border-radius: 6px;
+}
+
+/* ===== Lista de herramientas ===== */
+#tools-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tool-btn {
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  cursor: grab;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.tool-btn:hover {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  transform: translateX(4px);
+  box-shadow: var(--shadow-md);
+}
+
+.tool-btn:active {
+  cursor: grabbing;
+}
+
+.muted {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* ===== Consola ===== */
+.console-controls {
+  display: flex;
+  justify-content: flex-end;
+}
+
+#log {
+  flex: 1;
+  background: #1e293b;
+  color: #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 0;
+  overflow-y: auto;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* ===== Área de trabajo ===== */
+#centro {
+  position: relative;
+  background: 
+    linear-gradient(90deg, #e2e8f0 1px, transparent 1px),
+    linear-gradient(0deg, #e2e8f0 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: -1px -1px;
+  background-color: #f1f5f9;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+#mundo {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease-out;
+}
+
+#edges {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 16px;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ===== Nodos ===== */
+.node {
+  position: absolute;
+  min-width: var(--nodo-min-w);
+  min-height: var(--nodo-min-h);
+  background: white;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  cursor: move;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.node:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-light);
+}
+
+.node.selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2), var(--shadow-lg);
+  z-index: 20;
+}
+
+.node .titlebar {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  height: 8px;
+  border-radius: 10px 10px 0 0;
+  cursor: grab;
+}
+
+.node .titlebar:active {
+  cursor: grabbing;
+}
+
+.node .title {
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.node .body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Campos del nodo */
+.node label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.node input,
+.node select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 13px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.node input:focus,
+.node select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* ===== Puertos de conexión ===== */
+.port {
+  position: absolute;
+  width: var(--port-size);
+  height: var(--port-size);
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  background: white;
+  cursor: crosshair;
+  z-index: 100;
+  transition: all 0.2s ease;
+}
+
+.port:hover {
+  transform: scale(1.3);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+}
+
+.port.in {
+  left: calc(-1 * var(--port-size) / 2);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--secondary);
+  border-color: var(--secondary);
+}
+
+.port.out {
+  right: calc(-1 * var(--port-size) / 2);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+/* ===== Conexiones (paths SVG) ===== */
+path.edge-bg {
+  fill: none;
+  stroke: #cbd5e1;
+  stroke-width: 8;
+  opacity: 0.3;
+}
+
+path.edge {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 3;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+path.edge:hover {
+  stroke: var(--primary-light);
+  stroke-width: 4;
+}
+
+/* ===== Scrollbars personalizados ===== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-hover);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* ===== Animaciones ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.node {
+  animation: fadeIn 0.3s ease;
+}
+
+/* ===== Responsive (opcional para pantallas pequeñas) ===== */
+@media (max-width: 1400px) {
+  :root {
+    --sidebar-width: 250px;
+    --console-width: 300px;
+  }
+}

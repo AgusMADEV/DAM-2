@@ -1,0 +1,98 @@
+{
+  "rules": [
+    {
+      "category": "client",
+      "name": "Cliente",
+      "description": "Emails de clientes actuales o en proceso que requieren seguimiento, gestión de cita, documentación o respuesta operativa.",
+      "logic": {
+        "keywords_any": [
+          "pedido",
+          "problema",
+          "incidencia",
+          "seguimiento",
+          "mi cita",
+          "mi pedido",
+          "documentación",
+          "cambiar cita",
+          "adjunto documentación"
+        ],
+        "attachments_any": [],
+        "from_domains_any": []
+      }
+    },
+    {
+      "category": "billing",
+      "name": "Facturas",
+      "description": "Emails relacionados con facturas, pagos, presupuestos, administración o proveedores.",
+      "logic": {
+        "keywords_any": [
+          "factura",
+          "pago",
+          "proveedor",
+          "presupuesto",
+          "abono",
+          "recibo"
+        ],
+        "attachments_any": ["pdf"],
+        "from_domains_any": []
+      }
+    },
+    {
+      "category": "lead",
+      "name": "Lead",
+      "description": "Emails de personas o empresas que todavía no son clientes y solicitan información, precio o contratación.",
+      "logic": {
+        "keywords_any": [
+          "información",
+          "presupuesto",
+          "precio",
+          "tarifa",
+          "me interesa",
+          "quisiera saber",
+          "solicitar información",
+          "cómo funciona",
+          "contratar",
+          "consulta"
+        ],
+        "attachments_any": [],
+        "from_domains_any": []
+      }
+    },
+    {
+      "category": "internal",
+      "name": "Interno",
+      "description": "Emails internos del equipo, colaboradores o comunicaciones operativas que no son de clientes ni comerciales.",
+      "logic": {
+        "keywords_any": [
+          "reunión",
+          "equipo",
+          "revisar",
+          "actualización",
+          "seguimiento",
+          "interno",
+          "tarea",
+          "pendiente"
+        ],
+        "attachments_any": [],
+        "from_domains_any": ["sodire.es"]
+      }
+    },
+    {
+      "category": "spam",
+      "name": "Spam",
+      "description": "Emails irrelevantes, promocionales o no deseados que no aportan valor al negocio.",
+      "logic": {
+        "keywords_any": [
+          "seo",
+          "posicionamiento",
+          "oferta",
+          "marketing",
+          "publicidad",
+          "promoción"
+        ],
+        "attachments_any": [],
+        "from_domains_any": []
+      }
+    }
+  ]
+}

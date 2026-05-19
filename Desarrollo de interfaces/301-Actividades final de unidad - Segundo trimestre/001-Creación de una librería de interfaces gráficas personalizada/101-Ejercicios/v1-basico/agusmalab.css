@@ -1,0 +1,269 @@
+/*!
+ * AgusmaLab - Librería de Componentes UI v1.0 (Básica)
+ * Librería personal de componentes reutilizables
+ * Autor: Agustín Mateo
+ * Fecha: 17 de febrero de 2026
+ */
+
+/* ========================================
+   VARIABLES Y TOKENS DE DISEÑO
+   ======================================== */
+:root {
+  /* Colores principales */
+  --agl-primary: #3b82f6;
+  --agl-secondary: #64748b;
+  --agl-success: #10b981;
+  --agl-warning: #f59e0b;
+  --agl-danger: #ef4444;
+  --agl-info: #06b6d4;
+  
+  /* Colores de fondo y texto */
+  --agl-bg: #ffffff;
+  --agl-bg-alt: #f8fafc;
+  --agl-text: #1e293b;
+  --agl-text-muted: #64748b;
+  --agl-border: #e2e8f0;
+  
+  /* Espaciado */
+  --agl-space-xs: 0.25rem;
+  --agl-space-sm: 0.5rem;
+  --agl-space-md: 1rem;
+  --agl-space-lg: 1.5rem;
+  --agl-space-xl: 2rem;
+  
+  /* Bordes y sombras */
+  --agl-radius: 0.5rem;
+  --agl-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --agl-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --agl-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  
+  /* Tipografía */
+  --agl-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --agl-font-size: 1rem;
+  --agl-font-size-sm: 0.875rem;
+  --agl-font-size-lg: 1.125rem;
+  --agl-font-size-xl: 1.5rem;
+  
+  /* Transiciones */
+  --agl-transition: all 0.2s ease;
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --agl-bg: #1e293b;
+    --agl-bg-alt: #0f172a;
+    --agl-text: #f1f5f9;
+    --agl-text-muted: #94a3b8;
+    --agl-border: #334155;
+  }
+}
+
+/* ========================================
+   RESET Y BASE
+   ======================================== */
+.agl-container,
+.agl-container * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.agl-container {
+  font-family: var(--agl-font);
+  font-size: var(--agl-font-size);
+  color: var(--agl-text);
+}
+
+/* ========================================
+   COMPONENTE: StatsCard
+   Tarjetas de estadísticas
+   ======================================== */
+.agl-stats-card {
+  background: var(--agl-bg);
+  border: 1px solid var(--agl-border);
+  border-radius: var(--agl-radius);
+  padding: var(--agl-space-lg);
+  box-shadow: var(--agl-shadow-sm);
+  transition: var(--agl-transition);
+}
+
+.agl-stats-card:hover {
+  box-shadow: var(--agl-shadow-md);
+  transform: translateY(-2px);
+}
+
+.agl-stats-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--agl-space-md);
+}
+
+.agl-stats-card-title {
+  font-size: var(--agl-font-size-sm);
+  color: var(--agl-text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.agl-stats-card-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--agl-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--agl-font-size-xl);
+}
+
+.agl-stats-card-icon.primary {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--agl-primary);
+}
+
+.agl-stats-card-icon.success {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--agl-success);
+}
+
+.agl-stats-card-icon.warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--agl-warning);
+}
+
+.agl-stats-card-icon.danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--agl-danger);
+}
+
+.agl-stats-card-icon.info {
+  background: rgba(6, 182, 212, 0.1);
+  color: var(--agl-info);
+}
+
+.agl-stats-card-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--agl-text);
+  margin-bottom: var(--agl-space-xs);
+}
+
+.agl-stats-card-footer {
+  font-size: var(--agl-font-size-sm);
+  color: var(--agl-text-muted);
+}
+
+/* ========================================
+   COMPONENTE: SimpleTable
+   Tabla básica con estilos
+   ======================================== */
+.agl-table-wrapper {
+  background: var(--agl-bg);
+  border: 1px solid var(--agl-border);
+  border-radius: var(--agl-radius);
+  overflow: hidden;
+  box-shadow: var(--agl-shadow-sm);
+}
+
+.agl-table-header {
+  padding: var(--agl-space-lg);
+  border-bottom: 1px solid var(--agl-border);
+  background: var(--agl-bg-alt);
+}
+
+.agl-table-title {
+  font-size: var(--agl-font-size-lg);
+  font-weight: 600;
+  color: var(--agl-text);
+  margin: 0;
+}
+
+.agl-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.agl-table thead {
+  background: var(--agl-bg-alt);
+}
+
+.agl-table th {
+  padding: var(--agl-space-md);
+  text-align: left;
+  font-weight: 600;
+  font-size: var(--agl-font-size-sm);
+  color: var(--agl-text);
+  border-bottom: 2px solid var(--agl-border);
+}
+
+.agl-table td {
+  padding: var(--agl-space-md);
+  border-bottom: 1px solid var(--agl-border);
+  color: var(--agl-text);
+}
+
+.agl-table tbody tr {
+  transition: var(--agl-transition);
+}
+
+.agl-table tbody tr:hover {
+  background: var(--agl-bg-alt);
+}
+
+.agl-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Filas zebra alternas */
+.agl-table tbody tr:nth-child(even) {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.agl-table tbody tr:nth-child(even):hover {
+  background: var(--agl-bg-alt);
+}
+
+/* ========================================
+   UTILIDADES
+   ======================================== */
+.agl-grid {
+  display: grid;
+  gap: var(--agl-space-lg);
+}
+
+.agl-grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.agl-grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.agl-grid-4 {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+  .agl-stats-card {
+    padding: var(--agl-space-md);
+  }
+  
+  .agl-stats-card-value {
+    font-size: 1.5rem;
+  }
+  
+  .agl-table {
+    font-size: var(--agl-font-size-sm);
+  }
+  
+  .agl-table th,
+  .agl-table td {
+    padding: var(--agl-space-sm);
+  }
+}
+

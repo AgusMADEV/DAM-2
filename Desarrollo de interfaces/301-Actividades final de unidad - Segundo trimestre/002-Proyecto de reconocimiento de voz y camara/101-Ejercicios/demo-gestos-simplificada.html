@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Demo Simplificada - Reconocimiento de Gestos</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    
+    .panel {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+    
+    h1 {
+      color: #667eea;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    
+    .video-container {
+      position: relative;
+      width: 100%;
+      max-width: 640px;
+      margin: 0 auto;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    
+    canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    video {
+      display: none;
+    }
+    
+    #status {
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border-left: 4px solid #667eea;
+      text-align: center;
+      font-size: 18px;
+      min-height: 60px;
+    }
+    
+    .gestos-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    
+    .gesto-card {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      border: 2px solid #e0e0e0;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    
+    .gesto-card:hover {
+      transform: translateY(-5px);
+      border-color: #667eea;
+    }
+    
+    .gesto-card .emoji {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    
+    .gesto-card h3 {
+      color: #667eea;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    
+    .gesto-card p {
+      color: #666;
+      font-size: 14px;
+      margin: 5px 0;
+    }
+    
+    .info-box {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 15px 0;
+      border-left: 4px solid #2196F3;
+    }
+    
+    .contador {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      margin-top: 20px;
+    }
+    
+    .contador h2 {
+      margin: 0 0 15px 0;
+    }
+    
+    .contador-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    
+    .contador-item {
+      background: rgba(255,255,255,0.2);
+      padding: 10px;
+      border-radius: 5px;
+    }
+    
+    .contador-valor {
+      font-size: 32px;
+      font-weight: bold;
+      display: block;
+    }
+  </style>
+  
+  <!-- MediaPipe Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+</head>
+<body>
+  <div class="panel">
+    <h1>👋 Demo Simplificada - Reconocimiento de Gestos</h1>
+    <p class="subtitle">Usa tu mano para interactuar con la aplicación</p>
+    
+    <div class="video-container">
+      <video class="input_video" autoplay playsinline muted></video>
+      <canvas class="output_canvas" width="640" height="480"></canvas>
+    </div>
+    
+    <div id="status">Iniciando cámara y reconocimiento de gestos...</div>
+    
+    <div class="info-box">
+      <strong>💡 Cómo usar:</strong> Coloca tu mano frente a la cámara y haz uno de los gestos mostrados abajo. Mantén el gesto durante 1-2 segundos para que se detecte.
+    </div>
+    
+    <div class="gestos-info">
+      <div class="gesto-card">
+        <div class="emoji">✌️</div>
+        <h3>Dos Dedos</h3>
+        <p>Índice y medio arriba</p>
+        <p><strong>Acción:</strong> Saludo</p>
+      </div>
+      
+      <div class="gesto-card">
+        <div class="emoji">👍</div>
+        <h3>Pulgar Arriba</h3>
+        <p>Solo el pulgar extendido</p>
+        <p><strong>Acción:</strong> Me gusta</p>
+      </div>
+      
+      <div class="gesto-card">
+        <div class="emoji">✊</div>
+        <h3>Puño Cerrado</h3>
+        <p>Todos los dedos cerrados</p>
+        <p><strong>Acción:</strong> Detener</p>
+      </div>
+      
+      <div class="gesto-card">
+        <div class="emoji">🖐️</div>
+        <h3>Mano Abierta</h3>
+        <p>4 o 5 dedos extendidos</p>
+        <p><strong>Acción:</strong> Hola</p>
+      </div>
+    </div>
+    
+    <div class="contador">
+      <h2>📊 Gestos Detectados</h2>
+      <div class="contador-grid">
+        <div class="contador-item">
+          <span class="contador-valor" id="count-dos">0</span>
+          <span>✌️ Dos Dedos</span>
+        </div>
+        <div class="contador-item">
+          <span class="contador-valor" id="count-pulgar">0</span>
+          <span>👍 Pulgar</span>
+        </div>
+        <div class="contador-item">
+          <span class="contador-valor" id="count-puno">0</span>
+          <span>✊ Puño</span>
+        </div>
+        <div class="contador-item">
+          <span class="contador-valor" id="count-abierta">0</span>
+          <span>🖐️ Abierta</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // CONFIGURACIÓN
+    // ==========================================
+    const COOLDOWN = 1500; // Tiempo entre detecciones (ms)
+    let lastGestureTime = 0;
+    
+    // Contadores de gestos
+    let contadores = {
+      dos_dedos: 0,
+      pulgar_arriba: 0,
+      puno: 0,
+      mano_abierta: 0
+    };
+    
+    // ==========================================
+    // ELEMENTOS DEL DOM
+    // ==========================================
+    const video = document.querySelector('.input_video');
+    const canvas = document.querySelector('.output_canvas');
+    const ctx = canvas.getContext('2d');
+    const statusDiv = document.getElementById('status');
+    
+    // ==========================================
+    // DETECCIÓN DE GESTOS
+    // ==========================================
+    function detectarGesto(landmarks) {
+      if (!landmarks || landmarks.length === 0) return null;
+      
+      // Puntos clave de la mano (21 landmarks)
+      const pulgar = landmarks[4];
+      const indiceTip = landmarks[8];
+      const medioTip = landmarks[12];
+      const anularTip = landmarks[16];
+      const meniqueTip = landmarks[20];
+      
+      // Función auxiliar: verificar si un dedo está extendido
+      function dedoExtendido(puntaTip, baseY) {
+        return puntaTip.y < baseY;
+      }
+      
+      // Verificar estado de cada dedo
+      const indiceExtendido = dedoExtendido(indiceTip, landmarks[6].y);
+      const medioExtendido = dedoExtendido(medioTip, landmarks[10].y);
+      const anularExtendido = dedoExtendido(anularTip, landmarks[14].y);
+      const meniqueExtendido = dedoExtendido(meniqueTip, landmarks[18].y);
+      
+      // Pulgar es especial (se extiende horizontalmente)
+      const pulgarExtendido = Math.abs(pulgar.x - landmarks[2].x) > 0.05;
+      
+      // Contar dedos extendidos (sin contar pulgar)
+      const dedosExtendidos = [
+        indiceExtendido,
+        medioExtendido,
+        anularExtendido,
+        meniqueExtendido
+      ].filter(Boolean).length;
+      
+      // ==========================================
+      // IDENTIFICAR GESTOS
+      // ==========================================
+      
+      // ✌️ DOS DEDOS: Índice y medio arriba, otros abajo
+      if (indiceExtendido && medioExtendido && !anularExtendido && !meniqueExtendido) {
+        return {
+          nombre: "dos_dedos",
+          emoji: "✌️",
+          descripcion: "Dos Dedos - Saludo"
+        };
+      }
+      
+      // 👍 PULGAR ARRIBA: Solo pulgar extendido
+      if (pulgarExtendido && !indiceExtendido && !medioExtendido && !anularExtendido && !meniqueExtendido) {
+        return {
+          nombre: "pulgar_arriba",
+          emoji: "👍",
+          descripcion: "Pulgar Arriba - Me Gusta"
+        };
+      }
+      
+      // ✊ PUÑO: Todos los dedos cerrados
+      if (dedosExtendidos === 0 && !pulgarExtendido) {
+        return {
+          nombre: "puno",
+          emoji: "✊",
+          descripcion: "Puño Cerrado - Detener"
+        };
+      }
+      
+      // 🖐️ MANO ABIERTA: 4 o más dedos extendidos
+      if (dedosExtendidos >= 4) {
+        return {
+          nombre: "mano_abierta",
+          emoji: "🖐️",
+          descripcion: "Mano Abierta - Hola"
+        };
+      }
+      
+      return null;
+    }
+    
+    // ==========================================
+    // EJECUTAR ACCIÓN DEL GESTO
+    // ==========================================
+    function ejecutarAccion(gesto) {
+      const ahora = Date.now();
+      
+      // Sistema de cooldown para evitar múltiples detecciones
+      if (ahora - lastGestureTime < COOLDOWN) {
+        return;
+      }
+      
+      lastGestureTime = ahora;
+      
+      // Actualizar contador
+      contadores[gesto.nombre]++;
+      actualizarContadores();
+      
+      // Actualizar estado visual
+      statusDiv.textContent = `${gesto.emoji} ${gesto.descripcion} detectado!`;
+      statusDiv.style.background = '#d4edda';
+      statusDiv.style.borderColor = '#28a745';
+      
+      // Feedback sonoro (opcional)
+      console.log(`Gesto detectado: ${gesto.nombre}`);
+      
+      // Restaurar estado después de 1 segundo
+      setTimeout(() => {
+        statusDiv.style.background = '#f5f5f5';
+        statusDiv.style.borderColor = '#667eea';
+      }, 1000);
+    }
+    
+    function actualizarContadores() {
+      document.getElementById('count-dos').textContent = contadores.dos_dedos;
+      document.getElementById('count-pulgar').textContent = contadores.pulgar_arriba;
+      document.getElementById('count-puno').textContent = contadores.puno;
+      document.getElementById('count-abierta').textContent = contadores.mano_abierta;
+    }
+    
+    // ==========================================
+    // CALLBACK DE MEDIAPIPE
+    // ==========================================
+    function onResults(results) {
+      // Limpiar canvas
+      ctx.save();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Dibujar imagen de la cámara
+      ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+      
+      // Si se detectan manos
+      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        for (const landmarks of results.multiHandLandmarks) {
+          // Dibujar conexiones de la mano
+          drawConnectors(ctx, landmarks, HAND_CONNECTIONS, {
+            color: '#00FF00',
+            lineWidth: 3
+          });
+          
+          // Dibujar puntos de landmarks
+          drawLandmarks(ctx, landmarks, {
+            color: '#FF0000',
+            lineWidth: 1,
+            radius: 4
+          });
+          
+          // Detectar gesto
+          const gesto = detectarGesto(landmarks);
+          if (gesto) {
+            ejecutarAccion(gesto);
+            
+            // Mostrar nombre del gesto en el canvas
+            ctx.font = '24px Arial';
+            ctx.fillStyle = 'yellow';
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 3;
+            ctx.strokeText(gesto.emoji + ' ' + gesto.nombre.replace('_', ' '), 10, 40);
+            ctx.fillText(gesto.emoji + ' ' + gesto.nombre.replace('_', ' '), 10, 40);
+          }
+        }
+      } else {
+        statusDiv.textContent = "👋 Muestra tu mano a la cámara...";
+      }
+      
+      ctx.restore();
+    }
+    
+    // ==========================================
+    // INICIALIZACIÓN DE MEDIAPIPE
+    // ==========================================
+    const hands = new Hands({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+    });
+    
+    hands.setOptions({
+      maxNumHands: 1,              // Detectar solo una mano
+      modelComplexity: 1,          // Complejidad media (0=ligero, 1=medio, 2=completo)
+      minDetectionConfidence: 0.7, // Confianza mínima para detección
+      minTrackingConfidence: 0.7   // Confianza mínima para seguimiento
+    });
+    
+    hands.onResults(onResults);
+    
+    // ==========================================
+    // INICIALIZACIÓN DE LA CÁMARA
+    // ==========================================
+    const camera = new Camera(video, {
+      onFrame: async () => {
+        await hands.send({image: video});
+      },
+      width: 640,
+      height: 480
+    });
+    
+    camera.start().then(() => {
+      statusDiv.textContent = "✅ Cámara activa - Muestra gestos con tu mano";
+      console.log("Sistema de reconocimiento de gestos iniciado");
+    }).catch((error) => {
+      statusDiv.textContent = "❌ Error al activar la cámara. Verifica los permisos.";
+      console.error("Error:", error);
+    });
+  </script>
+</body>
+</html>

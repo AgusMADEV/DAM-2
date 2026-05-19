@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <title>TAME-IA</title>
+    <style>
+      html,body{padding:0px;margin:0px;width:100%;height:100%;font-family:sans-serif;overflow:hidden;}
+      body{display:flex;}
+      nav{flex:1;border-right:1px solid lightgray;background:rgb(240,240,240);padding:20px;}
+      main{flex:4;display:flex;flex-direction:column;justify-content:space-between;}
+      main header{border-bottom:1px solid lightgray;padding:20px;}
+      main section{padding:20px;}
+      main footer{padding:20px;}
+      #prompt{border:1px solid lightgray;border-radius:40px;padding:20px;}
+      #prompt input{border:none;width:100%;outline:none;}
+      nav img{width:50px;}
+      nav #conversaciones{height:100%;display:flex;flex-direction:column;gap:20px;padding:20px;overflow-y:scroll;}
+    </style>
+  </head>
+  <body>
+    <nav>
+      <img src="logo.png">
+      <section id="conversaciones">
+        
+      </section>
+      </section>
+    </nav>
+    <main>
+      <header>
+        Hola
+      </header>
+      <section>
+        Conversaciones
+      </section>
+      <footer>
+        <div id="prompt">
+          <input type="text">
+        </div>
+      </footer>
+    </main>
+    <script>
+      fetch("api/conversaciones.php")
+      .then(function(respuesta){return respuesta.json()})
+      .then(function(datos){
+        let contenedor = document.querySelector("#conversaciones")
+        datos.forEach(function(dato){
+          let articulo = document.createElement("article")
+          articulo.classList.add("conversacion")
+          articulo.textContent = dato.descripcion
+          articulo.onclick = function(){
+            console.log("has hecho click en el id: "+dato.Identificador)
+          }
+          contenedor.appendChild(articulo)
+        })
+      })
+    </script>
+  </body>
+</html>

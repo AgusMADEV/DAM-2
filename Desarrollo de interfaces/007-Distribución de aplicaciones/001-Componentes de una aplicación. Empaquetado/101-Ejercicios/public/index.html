@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>jocarsa | editor</title>
+
+  <!-- Ionic core CSS (solo para estilos base) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+
+  <!-- Ubuntu Mono -->
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!-- CodeMirror CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/darcula.min.css" />
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Ionic core JS (no hace falta Angular) -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+
+  <!-- CodeMirror core + modos -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/markdown/markdown.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/shell/shell.min.js"></script>
+</head>
+<body>
+<ion-app>
+  <!-- Sin cabecera: todo el alto para el editor -->
+  <div id="layout">
+    <!-- Árbol de carpetas/ficheros -->
+    <div id="sidebar">
+      <div id="tree"></div>
+    </div>
+
+    <!-- Separador redimensionable -->
+    <div id="divider"></div>
+
+    <!-- Pestañas + editor -->
+    <div id="editor-pane">
+      <div id="tabs"></div>
+      <div id="editor"></div>
+    </div>
+  </div>
+</ion-app>
+
+<!-- Menú contextual del árbol -->
+<div id="context-menu">
+  <div class="context-item" data-action="enter-folder">Entrar en la carpeta</div>
+  <div class="context-item" data-action="new-folder">Nueva carpeta</div>
+  <div class="context-item" data-action="new-file">Nuevo archivo</div>
+  <div class="context-separator"></div>
+  <div class="context-item" data-action="go-up">Subir una carpeta</div>
+  <div class="context-item" data-action="go-root">Ir a la raíz</div>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
+

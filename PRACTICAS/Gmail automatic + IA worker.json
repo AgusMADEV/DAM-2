@@ -1,0 +1,831 @@
+{
+  "name": "Gmail automatic + IA worker",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1072,
+        -128
+      ],
+      "id": "0cc62c0c-d7bd-4d26-a274-7963508cf13b",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        512
+      ],
+      "id": "f894905d-2ef7-49d6-8771-61dfa1394cce",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "GI9POaOJpONaymbM",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.text || $json.response || $json.output || '';\nconst match = raw.match(/\\{[\\s\\S]*\\}/);\n\nif (!match) {\n  return [{\n    json: {\n      categoria: 'otro',\n      prioridad: 'media',\n      resumen: 'No se pudo analizar el correo automáticamente.',\n      intencion: 'Revisión manual',\n      requiere_respuesta: true\n    }\n  }];\n}\n\nlet parsed;\ntry {\n  parsed = JSON.parse(match[0]);\n} catch {\n  parsed = {\n    categoria: 'otro',\n    prioridad: 'media',\n    resumen: 'JSON inválido devuelto por el modelo.',\n    intencion: 'Revisión manual',\n    requiere_respuesta: true\n  };\n}\n\nconst categoriasValidas = ['ventas', 'soporte', 'facturacion', 'incidencias', 'otro'];\nconst prioridadesValidas = ['baja', 'media', 'alta'];\n\nparsed.categoria = categoriasValidas.includes(parsed.categoria) ? parsed.categoria : 'otro';\nparsed.prioridad = prioridadesValidas.includes(parsed.prioridad) ? parsed.prioridad : 'media';\nparsed.resumen = parsed.resumen || 'Sin resumen';\nparsed.intencion = parsed.intencion || 'Sin intención clara';\nparsed.requiere_respuesta = typeof parsed.requiere_respuesta === 'boolean' ? parsed.requiere_respuesta : true;\n\nreturn [{ json: parsed }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -432,
+        -128
+      ],
+      "id": "00a443bc-eaa7-40b7-8fb5-3907a5464fb6",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Redacta una respuesta de correo profesional, cercana y bien estructurada, en español de España.\n\nObjetivo:\nResponder al email de forma clara, elegante y humana, como si fuera una empresa seria y cuidada.\n\nInstrucciones:\n- No inventes datos ni condiciones no confirmadas.\n- Si falta información, indícalo con naturalidad y pide solo lo imprescindible.\n- Usa un tono amable, profesional y seguro.\n- Redacta un correo visualmente limpio y agradable de leer.\n- Evita frases robóticas o demasiado genéricas.\n- No repitas literalmente el mensaje del cliente.\n- Sé breve, pero no seco.\n- No digas que es un texto generado con Inteligencia Artificial\n- Devuelve solo el texto final del correo, sin comentarios ni explicaciones.\n\nEstructura obligatoria:\n1. Saludo personalizado si es posible.\n2. Frase breve de agradecimiento o acuse de recibo.\n3. Respuesta principal en 1 o 2 párrafos claros.\n4. Siguiente paso o petición de información, si aplica.\n5. Despedida profesional.\n6. Firma simple de empresa.\n- No incluyas \"Asunto:\" dentro del cuerpo del correo.\n- No escribas encabezados técnicos ni metadatos.\n- Empieza directamente por el saludo.\n- Usa saltos de línea normales entre párrafos.\n\nDatos del análisis:\n- Categoría: {{ $json.categoria }}\n- Prioridad: {{ $json.prioridad }}\n- Resumen: {{ $json.resumen }}\n- Intención: {{ $json.intencion }}\n\nCorreo original:\n- Asunto: {{ $('Set gmail').item.json.subject }}\n- Remitente: {{ $('Set gmail').item.json.from }}\n- Contenido:\n{{ $('Set gmail').item.json.body }}\n\nSegún la categoría, adapta el estilo:\n\n- ventas:\n  tono consultivo, cercano y proactivo\n- soporte:\n  tono resolutivo, claro y tranquilizador\n- facturacion:\n  tono formal, preciso y ordenado\n- incidencias:\n  tono empático, responsable y orientado a solución\n- otro:\n  tono profesional y neutro\n\nReglas de estilo:\n- Si es una incidencia o soporte: transmite ayuda y claridad.\n- Si es ventas: transmite interés, confianza y orientación.\n- Si es facturación: transmite precisión y formalidad.\n- Si el correo está enfadado o tenso: responde con calma, empatía y sin confrontación.\n- Si faltan datos: pide la información en una lista breve dentro del propio correo, con lenguaje natural.\n- Máximo aproximado: 120-170 palabras.\n\nFirma:\nAtentamente,\nEquipo de atención",
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        688,
+        -192
+      ],
+      "id": "02df550a-cc7d-4d40-8a6d-22542507af18",
+      "name": "Borrador"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un asistente que clasifica correos de empresa.\n\nTu tarea es analizar el email y devolver EXCLUSIVAMENTE un JSON válido, completo y bien formado.\n\n⚠️ IMPORTANTE:\n- Devuelve SOLO el JSON.\n- No añadas texto antes ni después.\n- No uses markdown.\n- No expliques nada.\n- Asegúrate de cerrar correctamente todas las llaves {}.\n- El JSON debe ser parseable sin errores.\n\nEstructura exacta:\n\n{\n  \"categoria\": \"ventas|soporte|facturacion|incidencias|otro\",\n  \"prioridad\": \"baja|media|alta\",\n  \"resumen\": \"string breve\",\n  \"intencion\": \"string breve\",\n  \"requiere_respuesta\": true\n}\n\nReglas de clasificación:\n\n- ventas → interés en comprar, presupuestos, productos\n- soporte → dudas, ayuda, consultas generales\n- facturacion → pagos, facturas, cobros\n- incidencias → errores, fallos, problemas técnicos\n- otro → cualquier caso no claro\n\nReglas adicionales:\n- \"resumen\" → máximo 1 frase clara\n- \"intencion\" → qué quiere el usuario en una frase\n- \"requiere_respuesta\" → true si espera respuesta, false si no\n\nEmail:\n\nAsunto: {{ $json.subject }}\nRemitente: {{ $json.from }}\nContenido:\n{{ $json.body }}",
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -720,
+        -128
+      ],
+      "id": "6d686150-46a8-4bcf-9bc1-40d720d69380",
+      "name": "Analisis"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1504,
+        -176
+      ],
+      "id": "d90dd427-2546-4c9f-b64f-40ac11d2fc81",
+      "name": "Wait",
+      "webhookId": "e1adf97e-267b-44d8-b39a-4cbae81fe0bd"
+    },
+    {
+      "parameters": {
+        "sendTo": "agusmadevelop@gmail.com",
+        "subject": "={{ $json.internalSubject }}",
+        "message": "={{ '<div style=\"font-family: Arial, sans-serif; white-space: pre-wrap;\">' + ($json.internalBody || '') + '</div>' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1344,
+        -176
+      ],
+      "id": "45dc8441-f505-418b-a2b6-7c4da5975847",
+      "name": "Send a message",
+      "webhookId": "8f4a8b73-bcc9-44ca-b7e9-eb391d167683",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7c056bfe-9ee8-47df-9905-8467db57d6bf",
+              "name": "from",
+              "value": "={{ $json.from.text }}",
+              "type": "string"
+            },
+            {
+              "id": "ac6653a0-2829-42c4-b93c-8e955392defd",
+              "name": "subject",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "68cbb92e-394a-4c7c-8100-779fc74b7de4",
+              "name": "body",
+              "value": "={{ ($json.text || '').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "f91ba66f-45aa-4ab1-b636-db2bcb81deef",
+              "name": "messageId",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "906cd896-c630-453a-a9c8-93a5ec53a5d1",
+              "name": "threadId",
+              "value": "={{ $json.threadId }}",
+              "type": "string"
+            },
+            {
+              "id": "dfd4c109-62cc-4324-acc1-bc93f55a416b",
+              "name": "headerMessageId",
+              "value": "={{ $json.messageId }}",
+              "type": "string"
+            },
+            {
+              "id": "15da1edd-f6a1-48ce-b8ae-d344ac152c16",
+              "name": "receivedDate",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -864,
+        -128
+      ],
+      "id": "586cc653-dee1-4ca1-828a-8a08f8c76939",
+      "name": "Set gmail"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4736bfab-697d-40c0-936e-9758fa5ac1b5",
+              "name": "draft",
+              "value": "={{ (($('Borrador').item.json.text || $('Borrador').item.json.response || $('Borrador').item.json.output || '')).replace(/\\\\n/g, '\\n') }}",
+              "type": "string"
+            },
+            {
+              "id": "ba13d6a5-c67e-4f3f-997b-a78dbeca4362",
+              "name": "=approveUrl",
+              "value": "={{ $execution.resumeUrl + '?decision=approve' }}",
+              "type": "string"
+            },
+            {
+              "id": "15efbe84-4eef-46f2-b097-fd8469fc2f59",
+              "name": "rejectUrl",
+              "value": "={{ $execution.resumeUrl + '?decision=reject' }}",
+              "type": "string"
+            },
+            {
+              "id": "2d07d873-8934-483a-b7a4-5a852ce3113e",
+              "name": "from",
+              "value": "={{ $('Set gmail').item.json.from }}",
+              "type": "string"
+            },
+            {
+              "id": "365ee0e3-874d-4d30-a224-faa07d490635",
+              "name": "subject",
+              "value": "={{ $('Set gmail').item.json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "58d3e1eb-6f2e-45a0-b094-60d95a311d28",
+              "name": "categoria",
+              "value": "={{ $('Code in JavaScript').item.json.categoria }}",
+              "type": "string"
+            },
+            {
+              "id": "019157ed-cb59-4e5f-9a68-371a1162c642",
+              "name": "prioridad",
+              "value": "={{ $('Code in JavaScript').item.json.prioridad }}",
+              "type": "string"
+            },
+            {
+              "id": "6d3e09ae-878b-4762-be54-967834c9ff32",
+              "name": "resumen",
+              "value": "={{ $('Code in JavaScript').item.json.resumen }}",
+              "type": "string"
+            },
+            {
+              "id": "73f8718b-f84e-499d-bec4-05581a6a3f17",
+              "name": "=messageId",
+              "value": "={{ $('Set gmail').item.json.messageId }}",
+              "type": "string"
+            },
+            {
+              "id": "02ef542c-a62d-43eb-bf5d-59d847cb1774",
+              "name": "internalSubject",
+              "value": "={{ '[Revisión IA] ' + $('Set gmail').item.json.subject }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1008,
+        -176
+      ],
+      "id": "0545a19a-e92d-4cce-a69a-c7a90ceabeae",
+      "name": "PrepararRevision"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c38d479c-2189-4a5e-a645-756e25345faa",
+              "name": "internalSubject",
+              "value": "={{ $json.internalSubject }}",
+              "type": "string"
+            },
+            {
+              "id": "7af79c1c-4f95-42b0-be15-a969ad94b2e3",
+              "name": "internalBody",
+              "value": "={{ 'Correo recibido de: ' + $json.from +\n'\\n\\nAsunto: ' + $json.subject +\n'\\n\\nCategoría: ' + $json.categoria +\n'\\nPrioridad: ' + $json.prioridad +\n'\\nResumen: ' + $json.resumen +\n'\\n\\nBorrador propuesto:\\n\\n' + ($json.draft || '').replace(/\\\\n/g, '\\n') +\n'\\n\\nAprobar:\\n' + $json.approveUrl +\n'\\n\\nRechazar:\\n' + $json.rejectUrl }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1168,
+        -176
+      ],
+      "id": "a7e2e3a0-3c7a-4d86-bcc1-0258895422d2",
+      "name": "ConstruirCorreoRevision"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5c6755e2-e987-404a-b11e-cf0b0876bd4b",
+              "leftValue": "={{ $json.query.decision }}",
+              "rightValue": "approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1696,
+        -176
+      ],
+      "id": "ed6611d2-942c-4aa7-99a7-af27796955ca",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('PrepararRevision').item.json.messageId }}",
+        "message": "={{ $('PrepararRevision').item.json.draft }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1888,
+        -352
+      ],
+      "id": "e7b9f082-b995-4491-8a03-5544ff35ae0f",
+      "name": "Reply to a message",
+      "webhookId": "aac5d7a2-1f97-4cae-ab11-41c1ebb04af7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('PrepararRevision').item.json.messageId }}",
+        "labelIds": [
+          "Label_8091616593185746588"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2096,
+        -352
+      ],
+      "id": "777a48ff-dec2-44cb-84da-82b5983e8b3a",
+      "name": "Add label to message",
+      "webhookId": "b1426180-c62e-4450-a591-7e46cd12fe82",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "agustin.sodire@gmail.com",
+        "subject": "={{ '[Rechazado] ' + $('PrepararRevision').item.json.messageId }}",
+        "message": "={{  'El borrador generado por la IA ha sido rechazado.\\n\\n' + 'Correo original:\\n' + $('PrepararRevision').item.json.subject + '\\n\\n' + 'Revisar manualmente.' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1904,
+        -80
+      ],
+      "id": "02ab4198-7eb5-41fa-b992-156887b6927b",
+      "name": "Send a message1",
+      "webhookId": "af9ad7a7-92ea-406f-9b6d-a4007fb3d326",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4ad1156c-771c-454f-96d3-38c2e4655a1a",
+              "leftValue": true,
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        368,
+        -128
+      ],
+      "id": "91722f25-e90c-4982-9087-5d17849d155b",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Set gmail').item.json.messageId }}",
+        "labelIds": [
+          "Label_5298530767740082081"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        640,
+        144
+      ],
+      "id": "559d5724-d17e-4e57-ab08-e3b3b2778f28",
+      "name": "Add label to message1",
+      "webhookId": "13ead6e3-23a9-4d11-bea4-485a9b6f5a1c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "removeLabels",
+        "messageId": "={{ $('Set gmail').item.json.messageId }}",
+        "labelIds": [
+          "INBOX"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        848,
+        144
+      ],
+      "id": "7695ab39-2c56-4ae0-80cf-1a2daa256be1",
+      "name": "Remove label from message",
+      "webhookId": "fde1402e-03a0-416f-9356-f8dbcc8214ab",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function puntuacionFaq(faq, text) {\n  let score = 0;\n\n  const pregunta = (faq.pregunta_tipo || '').toLowerCase();\n  const respuesta = (faq.respuesta_oficial || '').toLowerCase();\n  const cuandoUsar = (faq.cuando_usar || '').toLowerCase();\n  const categoriaFaq = (faq.categoria_origen || '').toLowerCase();\n\n  const bloques = [pregunta, respuesta, cuandoUsar, categoriaFaq];\n\n  for (const bloque of bloques) {\n    const palabras = bloque\n      .split(/\\s+/)\n      .map(p => p.replace(/[¿?.,;:()\"]/g, '').trim())\n      .filter(p => p.length > 3);\n\n    for (const palabra of palabras) {\n      if (text.includes(palabra)) {\n        score += 1;\n      }\n    }\n  }\n\n  if (\n    text.includes('precio') ||\n    text.includes('presupuesto') ||\n    text.includes('coste') ||\n    text.includes('tarifa')\n  ) {\n    if (\n      pregunta.includes('precio') ||\n      respuesta.includes('tarifa') ||\n      respuesta.includes('coste')\n    ) {\n      score += 5;\n    }\n  }\n\n  if (\n    text.includes('formación') ||\n    text.includes('workshop') ||\n    text.includes('workshops')\n  ) {\n    if (\n      pregunta.includes('formación') ||\n      respuesta.includes('workshop')\n    ) {\n      score += 5;\n    }\n  }\n\n  if (\n    text.includes('ia') ||\n    text.includes('inteligencia artificial')\n  ) {\n    if (\n      pregunta.includes('ia') ||\n      respuesta.includes('ia')\n    ) {\n      score += 3;\n    }\n  }\n\n  if (\n    text.includes('soporte') ||\n    text.includes('ayuda') ||\n    text.includes('problema') ||\n    text.includes('error')\n  ) {\n    if (\n      categoriaFaq.includes('soporte') ||\n      cuandoUsar.includes('soporte')\n    ) {\n      score += 4;\n    }\n  }\n\n  return score;\n}\n\nreturn items\n  .map(item => {\n    const text = [\n      item.json.subject || '',\n      item.json.body || '',\n      item.json.resumen || '',\n      item.json.intencion || '',\n      item.json.categoria || ''\n    ].join(' ').toLowerCase();\n\n    return {\n      json: {\n        ...item.json,\n        score: puntuacionFaq(item.json, text)\n      }\n    };\n  })\n  .filter(item => item.json.score > 0)\n  .sort((a, b) => b.json.score - a.json.score)\n  .slice(0, 3);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        -128
+      ],
+      "id": "99bec6a2-7b4c-4052-aecb-286d14ed01eb",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const email = ($json.body || '').toLowerCase();\n\nlet accion = \"to_reply\";\nlet policy_id = \"default\";\nlet motivo = \"Sin política especial aplicada\";\n\nif (email.includes(\"precio\") || email.includes(\"coste\") || email.includes(\"presupuesto\") || email.includes(\"tarifa\")) {\n  accion = \"to_waiting\";\n  policy_id = \"POLICY_PRECIO\";\n  motivo = \"Pregunta sobre precios o presupuesto\";\n}\n\nif (email.includes(\"datos\") || email.includes(\"rgpd\") || email.includes(\"privacidad\") || email.includes(\"confidencial\")) {\n  accion = \"to_sensitive\";\n  policy_id = \"POLICY_DATOS\";\n  motivo = \"Tema sensible relacionado con datos o privacidad\";\n}\n\nreturn [\n  {\n    json: {\n      ...$json,\n      accion_final: accion,\n      policy_id,\n      policy_motivo: motivo\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        496
+      ],
+      "id": "fa4aef04-f570-4d30-951d-fb89bc319d5a",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1x6ZssuHLmfIvrOtHeIABbgNvJrYlo79LtdlqLxR0dFQ/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1921131902,
+          "mode": "list",
+          "cachedResultName": "Políticas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1x6ZssuHLmfIvrOtHeIABbgNvJrYlo79LtdlqLxR0dFQ/edit#gid=1921131902"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        160,
+        496
+      ],
+      "id": "cfde7b04-3858-4525-9275-252129a74363",
+      "name": "Politicas",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PGtualgb4ukwEdaI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1x6ZssuHLmfIvrOtHeIABbgNvJrYlo79LtdlqLxR0dFQ/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "FAQs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1x6ZssuHLmfIvrOtHeIABbgNvJrYlo79LtdlqLxR0dFQ/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -272,
+        -16
+      ],
+      "id": "c5e80f2f-3477-4eae-8a0e-a02484e25e14",
+      "name": "FAQs",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PGtualgb4ukwEdaI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -48,
+        -112
+      ],
+      "id": "2e28d46a-16df-4ae5-8000-6372822fded0",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analisis",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Borrador",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "FAQs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analisis": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Borrador": {
+      "main": [
+        [
+          {
+            "node": "PrepararRevision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set gmail": {
+      "main": [
+        [
+          {
+            "node": "Analisis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PrepararRevision": {
+      "main": [
+        [
+          {
+            "node": "ConstruirCorreoRevision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ConstruirCorreoRevision": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a message": {
+      "main": [
+        [
+          {
+            "node": "Add label to message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Borrador",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add label to message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add label to message1": {
+      "main": [
+        [
+          {
+            "node": "Remove label from message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Politicas": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FAQs": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "729ecd4d-eaa1-42f6-b1d6-715d7029b87d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ce30596c2036c9787cf7de133bdf9beb7ac4721aa6f313e72b19791ad015b927"
+  },
+  "id": "7a5Z8nS1SxwAp0T9",
+  "tags": []
+}

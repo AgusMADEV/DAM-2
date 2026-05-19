@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Tareas - Voz y Gestos</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #333;
+    }
+    
+    .panel {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 1.2em;
+    }
+    
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+    
+    button:hover {
+      background: #1d4ed8;
+    }
+    
+    #status {
+      padding: 15px;
+      background: #f0f0f0;
+      border-radius: 5px;
+      margin: 15px 0;
+      min-height: 50px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    th {
+      background: #f8f8f8;
+      font-weight: 600;
+    }
+
+    .completada {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+    
+    .video-container {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #000;
+    }
+    
+    canvas {
+      width: 100%;
+      display: block;
+    }
+    
+    video {
+      display: none;
+    }
+
+    .info {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .info strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+  </style>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Sistema de Tareas con Voz y Gestos</h1>
+    
+    <div class="panel">
+      <h2>📋 Gestión de Tareas</h2>
+      
+      <button id="btnEscuchar">🎤 Escuchar</button>
+      <button id="btnLimpiar">🗑️ Limpiar Todo</button>
+      
+      <div id="status">Presiona "Escuchar" para dar comandos de voz</div>
+      
+      <div id="contenedorTabla"></div>
+      
+      <div class="info">
+        <strong>Comandos disponibles:</strong>
+        • "agregar [nombre]" - Añade tarea<br>
+        • "eliminar [número]" - Elimina tarea<br>
+        • "limpiar" - Elimina todas
+      </div>
+    </div>
+    
+    <div class="panel">
+      <h2>👋 Control por Gestos</h2>
+      
+      <div class="video-container">
+        <video class="input_video" autoplay playsinline muted></video>
+        <canvas class="output_canvas" width="640" height="480"></canvas>
+      </div>
+      
+      <div class="info">
+        <strong>Gestos disponibles:</strong>
+        ✌️ Dos dedos: Añadir tarea<br>
+        ✊ Puño cerrado: Eliminar última tarea
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    // DATOS
+    // ============================================
+    let tareas = [];
+    let contadorId = 1;
+    
+    // ============================================
+    // FUNCIONES DE TAREAS
+    // ============================================
+    function mostrarTabla() {
+      const contenedor = document.getElementById("contenedorTabla");
+      
+      if (tareas.length === 0) {
+        contenedor.innerHTML = '<p style="padding: 20px; text-align: center; color: #999;">No hay tareas</p>';
+        return;
+      }
+
+      let html = '<table><thead><tr><th>#</th><th>Tarea</th></tr></thead><tbody>';
+      
+      tareas.forEach((tarea, index) => {
+        const clase = tarea.completada ? 'completada' : '';
+        html += `<tr class="${clase}"><td>${index}</td><td>${tarea.nombre}</td></tr>`;
+      });
+      
+      html += '</tbody></table>';
+      contenedor.innerHTML = html;
+    }
+    
+    function agregar(nombre) {
+      if (!nombre) return;
+      tareas.push({ id: contadorId++, nombre: nombre, completada: false });
+      mostrarTabla();
+      hablar("Tarea agregada");
+    }
+    
+    function eliminar(indice) {
+      if (indice >= 0 && indice < tareas.length) {
+        tareas.splice(indice, 1);
+        mostrarTabla();
+        hablar("Tarea eliminada");
+      }
+    }
+    
+    function limpiar() {
+      tareas = [];
+      mostrarTabla();
+      hablar("Lista limpia");
+    }
+    
+    // ============================================
+    // VOZ
+    // ============================================
+    function hablar(texto) {
+      const utterance = new SpeechSynthesisUtterance(texto);
+      utterance.lang = 'es-ES';
+      speechSynthesis.speak(utterance);
+    }
+    
+    // Reconocimiento
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (SpeechRecognition) {
+      const reconocimiento = new SpeechRecognition();
+      reconocimiento.lang = "es-ES";
+      
+      reconocimiento.onstart = () => {
+        document.getElementById("status").textContent = "🎤 Escuchando...";
+      };
+      
+      reconocimiento.onresult = (event) => {
+        const texto = event.results[0][0].transcript.toLowerCase();
+        document.getElementById("status").textContent = `Comando: "${texto}"`;
+        procesarComando(texto);
+      };
+      
+      reconocimiento.onerror = () => {
+        document.getElementById("status").textContent = "Error en reconocimiento";
+      };
+      
+      document.getElementById("btnEscuchar").onclick = () => {
+        reconocimiento.start();
+      };
+    }
+    
+    function procesarComando(comando) {
+      const palabras = comando.split(" ");
+      
+      if (comando.includes("agregar") || comando.includes("añadir")) {
+        const tarea = palabras.slice(1).join(" ");
+        agregar(tarea);
+      } else if (comando.includes("eliminar") || comando.includes("borrar")) {
+        const num = parseInt(palabras[1]) || 0;
+        eliminar(num);
+      } else if (comando.includes("limpiar")) {
+        limpiar();
+      }
+    }
+    
+    // ============================================
+    // GESTOS
+    // ============================================
+    const video = document.querySelector('.input_video');
+    const canvas = document.querySelector('.output_canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let ultimoGesto = 0;
+    
+    function detectarGesto(landmarks) {
+      if (!landmarks) return null;
+      
+      const indicePunta = landmarks[8];
+      const medioTip = landmarks[12];
+      const anularTip = landmarks[16];
+      const meniqueTip = landmarks[20];
+      
+      // Contar dedos extendidos
+      let dedos = 0;
+      if (indicePunta.y < landmarks[6].y) dedos++;
+      if (medioTip.y < landmarks[10].y) dedos++;
+      if (anularTip.y < landmarks[14].y) dedos++;
+      if (meniqueTip.y < landmarks[18].y) dedos++;
+      
+      if (dedos === 2) return "dos_dedos";
+      if (dedos === 0) return "puno";
+      
+      return null;
+    }
+    
+    function ejecutarGesto(gesto) {
+      const ahora = Date.now();
+      if (ahora - ultimoGesto < 2000) return; // 2 segundos entre gestos
+      ultimoGesto = ahora;
+      
+      if (gesto === "dos_dedos") {
+        agregar("Nueva tarea");
+      } else if (gesto === "puno") {
+        if (tareas.length > 0) eliminar(tareas.length - 1);
+      }
+    }
+    
+    function onResults(results) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+      
+      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        for (const landmarks of results.multiHandLandmarks) {
+          drawConnectors(ctx, landmarks, HAND_CONNECTIONS, {color: '#00FF00', lineWidth: 2});
+          drawLandmarks(ctx, landmarks, {color: '#FF0000', lineWidth: 1});
+          
+          const gesto = detectarGesto(landmarks);
+          if (gesto) ejecutarGesto(gesto);
+        }
+      }
+    }
+    
+    const hands = new Hands({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+    });
+    
+    hands.setOptions({
+      maxNumHands: 1,
+      modelComplexity: 1,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+    });
+    
+    hands.onResults(onResults);
+    
+    const camera = new Camera(video, {
+      onFrame: async () => {
+        await hands.send({image: video});
+      },
+      width: 640,
+      height: 480
+    });
+    
+    camera.start();
+    
+    // ============================================
+    // EVENTOS
+    // ============================================
+    document.getElementById("btnLimpiar").onclick = () => {
+      if (confirm("¿Eliminar todas las tareas?")) limpiar();
+    };
+    
+    // Inicializar
+    mostrarTabla();
+  </script>
+</body>
+</html>

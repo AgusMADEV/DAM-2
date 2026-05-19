@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgusmaLab v3.0 Premium - Demo</title>
+  
+  <!-- Cargar nuestra librería -->
+  <link rel="stylesheet" href="agusmalab.css">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 2rem;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    /* Textura sutil de fondo */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(at 20% 30%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
+        radial-gradient(at 80% 70%, rgba(16, 185, 129, 0.06) 0px, transparent 50%);
+      pointer-events: none;
+    }
+    
+    .demo-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .demo-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 3rem;
+      animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .demo-header h1 {
+      font-size: 2.75rem;
+      margin-bottom: 0.5rem;
+      text-shadow: none;
+      font-weight: 700;
+      color: #f8fafc;
+      letter-spacing: -0.03em;
+    }
+    
+    .demo-header p {
+      font-size: 1.125rem;
+      opacity: 0.7;
+      margin-top: 0.75rem;
+      font-weight: 400;
+      color: #cbd5e1;
+      letter-spacing: 0;
+    }
+    
+    .demo-section {
+      margin-bottom: 4rem;
+      animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .demo-section:nth-child(2) { animation-delay: 0.1s; }
+    .demo-section:nth-child(3) { animation-delay: 0.2s; }
+    .demo-section:nth-child(4) { animation-delay: 0.3s; }
+    
+    .section-title {
+      color: #e2e8f0;
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.75rem;
+      margin-bottom: 2rem;
+    }
+    
+    .demo-controls {
+      background: rgba(30, 41, 59, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+    }
+    
+    .demo-controls h4 {
+      color: #f1f5f9;
+      margin: 0 0 1rem 0;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.9;
+    }
+    
+    .demo-controls button {
+      background: rgba(59, 130, 246, 0.9);
+      color: white;
+      border: 1px solid rgba(96, 165, 250, 0.3);
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      font-size: 0.875rem;
+      cursor: pointer;
+      margin-right: 0.75rem;
+      margin-bottom: 0.75rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .demo-controls button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      background: rgba(59, 130, 246, 1);
+      border-color: rgba(96, 165, 250, 0.5);
+    }
+    
+    .demo-controls button:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-container">
+    <!-- Header -->
+    <div class="demo-header">
+      <h1>AgusmaLab v3.0</h1>
+      <p>Librería de Componentes UI Profesional</p>
+    </div>
+
+    <!-- Sección: Tarjetas de Estadísticas -->
+    <div class="demo-section">
+      <h2 class="section-title">
+        Tarjetas de Estadísticas
+      </h2>
+      
+      <div class="demo-controls">
+        <h4>Controles Interactivos</h4>
+        <button onclick="simularActualizacion()">Simular Actualización de Datos</button>
+        <button onclick="simularCambios()">Mostrar Cambios Aleatorios</button>
+      </div>
+      
+      <div class="stats-grid">
+        <div id="stat1"></div>
+        <div id="stat2"></div>
+        <div id="stat3"></div>
+        <div id="stat4"></div>
+      </div>
+    </div>
+
+    <!-- Sección: Tabla Interactiva -->
+    <div class="demo-section">
+      <h2 class="section-title">
+        Tabla Interactiva
+      </h2>
+      
+      <div class="demo-controls">
+        <h4>Características de la Tabla</h4>
+        <p style="color: #94a3b8; margin: 0; font-size: 0.875rem;">
+          Búsqueda en tiempo real | Ordenamiento por columnas | Paginación automática
+        </p>
+      </div>
+      
+      <div id="tabla-usuarios"></div>
+    </div>
+
+    <!-- Sección: Gráfico de Barras -->
+    <div class="demo-section">
+      <h2 class="section-title">
+        Gráfico de Barras
+      </h2>
+      
+      <div class="demo-controls">
+        <h4>Controles del Gráfico</h4>
+        <button onclick="actualizarGrafico1()">Ver Trimestre 1</button>
+        <button onclick="actualizarGrafico2()">Ver Trimestre 2</button>
+        <button onclick="actualizarGrafico3()">Datos Aleatorios</button>
+      </div>
+      
+      <div id="grafico-ventas"></div>
+    </div>
+  </div>
+
+  <!-- Cargar JavaScript -->
+  <script src="agusmalab.js"></script>
+  
+  <!-- Inicialización y Demos -->
+  <script>
+    // ========================================
+    // VARIABLES GLOBALES
+    // ========================================
+    
+    let tarjeta1, tarjeta2, tarjeta3, tarjeta4;
+    let grafico;
+    
+    // ========================================
+    // TARJETAS DE ESTADÍSTICAS
+    // ========================================
+    
+    tarjeta1 = new AgusmaLab.StatsCard('#stat1', {
+      titulo: 'Usuarios Activos',
+      valor: '2,847',
+      icono: 'usuarios',
+      colorIcono: 'primary',
+      descripcion: 'Registrados hoy',
+      cambio: '+12.5%',
+      tipoCambio: 'positivo'
+    });
+
+    tarjeta2 = new AgusmaLab.StatsCard('#stat2', {
+      titulo: 'Ingresos del Mes',
+      valor: '€127,543',
+      icono: 'dinero',
+      colorIcono: 'success',
+      descripcion: 'Objetivo: €150,000',
+      cambio: '+23.8%',
+      tipoCambio: 'positivo'
+    });
+
+    tarjeta3 = new AgusmaLab.StatsCard('#stat3', {
+      titulo: 'Pedidos Pendientes',
+      valor: '47',
+      icono: 'pedidos',
+      colorIcono: 'warning',
+      descripcion: 'Procesar hoy',
+      cambio: '-5 desde ayer',
+      tipoCambio: 'neutral'
+    });
+
+    tarjeta4 = new AgusmaLab.StatsCard('#stat4', {
+      titulo: 'Tasa de Conversión',
+      valor: '3.42%',
+      icono: 'tendencia',
+      colorIcono: 'info',
+      descripcion: 'Este mes',
+      cambio: '-0.3%',
+      tipoCambio: 'negativo'
+    });
+
+    // ========================================
+    // TABLA INTERACTIVA
+    // ========================================
+    
+    const tablaUsuarios = new AgusmaLab.DataTable('#tabla-usuarios', {
+      titulo: 'Gestión de Usuarios - Sistema CRM',
+      columnas: [
+        { campo: 'id', etiqueta: 'ID', ordenable: true },
+        { campo: 'nombre', etiqueta: 'Nombre Completo', ordenable: true },
+        { campo: 'email', etiqueta: 'Email', ordenable: true },
+        { campo: 'ciudad', etiqueta: 'Ciudad', ordenable: true },
+        { campo: 'pais', etiqueta: 'País', ordenable: true },
+        { campo: 'registro', etiqueta: 'F. Registro', ordenable: true },
+        { campo: 'estado', etiqueta: 'Estado', ordenable: true }
+      ],
+      datos: [
+        { id: 1, nombre: 'Ana García Pérez', email: 'ana.garcia@empresa.com', ciudad: 'Madrid', pais: 'España', registro: '2024-01-15', estado: 'Activo' },
+        { id: 2, nombre: 'Carlos López Martín', email: 'carlos.lopez@empresa.com', ciudad: 'Barcelona', pais: 'España', registro: '2024-01-18', estado: 'Activo' },
+        { id: 3, nombre: 'María Fernández Ruiz', email: 'maria.fernandez@empresa.com', ciudad: 'Valencia', pais: 'España', registro: '2024-02-01', estado: 'Activo' },
+        { id: 4, nombre: 'Juan Martínez Soto', email: 'juan.martinez@empresa.com', ciudad: 'Sevilla', pais: 'España', registro: '2024-02-05', estado: 'Inactivo' },
+        { id: 5, nombre: 'Laura Sánchez Gil', email: 'laura.sanchez@empresa.com', ciudad: 'Bilbao', pais: 'España', registro: '2024-02-08', estado: 'Activo' },
+        { id: 6, nombre: 'Pedro Gómez Castro', email: 'pedro.gomez@empresa.com', ciudad: 'Málaga', pais: 'España', registro: '2024-02-10', estado: 'Activo' },
+        { id: 7, nombre: 'Isabel Ruiz Moreno', email: 'isabel.ruiz@empresa.com', ciudad: 'Zaragoza', pais: 'España', registro: '2024-02-12', estado: 'Activo' },
+        { id: 8, nombre: 'Miguel Torres Prieto', email: 'miguel.torres@empresa.com', ciudad: 'Murcia', pais: 'España', registro: '2024-02-14', estado: 'Pendiente' },
+        { id: 9, nombre: 'Carmen Díaz Vega', email: 'carmen.diaz@empresa.com', ciudad: 'Palma', pais: 'España', registro: '2024-02-15', estado: 'Activo' },
+        { id: 10, nombre: 'Antonio Jiménez Luna', email: 'antonio.jimenez@empresa.com', ciudad: 'Las Palmas', pais: 'España', registro: '2024-02-16', estado: 'Activo' },
+        { id: 11, nombre: 'Rosa Álvarez Blanco', email: 'rosa.alvarez@empresa.com', ciudad: 'Valladolid', pais: 'España', registro: '2023-12-20', estado: 'Activo' },
+        { id: 12, nombre: 'Francisco Romero Ortiz', email: 'francisco.romero@empresa.com', ciudad: 'Córdoba', pais: 'España', registro: '2023-12-22', estado: 'Inactivo' },
+        { id: 13, nombre: 'Lucía Navarro Ramos', email: 'lucia.navarro@empresa.com', ciudad: 'Alicante', pais: 'España', registro: '2024-01-05', estado: 'Activo' },
+        { id: 14, nombre: 'Javier Serrano Mendez', email: 'javier.serrano@empresa.com', ciudad: 'Vigo', pais: 'España', registro: '2024-01-08', estado: 'Activo' },
+        { id: 15, nombre: 'Elena Molina Cruz', email: 'elena.molina@empresa.com', ciudad: 'Gijón', pais: 'España', registro: '2024-01-10', estado: 'Activo' },
+        { id: 16, nombre: 'David Moreno Santos', email: 'david.moreno@empresa.com', ciudad: 'Hospitalet', pais: 'España', registro: '2024-01-12', estado: 'Pendiente' },
+        { id: 17, nombre: 'Patricia Guerrero Silva', email: 'patricia.guerrero@empresa.com', ciudad: 'Coruña', pais: 'España', registro: '2024-01-20', estado: 'Activo' },
+        { id: 18, nombre: 'Roberto Iglesias Vargas', email: 'roberto.iglesias@empresa.com', ciudad: 'Granada', pais: 'España', registro: '2024-01-22', estado: 'Activo' },
+        { id: 19, nombre: 'Cristina Delgado Herrera', email: 'cristina.delgado@empresa.com', ciudad: 'Elche', pais: 'España', registro: '2024-01-25', estado: 'Activo' },
+        { id: 20, nombre: 'Ángel Caballero Peña', email: 'angel.caballero@empresa.com', ciudad: 'Oviedo', pais: 'España', registro: '2024-01-28', estado: 'Inactivo' }
+      ],
+      busqueda: true,
+      ordenamiento: true,
+      paginacion: true,
+      filasPorPagina: 8
+    });
+
+    // ========================================
+    // GRÁFICO DE BARRAS
+    // ========================================
+    
+    grafico = new AgusmaLab.BarChart('#grafico-ventas', {
+      titulo: 'Ventas Mensuales 2024 - Primer Trimestre',
+      etiquetas: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo'],
+      datos: [125, 180, 165, 220, 195],
+      color: '#10b981',
+      ancho: 800,
+      alto: 350
+    });
+
+    // ========================================
+    // FUNCIONES INTERACTIVAS
+    // ========================================
+    
+    function simularActualizacion() {
+      const nuevoValor = Math.floor(Math.random() * 5000) + 2000;
+      tarjeta1.actualizarValor(nuevoValor.toLocaleString(), true);
+      
+      const nuevoIngreso = Math.floor(Math.random() * 50000) + 100000;
+      tarjeta2.actualizarValor('€' + nuevoIngreso.toLocaleString(), true);
+      
+      const nuevosPedidos = Math.floor(Math.random() * 100) + 20;
+      tarjeta3.actualizarValor(nuevosPedidos.toString(), true);
+      
+      const nuevaTasa = (Math.random() * 2 + 2).toFixed(2);
+      tarjeta4.actualizarValor(nuevaTasa + '%', true);
+      
+      console.log('✨ Datos actualizados!');
+    }
+    
+    function simularCambios() {
+      const cambios = [
+        { valor: (Math.random() * 30 - 10).toFixed(1), tipo: Math.random() > 0.5 ? 'positivo' : 'negativo' },
+        { valor: (Math.random() * 30 - 10).toFixed(1), tipo: Math.random() > 0.5 ? 'positivo' : 'negativo' },
+        { valor: (Math.random() * 30 - 10).toFixed(1), tipo: Math.random() > 0.5 ? 'positivo' : 'negativo' },
+        { valor: (Math.random() * 30 - 10).toFixed(1), tipo: Math.random() > 0.5 ? 'positivo' : 'negativo' }
+      ];
+      
+      tarjeta1.mostrarCambio((cambios[0].valor > 0 ? '+' : '') + cambios[0].valor + '%', cambios[0].tipo);
+      tarjeta2.mostrarCambio((cambios[1].valor > 0 ? '+' : '') + cambios[1].valor + '%', cambios[1].tipo);
+      tarjeta3.mostrarCambio((cambios[2].valor > 0 ? '+' : '') + cambios[2].valor + ' pedidos', cambios[2].tipo);
+      tarjeta4.mostrarCambio((cambios[3].valor > 0 ? '+' : '') + cambios[3].valor + '%', cambios[3].tipo);
+      
+      console.log('📊 Cambios aplicados!');
+    }
+    
+    function actualizarGrafico1() {
+      grafico.actualizarDatos(
+        [125, 180, 165, 220, 195],
+        ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo']
+      );
+      console.log('📈 Gráfico actualizado - Trimestre 1');
+    }
+    
+    function actualizarGrafico2() {
+      grafico.actualizarDatos(
+        [210, 195, 240, 225, 260],
+        ['Junio', 'Julio', 'Agosto', 'Sept', 'Octubre']
+      );
+      console.log('📈 Gráfico actualizado - Trimestre 2');
+    }
+    
+    function actualizarGrafico3() {
+      const datosAleatorios = Array.from({length: 5}, () => Math.floor(Math.random() * 200) + 100);
+      grafico.actualizarDatos(datosAleatorios);
+      console.log('📈 Gráfico actualizado - Datos aleatorios');
+    }
+
+    // ========================================
+    // INFORMACIÓN EN CONSOLA
+    // ========================================
+    
+    console.log('%c AgusmaLab v3.0 Professional ', 'background: #1e293b; color: #60a5fa; font-size: 14px; font-weight: bold; padding: 8px 16px; border-radius: 4px;');
+    console.log('%c Características:', 'color: #94a3b8; font-size: 12px; font-weight: bold; margin-top: 8px;');
+    console.log('  → Diseño minimalista profesional');
+    console.log('  → Tema oscuro slate/blue');
+    console.log('  → Iconos SVG optimizados');
+    console.log('  → Glassmorphism sutil');
+    console.log('  → Animaciones fluidas');
+    console.log('');
+    console.log('📦 Componentes:', Object.keys(AgusmaLab).filter(k => k !== 'version' && k !== 'Iconos').join(', '));
+    console.log('🔢 Versión:', AgusmaLab.version);
+  </script>
+</body>
+</html>
+
+

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instrucciones - Monitoreo de Servidor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .step {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .step h3 {
+            color: #764ba2;
+            margin-bottom: 10px;
+        }
+        .step code {
+            background: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        .command {
+            background: #2d3748;
+            color: #48bb78;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        .button-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+        .alert {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .alert-info {
+            background: #d1ecf1;
+            border-left-color: #17a2b8;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .feature {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🖥️ Monitor de Servidor en Tiempo Real</h1>
+            <p>Actividad Práctica - Visualización de Datos</p>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2>📋 Estado de la Configuración</h2>
+                <div class="features">
+                    <div class="feature">
+                        <div class="feature-icon">✅</div>
+                        <h3>Archivos Copiados</h3>
+                        <p>Todos los archivos necesarios están listos</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">✅</div>
+                        <h3>Dependencias</h3>
+                        <p>psutil y pytz instalados</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">✅</div>
+                        <h3>Scripts Adaptados</h3>
+                        <p>Compatible con Windows</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">🚀</div>
+                        <h3>Listo para Usar</h3>
+                        <p>Todo configurado correctamente</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🚀 Cómo Iniciar la Aplicación</h2>
+                
+                <div class="step">
+                    <h3>Paso 1: Iniciar XAMPP Apache</h3>
+                    <p>Abre el Panel de Control de XAMPP y asegúrate de que Apache esté ejecutándose.</p>
+                </div>
+
+                <div class="step">
+                    <h3>Paso 2: Ejecutar el Monitor de Servidor</h3>
+                    <p>Opción A - Ejecución única (ya ejecutado):</p>
+                    <div class="command">
+python server_monitor.py
+                    </div>
+                    <p>Opción B - Ejecución continua (recomendado):</p>
+                    <div class="command">
+.\run_monitor.ps1
+                    </div>
+                    <p>El script se ejecutará cada 60 segundos recopilando nuevos datos.</p>
+                </div>
+
+                <div class="step">
+                    <h3>Paso 3: Acceder al Dashboard</h3>
+                    <p>Haz clic en el botón "Abrir Dashboard" abajo o accede manualmente a la URL.</p>
+                    <div class="button-container">
+                        <a href="index.php" class="btn btn-primary" target="_blank">
+                            🎯 Abrir Dashboard
+                        </a>
+                        <a href="README.md" class="btn btn-success" target="_blank">
+                            📖 Ver Documentación Completa
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>⚙️ Personalización</h2>
+                
+                <div class="alert alert-info">
+                    <strong>💡 Consejo:</strong> Abre el archivo <code>index.php</code> para personalizar:
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>Tipos de gráficos (line, bar, pie)</li>
+                        <li>Discos e interfaces de red a monitorear</li>
+                        <li>Credenciales de autenticación</li>
+                        <li>Cantidad y disposición de gráficas</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <h3>Ejemplo de Configuración de Endpoint</h3>
+                    <div class="command" style="color: #e2e8f0;">
+<span style="color: #cbd5e0;">// Cambiar el tipo de gráfico de CPU a barras</span>
+['endpoint' => 'cpu', 'type' => 'bar', 'label' => 'CPU'],
+
+<span style="color: #cbd5e0;">// Monitorear un disco específico de Windows</span>
+['endpoint' => 'disk_io', 'type' => 'line', 'label' => 'DISK I/O', 
+ 'disk' => 'PhysicalDrive0'],
+
+<span style="color: #cbd5e0;">// Cambiar la interfaz de red</span>
+['endpoint' => 'bandwidth', 'type' => 'line', 'label' => 'BANDWIDTH', 
+ 'iface' => 'Ethernet'],
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📊 Características del Dashboard</h2>
+                <ul style="line-height: 2; margin-left: 20px;">
+                    <li>✨ Actualización automática cada 10 segundos</li>
+                    <li>🎨 Diseño moderno estilo cyberpunk</li>
+                    <li>📱 Totalmente responsive</li>
+                    <li>📈 Múltiples tipos de gráficos (líneas, barras, circulares)</li>
+                    <li>🔒 Autenticación básica HTTP</li>
+                    <li>💾 Datos almacenados en CSV</li>
+                </ul>
+            </div>
+
+            <div class="alert">
+                <strong>⚠️ Importante:</strong> Asegúrate de que XAMPP Apache esté ejecutándose 
+                antes de intentar acceder al dashboard. El monitor de Python puede ejecutarse 
+                independientemente para recopilar datos en segundo plano.
+            </div>
+
+            <div class="section">
+                <h2>🎓 Ejercicios Sugeridos</h2>
+                <div class="step">
+                    <h3>1. Experimentar con Tipos de Gráficos</h3>
+                    <p>Cambia los tipos de visualización entre 'line', 'bar' y 'pie' para ver cuál representa mejor cada métrica.</p>
+                </div>
+                <div class="step">
+                    <h3>2. Añadir Nuevas Métricas</h3>
+                    <p>Agrega más endpoints al array <code>$endpoints</code> para monitorear otros recursos del sistema.</p>
+                </div>
+                <div class="step">
+                    <h3>3. Personalizar el Diseño</h3>
+                    <p>Modifica los estilos CSS en <code>index.php</code> para cambiar colores, tamaños y efectos visuales.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

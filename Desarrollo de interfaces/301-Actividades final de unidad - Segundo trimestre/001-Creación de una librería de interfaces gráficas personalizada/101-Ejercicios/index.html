@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgusmaLab - Índice de Versiones</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    
+    .container {
+      max-width: 900px;
+      width: 100%;
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .header .subtitle {
+      font-size: 1.125rem;
+      opacity: 0.9;
+    }
+    
+    .content {
+      padding: 3rem 2rem;
+    }
+    
+    .intro {
+      text-align: center;
+      margin-bottom: 3rem;
+      color: #64748b;
+    }
+    
+    .intro h2 {
+      color: #1e293b;
+      margin-bottom: 1rem;
+      font-size: 1.75rem;
+    }
+    
+    .versions {
+      display: grid;
+      gap: 1.5rem;
+    }
+    
+    .version-card {
+      border: 2px solid #e2e8f0;
+      border-radius: 0.75rem;
+      padding: 2rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .version-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .version-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+      transform: translateY(-4px);
+    }
+    
+    .version-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    
+    .version-card h3 {
+      font-size: 1.5rem;
+      color: #1e293b;
+      margin-bottom: 1rem;
+    }
+    
+    .version-card p {
+      color: #64748b;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+    
+    .features {
+      list-style: none;
+      margin-bottom: 1.5rem;
+    }
+    
+    .features li {
+      padding: 0.5rem 0;
+      color: #475569;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .features li:last-child {
+      border-bottom: none;
+    }
+    
+    .features li::before {
+      content: '✅ ';
+      margin-right: 0.5rem;
+    }
+    
+    .btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+      border:2px solid #667eea;
+    }
+    
+    .btn-secondary:hover {
+      background: #f8fafc;
+    }
+    
+    .footer {
+      background: #f8fafc;
+      padding: 2rem;
+      text-align: center;
+      color: #64748b;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    .footer a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .content {
+        padding: 2rem 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>🎨 AgusmaLab</h1>
+      <p class="subtitle">Librería Personal de Componentes de Interfaz de Usuario</p>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <div class="intro">
+        <h2>Bienvenido al Ejercicio Personal</h2>
+        <p>
+          Este proyecto presenta una librería de componentes UI desarrollada desde cero,
+          implementada en versiones progresivas desde lo más básico hasta características avanzadas.
+        </p>
+      </div>
+
+      <!-- Versiones -->
+      <div class="versions">
+        
+        <!-- Versión 1 -->
+        <div class="version-card">
+          <span class="version-badge">VERSIÓN 1.0</span>
+          <h3>Versión Básica - Fundamentos</h3>
+          <p>
+            La primera versión implementa los componentes fundamentales con funcionalidad básica.
+            Perfecta para entender la estructura y arquitectura de la librería.
+          </p>
+          
+          <ul class="features">
+            <li>Tarjetas de Estadísticas (StatsCard)</li>
+            <li>Tabla Simple con estilos (SimpleTable)</li>
+            <li>Sistema de diseño con variables CSS</li>
+            <li>Patrón UMD para compatibilidad</li>
+            <li>Diseño responsive básico</li>
+          </ul>
+          
+          <a href="v1-basico/index.html" class="btn">Ver Demo v1.0</a>
+          <a href="v1-basico/README.md" class="btn btn-secondary">Documentación</a>
+        </div>
+
+        <!-- Versión 2 -->
+        <div class="version-card">
+          <span class="version-badge">VERSIÓN 2.0</span>
+          <h3>Versión Mejorada - Interactividad</h3>
+          <p>
+            La segunda versión añade interactividad completa con búsqueda, ordenamiento,
+            paginación y un nuevo componente de gráficos. Esta versión cumple todos los
+            requisitos del ejercicio de clase.
+          </p>
+          
+          <ul class="features">
+            <li>StatsCard con animaciones e indicadores</li>
+            <li>DataTable con búsqueda en tiempo real</li>
+            <li>Ordenamiento por columnas (asc/desc)</li>
+            <li>Paginación completa con navegación</li>
+            <li>Gráficos de barras con Canvas</li>
+            <li>Métodos públicos para actualización</li>
+          </ul>
+          
+          <a href="v2-mejorado/index.html" class="btn">Ver Demo v2.0</a>
+          <a href="v2-mejorado/README.md" class="btn btn-secondary">Documentación</a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>
+        📚 <a href="README.md">Ver Documentación Completa del Proyecto</a>
+      </p>
+      <p style="margin-top: 1rem;">
+        Desarrollado como parte del ejercicio final de unidad<br>
+        <strong>Asignatura:</strong> Desarrollo de Interfaces - DAM 2<br>
+        <strong>Fecha:</strong> 17 de febrero de 2026<br>
+        <strong>Autor:</strong> Agustín Mateo
+      </p>
+    </div>
+  </div>
+</body>
+</html>

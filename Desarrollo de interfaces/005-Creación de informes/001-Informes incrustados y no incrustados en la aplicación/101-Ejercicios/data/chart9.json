@@ -1,0 +1,22 @@
+[
+  {
+    "label": "Facebook",
+    "value": 915.0,
+    "color": "#09122c"
+  },
+  {
+    "label": "Instagram",
+    "value": 93.0,
+    "color": "#17244d"
+  },
+  {
+    "label": "YouTube",
+    "value": 455.0,
+    "color": "#233666"
+  },
+  {
+    "label": "TikTok",
+    "value": 455.0,
+    "color": "#2f4882"
+  }
+]

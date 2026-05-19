@@ -1,0 +1,37 @@
+IONOS escritorio remoto
+en equipo: 93.93.116.146
+en usuario: Administrator
+contraseña: Sodire2025
+token: sodirebot2025
+
+Datos de WhatsApp
+identificador de aplicación:702049235714518
+clave secreta de aplicación:d0c37c19b61d75317a9d6d6e59fd634c
+token de acceso 60 dias: EAAJZBgpNPQdYBOw481mMCQYimJ30teDs8p3rw4mx6xtH7KimqC0ogQJ4ZA59nhQU4IP3ZCxriRxltld1kjRXEjTat39J63OJIDhoLpy7N6ZAa6hGzWGyXE41MsSMbnhlND90fXkJXtJOAzK3SDbd9ZAObktuFZAgGZB0pZCU4u8ElqjOsQq4eCcsw9fVLAZDZD
+api openai whatsap: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
+
+api OpenAI chatbot web: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
+
+Iniciar servidor WhatsApp:
+cd C:\chatbot_whatsapp
+python app.py
+Iniciar nginx:
+cd C:\nginx
+taskkill /F /IM nginx.exe
+.\nginx.exe
+
+Ver si nginx funciona:
+tasklist | findstr nginx
+
+Iniciar servidor Chat web:
+waitress-serve --port=8000 main:app
+
+Url Publica: http://93.93.116.146:8000/chatbot
+
+Cuenta de empresa OpenIA:
+info@sodire.es
+contraseña:@Sodire2021@
+
+email chatbot web:
+no-responder@sodire.es
+contraseña:venjvneroovnd213123+A

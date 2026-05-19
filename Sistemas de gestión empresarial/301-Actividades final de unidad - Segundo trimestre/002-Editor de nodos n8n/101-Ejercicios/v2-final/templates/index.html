@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>NodeFlow - Flask</title>
+  <link rel="icon" type="image/png" href="https://static.agusmadev.es/logos/logo-naranja-blanco.png">
+  <link rel="stylesheet" href="https://jocarsa.github.io/cssreset/cssreset.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <header>
+    <button id="play" class="btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+      Ejecutar grafo
+    </button>
+    <button id="deleteNode" class="btn" title="Elimina el nodo seleccionado (Supr)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/>
+      </svg>
+      Eliminar
+    </button>
+    <div style="border-left: 1px solid rgba(255,255,255,.25); height: 28px; margin: 0 6px;"></div>
+    <button id="saveBtn" class="btn" title="Guardar workflow (Ctrl+S)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+        <path d="M17 21v-8H7v8M7 3v5h8"/>
+      </svg>
+      Guardar
+    </button>
+    <button id="loadBtn" class="btn" title="Cargar workflow">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
+      </svg>
+      Cargar
+    </button>
+    <button id="exportBtn" class="btn" title="Exportar como JSON">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+      </svg>
+      Exportar
+    </button>
+    <button id="importBtn" class="btn" title="Importar desde JSON">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+      </svg>
+      Importar
+    </button>
+    <button id="newBtn" class="btn" title="Nuevo workflow (limpia todo)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+        <path d="M14 2v6h6M12 18v-6M9 15h6"/>
+      </svg>
+      Nuevo
+    </button>
+    <div class="muted">Pan: Ctrl + arrastrar · Zoom: Ctrl + rueda · Selección: clic · Borrar: Supr</div>
+    <div class="muted">BASE_DIR: <code>{{ base_dir }}</code></div>
+  </header>
+
+  <section id="tools">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <h3 style="margin:0;display:flex;align-items:center;gap:8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+        </svg>
+        Herramientas
+      </h3>
+      <button 
+        id="toggle-all-categories" 
+        type="button"
+        style="padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:10px;color:var(--primary);transition:all 0.2s ease;"
+        title="Expandir/Colapsar todas las categorías"
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M7 13l5 5 5-5M7 7l5 5 5-5"/>
+        </svg>
+      </button>
+    </div>
+    <div class="search-box">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.5;">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input 
+        type="text" 
+        id="tools-search" 
+        placeholder="Buscar... (Ctrl+K o /)" 
+        autocomplete="off"
+      />
+    </div>
+    <div id="tools-list">
+      <div style="text-align:center;padding:20px 10px;color:#9ca3af;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin:0 auto 12px;opacity:0.5;animation:spin 2s linear infinite;">
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+        </svg>
+        <div style="font-size:12px;font-weight:600;">Cargando herramientas...</div>
+      </div>
+    </div>
+  </section>
+
+  <main id="centro" aria-label="zona de trabajo">
+    <div id="mundo">
+      <svg id="edges" viewBox="0 0 4000 3000" preserveAspectRatio="none"></svg>
+    </div>
+    <div id="hint">Arrastra salida → entrada para conectar</div>
+  </main>
+
+  <aside id="console">
+    <h3>Consola</h3>
+    <pre id="log">Listo.</pre>
+    <div id="minimap-container">
+      <h4>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>
+        </svg>
+        Mini-mapa
+      </h4>
+      <canvas id="minimap"></canvas>
+    </div>
+  </aside>
+
+  <script id="app-config" type="application/json">
+    {
+      "baseDir": {{ base_dir|tojson }}
+    }
+  </script>
+  <script src="{{ url_for('static', filename='app.js') }}" type="module"></script>
+</body>
+</html>
+

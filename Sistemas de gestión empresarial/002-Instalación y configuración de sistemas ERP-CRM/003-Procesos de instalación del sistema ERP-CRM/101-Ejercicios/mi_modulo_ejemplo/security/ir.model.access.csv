@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_nota_public,access_nota_public,model_mi_modulo_ejemplo_nota,base.group_user,1,1,1,1

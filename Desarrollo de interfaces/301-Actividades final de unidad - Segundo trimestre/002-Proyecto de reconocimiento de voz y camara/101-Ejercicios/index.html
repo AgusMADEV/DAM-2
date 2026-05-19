@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyecto de Interfaces Naturales - Índice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .proyectos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .proyecto-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .proyecto-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .proyecto-card.principal {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .proyecto-card.principal h2,
+        .proyecto-card.principal .emoji {
+            color: white;
+        }
+
+        .proyecto-card.principal .descripcion {
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .emoji {
+            font-size: 4em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .descripcion {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        .caracteristicas {
+            list-style: none;
+            margin: 15px 0;
+            padding: 0;
+        }
+
+        .caracteristicas li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .caracteristicas li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .proyecto-card.principal .caracteristicas li:before {
+            color: #fff;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .proyecto-card.principal .btn {
+            background: white;
+            color: #667eea;
+        }
+
+        .proyecto-card.principal .btn:hover {
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.4);
+        }
+
+        .footer {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: #667eea;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+
+        .footer-link:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin-left: 10px;
+            font-weight: 600;
+        }
+
+        .badge.demo {
+            background: #ffc107;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .proyectos-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .proyecto-card.principal {
+                grid-column: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Proyecto de Interfaces Naturales</h1>
+            <p class="subtitle">Sistema de Gestión con Voz y Gestos</p>
+            <p style="margin-top: 10px; color: #999;">Desarrollo de Interfaces - DAM 2 | Febrero 2026</p>
+        </header>
+
+        <div class="proyectos-grid">
+            <!-- Proyecto Principal -->
+            <div class="proyecto-card principal">
+                <span class="emoji">🌟</span>
+                <h2>Aplicación Completa <span class="badge">Principal</span></h2>
+                <p class="descripcion">
+                    Sistema completo de gestión de tareas con integración total de interfaces naturales. 
+                    Combina reconocimiento de voz, síntesis de voz y detección de gestos en una aplicación 
+                    profesional con diseño moderno y funcionalidades avanzadas.
+                </p>
+                <ul class="caracteristicas">
+                    <li>Reconocimiento de voz en español</li>
+                    <li>Síntesis de voz para feedback</li>
+                    <li>Detección de gestos con MediaPipe</li>
+                    <li>4 gestos diferentes reconocidos</li>
+                    <li>Sistema de cooldown inteligente</li>
+                    <li>Interfaz responsive y moderna</li>
+                    <li>Gestión completa de tareas</li>
+                </ul>
+                <a href="proyecto-interfaces-naturales.html" class="btn">🚀 Abrir Aplicación Completa</a>
+            </div>
+
+            <!-- Demo de Voz -->
+            <div class="proyecto-card">
+                <span class="emoji">🎤</span>
+                <h2>Demo de Voz <span class="badge demo">Demo</span></h2>
+                <p class="descripcion">
+                    Versión simplificada enfocada exclusivamente en el reconocimiento de voz. 
+                    Ideal para entender cómo funciona la Web Speech API y el procesamiento de comandos.
+                </p>
+                <ul class="caracteristicas">
+                    <li>Código simplificado y comentado</li>
+                    <li>5 comandos de voz diferentes</li>
+                    <li>Conversión de texto a número</li>
+                    <li>Feedback visual y auditivo</li>
+                </ul>
+                <a href="demo-voz-simplificada.html" class="btn">🎙️ Ver Demo de Voz</a>
+            </div>
+
+            <!-- Demo de Gestos -->
+            <div class="proyecto-card">
+                <span class="emoji">👋</span>
+                <h2>Demo de Gestos <span class="badge demo">Demo</span></h2>
+                <p class="descripcion">
+                    Versión simplificada enfocada en el reconocimiento de gestos con las manos. 
+                    Perfecta para aprender sobre MediaPipe Hands y la detección de landmarks.
+                </p>
+                <ul class="caracteristicas">
+                    <li>4 gestos claramente definidos</li>
+                    <li>Visualización de landmarks</li>
+                    <li>Contador de gestos detectados</li>
+                    <li>Código educativo y claro</li>
+                </ul>
+                <a href="demo-gestos-simplificada.html" class="btn">✋ Ver Demo de Gestos</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <h3>📚 Documentación y Recursos</h3>
+            <div class="footer-links">
+                <a href="ejercicio.md" class="footer-link">📖 Documentación Técnica</a>
+                <a href="README.md" class="footer-link">📄 Guía Rápida</a>
+            </div>
+            <p style="margin-top: 20px; color: #999; font-size: 0.9em;">
+                Desarrollado con ❤️ para el curso de Desarrollo de Interfaces
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Mensaje de bienvenida
+        console.log(`
+╔════════════════════════════════════════════════╗
+║  🎯 Proyecto de Interfaces Naturales          ║
+║  📚 Desarrollo de Interfaces - DAM 2          ║
+║  👨‍💻 Febrero 2026                              ║
+╚════════════════════════════════════════════════╝
+
+✨ Explora las diferentes demos:
+   🌟 Aplicación Completa - Experiencia completa con voz + gestos
+   🎤 Demo de Voz - Aprende sobre reconocimiento de voz
+   👋 Demo de Gestos - Aprende sobre detección de manos
+
+💡 Consejo: Empieza con las demos simplificadas si eres nuevo
+            en interfaces naturales, luego prueba la aplicación completa.
+        `);
+    </script>
+</body>
+</html>

@@ -1,0 +1,759 @@
+{
+  "name": "MAILBOX_COLLECTOR_SINGLE_CLIENT",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "client_id"
+            },
+            {
+              "name": "client_name"
+            },
+            {
+              "name": "mailbox_email"
+            },
+            {
+              "name": "review_email"
+            },
+            {
+              "name": "processor_workflow_name"
+            },
+            {
+              "name": "source_type"
+            },
+            {
+              "name": "orchestrated_at"
+            },
+            {
+              "name": "gmail_credential_name"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        7456,
+        1424
+      ],
+      "id": "e084935e-475d-4e77-a29b-1c40a71dfb38",
+      "name": "Execute Sub-workflow Trigger",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4e819036-65f1-45fe-b180-1c9037cf50b6",
+              "name": "client_id",
+              "value": "={{ $json.client_id }}",
+              "type": "string"
+            },
+            {
+              "id": "1f7ab589-1dbe-4594-95f7-bf2a1f188a44",
+              "name": "client_name",
+              "value": "={{ $json.client_name }}",
+              "type": "string"
+            },
+            {
+              "id": "c29b4406-eeee-423f-aa9e-cf863a15f191",
+              "name": "mailbox_email",
+              "value": "={{ $json.mailbox_email }}",
+              "type": "string"
+            },
+            {
+              "id": "a28e783d-42c0-4bac-99b7-63ab7bd8cc91",
+              "name": "review_email",
+              "value": "={{ $json.review_email }}",
+              "type": "string"
+            },
+            {
+              "id": "4ff9ae16-d5a2-4497-b917-d9fdeb591cd6",
+              "name": "source_type",
+              "value": "={{ $json.source_type }}",
+              "type": "string"
+            },
+            {
+              "id": "255a8cbc-0eaf-4970-a3b3-3d9b914211b1",
+              "name": "gmail_credential_name",
+              "value": "={{ $json.gmail_credential_name }}",
+              "type": "string"
+            },
+            {
+              "id": "aaf6dfb1-b80f-44d2-b5cf-a62764a611b3",
+              "name": "collector_status",
+              "value": "received_input",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        7632,
+        1424
+      ],
+      "id": "044d05f7-bfc7-4f11-bcb0-afeddc275c7f",
+      "name": "Set input context"
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 2,
+        "output": "={{ String($json.source_type || '').trim() === 'gmail_oauth' ? 0 : 1 }}"
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        7808,
+        1424
+      ],
+      "id": "ccb87e2a-da3b-4d0d-b1fb-cf22e57dc781",
+      "name": "Switch source_type"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "81e12093-eff1-4a5e-950b-c6628ce78d6d",
+              "name": "collector_status",
+              "value": "route_gmail_oauth",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        8032,
+        1312
+      ],
+      "id": "7c84360c-6512-48fb-87e3-19bf75fe4550",
+      "name": "Mark gmail_oauth route"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c2c47885-a804-48ce-aa6d-f616812271c8",
+              "name": "collector_status",
+              "value": "unsupported_source_type",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        8032,
+        1568
+      ],
+      "id": "b06d2cb4-5cb1-4de4-81a7-5920b7764f3e",
+      "name": "Unsupported source"
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 3,
+        "output": "={{ String($json.gmail_credential_name || '').trim() === 'gmail_cliente_1' ? 0 : String($json.gmail_credential_name || '').trim() === 'gmail_cliente_2' ? 1 : 2 }}"
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        8192,
+        1280
+      ],
+      "id": "9da65fe4-13e9-45d5-a896-2cace76a4214",
+      "name": "Switch gmail_credential_name"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 20,
+        "filters": {
+          "q": "is:unread"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        8448,
+        1136
+      ],
+      "id": "86799991-3205-4824-92a8-b081050702b2",
+      "name": "Get Gmail cred 1",
+      "webhookId": "ccebf716-4777-47b5-9dbb-bf626b2e6d79",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Agus sodire"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 5,
+        "filters": {
+          "q": "is:unread"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        8448,
+        1296
+      ],
+      "id": "a105299b-e03c-49b8-962e-6159e12e1623",
+      "name": "Get Gmail cred 2",
+      "webhookId": "ccebf716-4777-47b5-9dbb-bf626b2e6d79",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dvBhGCLeFHEywhpt",
+          "name": "sodire ventas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c2c47885-a804-48ce-aa6d-f616812271c8",
+              "name": "collector_status",
+              "value": "unsupported_credential",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        8448,
+        1472
+      ],
+      "id": "b82dd02c-a060-4fd1-a0c4-14ca31fffb74",
+      "name": "Unsupported credential"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        9152,
+        1216
+      ],
+      "id": "081b569d-e7d2-4c2d-ae39-1daef54b0c1c",
+      "name": "Merge fetched gmail"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5a0b6de3-fe5f-4f22-81fb-93141ef3579c",
+              "name": "client_id",
+              "value": "={{ $json.client_id || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "f8183296-8e21-4107-b9ea-e920a99962be",
+              "name": "client_name",
+              "value": "={{ $json.client_name || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "ce5ae6ac-bbfe-4135-a15b-89248664f51e",
+              "name": "mailbox_email",
+              "value": "={{ $json.mailbox_email || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "f263f7dc-9e7f-4cb2-ac15-35cf1fa99082",
+              "name": "review_email",
+              "value": "={{ $json.review_email || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "7c9424e4-e303-4e14-a39f-ecf6505bbc84",
+              "name": "source_type",
+              "value": "={{ $json.source_type || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "3def8918-ca59-45c7-8e76-e622a26d9c53",
+              "name": "gmail_credential_name",
+              "value": "={{ $json.gmail_credential_name || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "4ff5f759-8f1d-4c00-a8ca-c75b3bae085e",
+              "name": "gmail_message_id",
+              "value": "={{ $json.id || $json.gmail_message_id || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "bfd8b62f-011a-4bae-b882-7c7d4f90bfe0",
+              "name": "thread_id",
+              "value": "={{ $json.threadId || $json.thread_id || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "b5f52882-56a5-436d-a0c4-e69c0ce68f57",
+              "name": "subject",
+              "value": "={{ $json.Subject || $json.subject || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "52348cb2-babe-48e1-b985-9e58d1c757eb",
+              "name": "from",
+              "value": "={{ $json.From || $json.from || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "4228d895-04ff-452c-b8c7-b7edba0da4f6",
+              "name": "to",
+              "value": "={{ $json.To || $json.to || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "f781ad2f-d89f-4926-8ecc-1e4a1fe048fa",
+              "name": "snippet",
+              "value": "={{ $json.snippet || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "c05354e2-2783-48b8-9186-6eb4ac1f5a31",
+              "name": "collector_status",
+              "value": "email_fetched",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        9360,
+        1216
+      ],
+      "id": "f9a7eb99-7d5b-4722-930f-b6b533682ae3",
+      "name": "Normalize gmail unified"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        8656,
+        1296
+      ],
+      "id": "e98a4b16-b3ca-43a5-87bf-2f88eb0a3926",
+      "name": "Get Gmail detail cred 2",
+      "webhookId": "8cf5ac64-7a85-4ca6-b5d9-dea8f0da83b5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dvBhGCLeFHEywhpt",
+          "name": "sodire ventas"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        8656,
+        1136
+      ],
+      "id": "05d4b8fe-3f48-44bb-a390-0c0c84fa1300",
+      "name": "Get Gmail detail cred 1",
+      "webhookId": "8cf5ac64-7a85-4ca6-b5d9-dea8f0da83b5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BY1WC60iRvXSuUFH",
+          "name": "Agus sodire"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "791895f4-a848-4ed1-99b0-d3096e2fa2dc",
+              "name": "client_id",
+              "value": "={{ $('Set input context').first().json.client_id }}",
+              "type": "string"
+            },
+            {
+              "id": "6fe6696a-0351-4c70-8739-873067094427",
+              "name": "client_name",
+              "value": "={{ $('Set input context').first().json.client_name }}",
+              "type": "string"
+            },
+            {
+              "id": "dbedeb5e-6156-4e66-a9f1-f0b97026c736",
+              "name": "mailbox_email",
+              "value": "={{ $('Set input context').first().json.mailbox_email }}",
+              "type": "string"
+            },
+            {
+              "id": "6899a0ff-103c-4bb2-bbb0-4a60959353b4",
+              "name": "review_email",
+              "value": "={{ $('Set input context').first().json.review_email }}",
+              "type": "string"
+            },
+            {
+              "id": "0d17b206-e466-4563-8c10-20b605c3bc34",
+              "name": "source_type",
+              "value": "={{ $('Set input context').first().json.source_type }}",
+              "type": "string"
+            },
+            {
+              "id": "3751943f-5c32-4d04-92fd-6fc51c2971f7",
+              "name": "gmail_credential_name",
+              "value": "={{ $('Set input context').first().json.gmail_credential_name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        8880,
+        1136
+      ],
+      "id": "d52f1485-22b1-4da4-8504-4630f6cb17e1",
+      "name": "Attach context cred 1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "791895f4-a848-4ed1-99b0-d3096e2fa2dc",
+              "name": "client_id",
+              "value": "={{ $('Set input context').first().json.client_id }}",
+              "type": "string"
+            },
+            {
+              "id": "6fe6696a-0351-4c70-8739-873067094427",
+              "name": "client_name",
+              "value": "={{ $('Set input context').first().json.client_name }}",
+              "type": "string"
+            },
+            {
+              "id": "dbedeb5e-6156-4e66-a9f1-f0b97026c736",
+              "name": "mailbox_email",
+              "value": "={{ $('Set input context').first().json.mailbox_email }}",
+              "type": "string"
+            },
+            {
+              "id": "6899a0ff-103c-4bb2-bbb0-4a60959353b4",
+              "name": "review_email",
+              "value": "={{ $('Set input context').first().json.review_email }}",
+              "type": "string"
+            },
+            {
+              "id": "5dcb25d9-730e-4f34-86ee-c525c0a9cadd",
+              "name": "source_type",
+              "value": "={{ $('Set input context').first().json.source_type }}",
+              "type": "string"
+            },
+            {
+              "id": "3751943f-5c32-4d04-92fd-6fc51c2971f7",
+              "name": "gmail_credential_name",
+              "value": "={{ $('Set input context').first().json.gmail_credential_name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        8880,
+        1296
+      ],
+      "id": "b5d91e5b-7081-4a64-a023-77a5c9ccbb23",
+      "name": "Attach context cred 2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "iT16kHr62aklmT1u",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/iT16kHr62aklmT1u",
+          "cachedResultName": "MAIL_PROCESSOR_IA_MULTI_CLIENT"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "client_id": "={{ $json.client_id }}",
+            "client_name": "={{ $json.client_name }}",
+            "mailbox_email": "={{ $json.mailbox_email }}",
+            "review_email": "={{ $json.review_email }}",
+            "source_type": "={{ $json.source_type }}",
+            "gmail_credential_name": "={{ $json.gmail_credential_name }}",
+            "gmail_message_id": "={{ $json.gmail_message_id }}",
+            "thread_id": "={{ $json.thread_id }}",
+            "subject": "={{ $json.subject }}",
+            "from": "={{ $json.from }}",
+            "to": "={{ $json.to }}",
+            "snippet": "={{ $json.snippet }}"
+          },
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        9568,
+        1216
+      ],
+      "id": "53b1eaef-3f0f-44ec-a767-063dac6ca9b3",
+      "name": "Call IA processor"
+    }
+  ],
+  "pinData": {
+    "Execute Sub-workflow Trigger": [
+      {
+        "json": {
+          "client_id": "cliente_001",
+          "client_name": "McMoose Consulting",
+          "mailbox_email": "agustin.sodire@gmail.com",
+          "review_email": "agusmadevelop@gmail.com",
+          "processor_workflow_name": "MAIL_PROCESSOR_COMMON_AI",
+          "source_type": "gmail_oauth",
+          "orchestrated_at": "2026-04-18T13:13:01.433+02:00",
+          "gmail_credential_name": "gmail_cliente_1"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Execute Sub-workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set input context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set input context": {
+      "main": [
+        [
+          {
+            "node": "Switch source_type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch source_type": {
+      "main": [
+        [
+          {
+            "node": "Mark gmail_oauth route",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unsupported source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark gmail_oauth route": {
+      "main": [
+        [
+          {
+            "node": "Switch gmail_credential_name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch gmail_credential_name": {
+      "main": [
+        [
+          {
+            "node": "Get Gmail cred 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Gmail cred 2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unsupported credential",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Gmail cred 1": {
+      "main": [
+        [
+          {
+            "node": "Get Gmail detail cred 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Gmail cred 2": {
+      "main": [
+        [
+          {
+            "node": "Get Gmail detail cred 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge fetched gmail": {
+      "main": [
+        [
+          {
+            "node": "Normalize gmail unified",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Gmail detail cred 2": {
+      "main": [
+        [
+          {
+            "node": "Attach context cred 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Gmail detail cred 1": {
+      "main": [
+        [
+          {
+            "node": "Attach context cred 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attach context cred 1": {
+      "main": [
+        [
+          {
+            "node": "Merge fetched gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attach context cred 2": {
+      "main": [
+        [
+          {
+            "node": "Merge fetched gmail",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Normalize gmail unified": {
+      "main": [
+        [
+          {
+            "node": "Call IA processor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "6729d047-7107-4795-b305-6a6fe020e3c3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ce30596c2036c9787cf7de133bdf9beb7ac4721aa6f313e72b19791ad015b927"
+  },
+  "id": "1EflS9wDsjQyxgwG",
+  "tags": [
+    {
+      "updatedAt": "2026-04-16T08:45:56.942Z",
+      "createdAt": "2026-04-16T08:45:56.942Z",
+      "id": "2gN2jOrZMkY26AUb",
+      "name": "Agustín"
+    }
+  ]
+}

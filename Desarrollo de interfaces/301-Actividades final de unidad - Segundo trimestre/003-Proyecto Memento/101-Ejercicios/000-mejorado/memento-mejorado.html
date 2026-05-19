@@ -1,0 +1,1728 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <title>Memento 3D - Sistema Avanzado de Gestión de Recuerdos</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <style>
+      :root {
+        --primary-color: #6366f1;
+        --secondary-color: #8b5cf6;
+        --bg-dark: #0f0f1e;
+        --bg-panel: rgba(15, 15, 30, 0.85);
+        --text-light: #e2e8f0;
+        --text-gray: #94a3b8;
+        --border-color: rgba(99, 102, 241, 0.3);
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body, html {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        overflow: hidden;
+        background: var(--bg-dark);
+        color: var(--text-light);
+      }
+
+      /* Glassmorphism panels */
+      .glass-panel {
+        background: var(--bg-panel);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+
+      /* Panel principal de controles */
+      #panelControl {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        width: 320px;
+        max-height: calc(100vh - 40px);
+        padding: 20px;
+        z-index: 100;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+
+      #panelControl::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      #panelControl::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+      }
+
+      #panelControl::-webkit-scrollbar-thumb {
+        background: var(--primary-color);
+        border-radius: 4px;
+      }
+
+      .panel-header {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: var(--primary-color);
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      .section {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .section:last-child {
+        border-bottom: none;
+      }
+
+      .section-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: var(--secondary-color);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .control-group {
+        margin-bottom: 12px;
+      }
+
+      .control-label {
+        display: block;
+        font-size: 12px;
+        margin-bottom: 6px;
+        color: var(--text-gray);
+      }
+
+      input[type="range"] {
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        outline: none;
+        -webkit-appearance: none;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+      }
+
+      input[type="range"]::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        cursor: pointer;
+        border: none;
+      }
+
+      .valor {
+        display: inline-block;
+        min-width: 40px;
+        text-align: right;
+        font-weight: 600;
+        color: var(--primary-color);
+      }
+
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+      }
+
+      input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        margin-right: 10px;
+        cursor: pointer;
+        accent-color: var(--primary-color);
+      }
+
+      /* Botones modernos */
+      .btn {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        margin-bottom: 8px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+      }
+
+      .btn-success {
+        background: var(--success);
+        color: white;
+      }
+
+      .btn-success:hover {
+        background: #059669;
+        transform: translateY(-2px);
+      }
+
+      .btn-danger {
+        background: var(--danger);
+        color: white;
+      }
+
+      .btn-danger:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-light);
+        border: 1px solid var(--border-color);
+      }
+
+      .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      /* Estadísticas */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .stat-card {
+        background: rgba(99, 102, 241, 0.1);
+        padding: 12px;
+        border-radius: 8px;
+        text-align: center;
+        border: 1px solid var(--border-color);
+      }
+
+      .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--primary-color);
+        display: block;
+      }
+
+      .stat-label {
+        font-size: 11px;
+        color: var(--text-gray);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      /* Modal mejorado */
+      #modalOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(8px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 200;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      #modalCaja {
+        background: linear-gradient(135deg, rgba(15, 15, 30, 0.95), rgba(30, 15, 45, 0.95));
+        border: 2px solid var(--border-color);
+        border-radius: 16px;
+        max-width: 700px;
+        max-height: 85vh;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        display: flex;
+        flex-direction: column;
+        animation: scaleIn 0.3s ease;
+      }
+
+      @keyframes scaleIn {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+
+      #modalHeader {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(99, 102, 241, 0.1);
+        border-radius: 14px 14px 0 0;
+      }
+
+      #modalTitulo {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--primary-color);
+      }
+
+      #modalCerrar {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-light);
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      #modalCerrar:hover {
+        background: var(--danger);
+        border-color: var(--danger);
+        transform: scale(1.05);
+      }
+
+      #modalContenido {
+        padding: 24px;
+        overflow-y: auto;
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      /* Formulario de nuevo recuerdo */
+      #formNuevoRecuerdo {
+        display: none;
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      .form-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: var(--text-gray);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-light);
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
+
+      textarea.form-input {
+        resize: vertical;
+        min-height: 80px;
+        font-family: inherit;
+      }
+
+      /* Campo de búsqueda */
+      #campoBusqueda {
+        width: 100%;
+        padding: 12px 16px;
+        padding-left: 40px;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-light);
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      #campoBusqueda:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
+
+      .search-wrapper {
+        position: relative;
+        margin-bottom: 12px;
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-gray);
+        font-size: 16px;
+      }
+
+      /* Propiedad toggles */
+      .prop-toggle {
+        background: rgba(99, 102, 241, 0.1);
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        border: 1px solid var(--border-color);
+      }
+
+      .prop-name {
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 6px;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      /* Notificaciones */
+      #notificaciones {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 300;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 350px;
+      }
+
+      .notificacion {
+        padding: 16px 20px;
+        border-radius: 10px;
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      @keyframes slideIn {
+        from { transform: translateX(400px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+
+      .notificacion.success {
+        background: linear-gradient(135deg, #10b981, #059669);
+      }
+
+      .notificacion.error {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+      }
+
+      .notificacion.info {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      }
+
+      /* Loading spinner */
+      .loading {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      /* Ayuda de teclado mejorada */
+      .keyboard-help {
+        background: rgba(99, 102, 241, 0.1);
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        line-height: 1.6;
+        color: var(--text-gray);
+        border: 1px solid var(--border-color);
+      }
+
+      .keyboard-help strong {
+        color: var(--primary-color);
+      }
+
+      /* Tags */
+      .tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 8px;
+      }
+
+      .tag {
+        padding: 4px 12px;
+        background: rgba(99, 102, 241, 0.2);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        font-size: 11px;
+        color: var(--text-light);
+        font-weight: 500;
+      }
+
+      /* Timeline */
+      #timeline {
+        display: none;
+        margin-top: 15px;
+        padding: 15px;
+        background: rgba(99, 102, 241, 0.05);
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+      }
+
+      .timeline-track {
+        position: relative;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        margin: 10px 0;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        #panelControl {
+          width: 280px;
+          left: 10px;
+          top: 10px;
+          max-height: calc(100vh - 20px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Panel de control principal -->
+    <div id="panelControl" class="glass-panel">
+      <div class="panel-header">🧠 Memento 3D</div>
+
+      <!-- Estadísticas -->
+      <div class="section">
+        <div class="section-title">📊 Estadísticas</div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-value" id="statTotal">0</span>
+            <span class="stat-label">Recuerdos</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="statConexiones">0</span>
+            <span class="stat-label">Conexiones</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="statPersonas">0</span>
+            <span class="stat-label">Personas</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="statVisible">0</span>
+            <span class="stat-label">Visibles</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Búsqueda -->
+      <div class="section">
+        <div class="section-title">🔍 Búsqueda</div>
+        <div class="search-wrapper">
+          <span class="search-icon">🔎</span>
+          <input type="text" id="campoBusqueda" placeholder="Buscar recuerdos...">
+        </div>
+      </div>
+
+      <!-- Gestión de recuerdos -->
+      <div class="section">
+        <div class="section-title">➕ Gestión</div>
+        <button class="btn btn-primary" id="btnNuevoRecuerdo">
+          <span>➕</span> Nuevo Recuerdo
+        </button>
+        <button class="btn btn-secondary" id="btnImportar">
+          <span>📥</span> Importar JSON
+        </button>
+        <button class="btn btn-secondary" id="btnExportar">
+          <span>📤</span> Exportar JSON
+        </button>
+        <input type="file" id="inputArchivo" accept=".json" style="display: none;">
+      </div>
+
+      <!-- Controles visuales -->
+      <div class="section">
+        <div class="section-title">🎨 Visualización</div>
+        
+        <div class="control-group">
+          <label class="control-label">
+            Máx conexiones por nodo
+            <span class="valor" id="maxConexionesValor">2</span>
+          </label>
+          <input id="maxConexiones" type="range" min="1" max="8" value="2">
+        </div>
+
+        <div class="checkbox-group">
+          <input id="chkMostrarLineas" type="checkbox" checked>
+          <label>Mostrar conexiones</label>
+        </div>
+
+        <div class="checkbox-group">
+          <input id="chkMostrarCapsulas" type="checkbox" checked>
+          <label>Mostrar cápsulas</label>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">
+            Transparencia cápsulas
+            <span class="valor" id="opacidadCapsulasValor">25%</span>
+          </label>
+          <input id="opacidadCapsulas" type="range" min="5" max="100" value="25">
+        </div>
+      </div>
+
+      <!-- Propiedades -->
+      <div class="section">
+        <div class="section-title">🏷️ Filtros por Propiedad</div>
+        <div id="propiedades"></div>
+      </div>
+
+      <!-- Controles de física -->
+      <div class="section">
+        <div class="section-title">⚡ Física</div>
+        <button class="btn btn-secondary" id="btnReactivarFisica">
+          <span>🔄</span> Reactivar Física
+        </button>
+      </div>
+
+      <!-- Ayuda -->
+      <div class="section">
+        <div class="section-title">⌨️ Controles</div>
+        <div class="keyboard-help">
+          <strong>Navegación:</strong><br>
+          W/A/S/D: Mover en plano<br>
+          Q/E: Subir / Bajar<br>
+          Ratón: Mirar alrededor<br>
+          Clic en nodo: Zoom + Info
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modalOverlay">
+      <div id="modalCaja">
+        <div id="modalHeader">
+          <div id="modalTitulo">Detalle de Recuerdo</div>
+          <button id="modalCerrar">✕ Cerrar</button>
+        </div>
+        <div id="modalContenido">
+          <!-- Contenido del recuerdo actual -->
+          <div id="contenidoRecuerdo"></div>
+          
+          <!-- Formulario para nuevo recuerdo -->
+          <div id="formNuevoRecuerdo">
+            <form id="formRecuerdo">
+              <div class="form-group">
+                <label class="form-label">👤 Nombre</label>
+                <input type="text" class="form-input" id="inputNombre" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">🎯 Hobbie</label>
+                <input type="text" class="form-input" id="inputHobbie" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">🎂 Edad</label>
+                <input type="number" class="form-input" id="inputEdad" min="1" max="150" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">🏙️ Ciudad</label>
+                <input type="text" class="form-input" id="inputCiudad" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">💼 Profesión</label>
+                <input type="text" class="form-input" id="inputProfesion" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">📅 Fecha (opcional)</label>
+                <input type="date" class="form-input" id="inputFecha">
+              </div>
+              <div class="form-group">
+                <label class="form-label">📝 Descripción adicional</label>
+                <textarea class="form-input" id="inputDescripcion" rows="4"></textarea>
+              </div>
+              <button type="submit" class="btn btn-success">
+                <span>💾</span> Guardar Recuerdo
+              </button>
+              <button type="button" class="btn btn-secondary" id="btnCancelarForm">
+                Cancelar
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Área de notificaciones -->
+    <div id="notificaciones"></div>
+
+    <!-- Escena A-Frame -->
+    <a-scene background="color: #0a0a15">
+      <!-- Cielo con gradiente mejorado -->
+      <a-sky material="shader: gradiente; topColor: #1e1b4b; bottomColor: #0a0a15"></a-sky>
+
+      <!-- Partículas de fondo (estrellas) -->
+      <a-entity id="particulas"></a-entity>
+
+      <!-- Cámara con controles mejorados -->
+      <a-entity id="rig"
+                camera
+                look-controls="pointerLockEnabled: false"
+                position="0 4 20"
+                cursor="rayOrigin: mouse; fuse: false"
+                raycaster="objects: .clickable; far: 100; interval: 100">
+      </a-entity>
+
+      <!-- Sistema de iluminación mejorado -->
+      <a-entity light="type: ambient; color: #667; intensity: 0.6"></a-entity>
+      <a-entity light="type: directional; color: #fff; intensity: 0.9" position="2 5 3"></a-entity>
+      <a-entity light="type: point; color: #6366f1; intensity: 0.7" position="-8 5 -5"></a-entity>
+      <a-entity light="type: point; color: #8b5cf6; intensity: 0.5" position="8 5 5"></a-entity>
+
+      <!-- Contenedores -->
+      <a-entity id="conexiones"></a-entity>
+      <a-entity id="nodos"></a-entity>
+    </a-scene>
+
+    <script>
+      const THREE = AFRAME.THREE;
+
+      // ==================== SHADERS ====================
+      AFRAME.registerShader('gradiente', {
+        schema: {
+          topColor:    {type: 'color', default: '#1e1b4b'},
+          bottomColor: {type: 'color', default: '#0a0a15'}
+        },
+        init: function (data) {
+          this.uniforms = {
+            topColor:    { value: new THREE.Color(data.topColor) },
+            bottomColor: { value: new THREE.Color(data.bottomColor) }
+          };
+          this.material = new THREE.ShaderMaterial({
+            uniforms: this.uniforms,
+            vertexShader: `
+              varying vec3 vWorldPosition;
+              void main() {
+                vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+                vWorldPosition = worldPosition.xyz;
+                gl_Position = projectionMatrix * viewMatrix * worldPosition;
+              }
+            `,
+            fragmentShader: `
+              uniform vec3 topColor;
+              uniform vec3 bottomColor;
+              varying vec3 vWorldPosition;
+              void main() {
+                float h = normalize(vWorldPosition).y;
+                float t = clamp(h * 0.5 + 0.5, 0.0, 1.0);
+                vec3 color = mix(bottomColor, topColor, t);
+                gl_FragColor = vec4(color, 1.0);
+              }
+            `,
+            side: THREE.BackSide,
+            depthWrite: false
+          });
+        },
+        update: function (data) {
+          this.uniforms.topColor.value.set(data.topColor);
+          this.uniforms.bottomColor.value.set(data.bottomColor);
+        }
+      });
+
+      // ==================== COMPONENTES ====================
+      AFRAME.registerComponent('billboard', {
+        schema: { target: { type: 'selector' } },
+        init: function () {
+          this.camEl = this.data.target || document.querySelector('#rig');
+        },
+        tick: function () {
+          if (!this.camEl) return;
+          const obj = this.el.object3D;
+          const camPos = new THREE.Vector3();
+          this.camEl.object3D.getWorldPosition(camPos);
+          obj.lookAt(camPos);
+        }
+      });
+
+      AFRAME.registerComponent('transparente-capsula', {
+        schema: {
+          opacity: { type: 'number', default: 0.25 }
+        },
+        init: function () {
+          const el = this.el;
+          const self = this;
+
+          this.applySettings = function () {
+            el.object3D.traverse(obj => {
+              if (obj.isMesh && obj.material) {
+                const m = obj.material;
+                m.transparent = true;
+                m.opacity = self.data.opacity;
+                m.depthWrite = false;
+                m.depthTest  = true;
+                m.side = THREE.DoubleSide;
+                m.needsUpdate = true;
+              }
+            });
+          };
+
+          if (el.object3D) {
+            this.applySettings();
+          }
+          el.addEventListener('object3dset', () => this.applySettings());
+        },
+        update: function (oldData) {
+          if (oldData && oldData.opacity === this.data.opacity) return;
+          if (this.applySettings) this.applySettings();
+        }
+      });
+
+      // ==================== SISTEMA DE DB (IndexedDB) ====================
+      class MementoDB {
+        constructor() {
+          this.db = null;
+          this.dbName = 'MementoDB';
+          this.version = 1;
+        }
+
+        async init() {
+          return new Promise((resolve, reject) => {
+            const request = indexedDB.open(this.dbName, this.version);
+
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => {
+              this.db = request.result;
+              resolve(this.db);
+            };
+
+            request.onupgradeneeded = (event) => {
+              const db = event.target.result;
+              
+              if (!db.objectStoreNames.contains('recuerdos')) {
+                const store = db.createObjectStore('recuerdos', { 
+                  keyPath: 'id', 
+                  autoIncrement: true 
+                });
+                store.createIndex('nombre', 'categories.nombre', { unique: false });
+                store.createIndex('ciudad', 'categories.ciudad', { unique: false });
+                store.createIndex('hobbie', 'categories.hobbie', { unique: false });
+              }
+            };
+          });
+        }
+
+        async agregarRecuerdo(recuerdo) {
+          return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction(['recuerdos'], 'readwrite');
+            const store = transaction.objectStore('recuerdos');
+            const request = store.add(recuerdo);
+
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+          });
+        }
+
+        async obtenerTodos() {
+          return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction(['recuerdos'], 'readonly');
+            const store = transaction.objectStore('recuerdos');
+            const request = store.getAll();
+
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+          });
+        }
+
+        async limpiarTodo() {
+          return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction(['recuerdos'], 'readwrite');
+            const store = transaction.objectStore('recuerdos');
+            const request = store.clear();
+
+            request.onsuccess = () => resolve();
+            request.onerror = () => reject(request.error);
+          });
+        }
+
+        async importarMasivo(recuerdos) {
+          const transaction = this.db.transaction(['recuerdos'], 'readwrite');
+          const store = transaction.objectStore('recuerdos');
+
+          return Promise.all(recuerdos.map(recuerdo => {
+            return new Promise((resolve, reject) => {
+              const request = store.add(recuerdo);
+              request.onsuccess = () => resolve(request.result);
+              request.onerror = () => reject(request.error);
+            });
+          }));
+        }
+      }
+
+      // ==================== SISTEMA DE NOTIFICACIONES ====================
+      class NotificationSystem {
+        constructor() {
+          this.container = document.getElementById('notificaciones');
+        }
+
+        show(mensaje, tipo = 'info', duracion = 3000) {
+          const notif = document.createElement('div');
+          notif.className = `notificacion ${tipo}`;
+          
+          const icon = tipo === 'success' ? '✓' : tipo === 'error' ? '✗' : 'ℹ';
+          notif.innerHTML = `<span style="font-size: 20px;">${icon}</span><span>${mensaje}</span>`;
+          
+          this.container.appendChild(notif);
+
+          setTimeout(() => {
+            notif.style.animation = 'slideIn 0.3s ease reverse';
+            setTimeout(() => notif.remove(), 300);
+          }, duracion);
+        }
+      }
+
+      // ==================== UTILIDADES ====================
+      function distancia3D(x1,y1,z1,x2,y2,z2){
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const dz = z2 - z1;
+        return Math.sqrt(dx*dx + dy*dy + dz*dz);
+      }
+
+      function hashCadena(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+          hash = (hash * 31 + str.charCodeAt(i)) | 0;
+        }
+        return Math.abs(hash);
+      }
+
+      // ==================== VARIABLES GLOBALES ====================
+      const db = new MementoDB();
+      const notificaciones = new NotificationSystem();
+      
+      const nodosContEl   = document.getElementById("nodos");
+      const conexionesEl  = document.getElementById("conexiones");
+      const rigEl         = document.getElementById("rig");
+
+      // Modal
+      const modalOverlay   = document.getElementById("modalOverlay");
+      const modalContenido = document.getElementById("modalContenido");
+      const modalTitulo    = document.getElementById("modalTitulo");
+      const modalCerrar    = document.getElementById("modalCerrar");
+      const contenidoRecuerdo = document.getElementById("contenidoRecuerdo");
+      const formNuevoRecuerdo = document.getElementById("formNuevoRecuerdo");
+
+      // Parámetros físicos
+      const LIM_X = 25;
+      const LIM_Y = 15;
+      const LIM_Z = 25;
+
+      const DISTANCIA_OBJETIVO = 6;
+      const DISTANCIA_MINIMA = 1.8;
+      const DISTANCIA_REPULSION_DISTINTO = 14;
+
+      const K_ATRACCION_FUERTE = 0.0018;
+      const K_ATRACCION_MEDIA = 0.001;
+      const K_REPULSION_DISTINTO = 0.0012;
+      const K_REPULSION_CORTA = 0.06;
+
+      const FRICCION = 0.93;
+      const MAX_FUERZA = 0.05;
+
+      const RADIO_CONEXION = 12;
+      const ACTUALIZAR_LINEAS_CADA = 10;
+
+      // Estado
+      let particulas = [];
+      let clavesPropiedades = [];
+      let usarEnRelacion = {};
+      let mostrarEnEtiqueta = {};
+      let mostrarLineas = true;
+      let mostrarCapsulas = true;
+      let opacidadCapsulas = 0.25;
+      let maxConexionesPorNodo = 2;
+      let etiquetasSucias = false;
+      let terminoBusqueda = '';
+
+      // ==================== FUNCIONES DE MODAL ====================
+      function mostrarModal(titulo, esFormulario = false) {
+        modalTitulo.textContent = titulo;
+        
+        if (esFormulario) {
+          contenidoRecuerdo.style.display = 'none';
+          formNuevoRecuerdo.style.display = 'block';
+        } else {
+          contenidoRecuerdo.style.display = 'block';
+          formNuevoRecuerdo.style.display = 'none';
+        }
+        
+        modalOverlay.style.display = "flex";
+      }
+
+      function ocultarModal() {
+        modalOverlay.style.display = "none";
+        document.getElementById('formRecuerdo').reset();
+      }
+
+      modalCerrar.addEventListener("click", ocultarModal);
+      modalOverlay.addEventListener("click", (e) => {
+        if (e.target === modalOverlay) ocultarModal();
+      });
+
+      // ==================== FUNCIONES DE VISUALIZACIÓN ====================
+      function crearCapsulaTransparenteHorizontal(){
+        const capsula = document.createElement("a-entity");
+        capsula.setAttribute("rotation", "0 0 90");
+        capsula.setAttribute("transparente-capsula", "opacity:0.25");
+
+        const cilindro = document.createElement("a-cylinder");
+        cilindro.setAttribute("radius", 0.7);
+        cilindro.setAttribute("height", 1.8);
+        cilindro.setAttribute("position", "0 0 0");
+        cilindro.setAttribute("class", "clickable");
+        cilindro.setAttribute("color", "#6366f1");
+        capsula.appendChild(cilindro);
+
+        const esferaArriba = document.createElement("a-sphere");
+        esferaArriba.setAttribute("radius", 0.7);
+        esferaArriba.setAttribute("position", "0 0.9 0");
+        esferaArriba.setAttribute("class", "clickable");
+        esferaArriba.setAttribute("color", "#8b5cf6");
+        capsula.appendChild(esferaArriba);
+
+        const esferaAbajo = document.createElement("a-sphere");
+        esferaAbajo.setAttribute("radius", 0.7);
+        esferaAbajo.setAttribute("position", "0 -0.9 0");
+        esferaAbajo.setAttribute("class", "clickable");
+        esferaAbajo.setAttribute("color", "#8b5cf6");
+        capsula.appendChild(esferaAbajo);
+
+        return capsula;
+      }
+
+      function construirEtiqueta(datosCategorias) {
+        const lineas = [];
+        for (const prop of clavesPropiedades) {
+          if (!mostrarEnEtiqueta[prop]) continue;
+          const val = (datosCategorias[prop] !== undefined && datosCategorias[prop] !== null)
+                      ? String(datosCategorias[prop])
+                      : "";
+          lineas.push(val);
+        }
+        return lineas.join("\n");
+      }
+
+      function crearNodos3D(items) {
+        // Limpiar nodos existentes
+        particulas.forEach(p => {
+          if (p.nodeEl && p.nodeEl.parentNode) {
+            p.nodeEl.parentNode.removeChild(p.nodeEl);
+          }
+        });
+        
+        particulas = [];
+
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          const categorias = item.categories || {};
+          const contenidoHtml = item.content || "";
+
+          const x = (Math.random() - 0.5) * LIM_X * 2;
+          const y = Math.random() * LIM_Y + 2;
+          const z = (Math.random() - 0.5) * LIM_Z * 2;
+
+          const nodo = document.createElement("a-entity");
+          nodo.setAttribute("position", `${x} ${y} ${z}`);
+          nodo.setAttribute("billboard", "target: #rig");
+
+          const capsula = crearCapsulaTransparenteHorizontal();
+          nodo.appendChild(capsula);
+
+          const texto = document.createElement("a-entity");
+          texto.setAttribute("text", {
+            value: construirEtiqueta(categorias),
+            align: "center",
+            color: "#ffffff",
+            width: 3.5,
+            wrapCount: 20,
+            baseline: "center"
+          });
+          texto.setAttribute("position", "0 0 -1.0");
+          texto.setAttribute("class", "clickable");
+          nodo.appendChild(texto);
+
+          nodosContEl.appendChild(nodo);
+
+          const pObj = {
+            x:x, y:y, z:z,
+            vx:(Math.random()-0.5)*0.1,
+            vy:(Math.random()-0.5)*0.1,
+            vz:(Math.random()-0.5)*0.1,
+            ax:0, ay:0, az:0,
+            fija:false,
+            estableFrames:0,
+            datos:categorias,
+            contenido:contenidoHtml,
+            nodeEl:nodo,
+            textEl:texto,
+            capsulaEl:capsula,
+            id: item.id || i,
+            visible: true
+          };
+
+          capsula.object3D.visible = mostrarCapsulas;
+          capsula.setAttribute("transparente-capsula", "opacity:" + opacidadCapsulas);
+
+          nodo.addEventListener("click", () => {
+            zoomACentroDeParticula(pObj);
+            mostrarDetalleRecuerdo(pObj);
+          });
+
+          particulas.push(pObj);
+        }
+
+        actualizarEstadisticas();
+      }
+
+      function mostrarDetalleRecuerdo(particula) {
+        const datos = particula.datos;
+        const html = `
+          <div style="color: var(--text-light);">
+            <h2 style="color: var(--primary-color); margin-bottom: 20px;">
+              ${datos.nombre || 'Sin nombre'}
+            </h2>
+            <div style="display: grid; gap: 12px;">
+              <div><strong>🎯 Hobbie:</strong> ${datos.hobbie || 'N/A'}</div>
+              <div><strong>🎂 Edad:</strong> ${datos.edad || 'N/A'}</div>
+              <div><strong>🏙️ Ciudad:</strong> ${datos.ciudad || 'N/A'}</div>
+              <div><strong>💼 Profesión:</strong> ${datos.profesion || 'N/A'}</div>
+              ${datos.fecha ? `<div><strong>📅 Fecha:</strong> ${datos.fecha}</div>` : ''}
+              ${datos.descripcion ? `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color);"><strong>📝 Descripción:</strong><br>${datos.descripcion}</div>` : ''}
+            </div>
+            <div class="tags-container">
+              ${Object.entries(datos).map(([key, value]) => 
+                `<span class="tag">${key}: ${value}</span>`
+              ).join('')}
+            </div>
+          </div>
+        `;
+        
+        contenidoRecuerdo.innerHTML = html;
+        mostrarModal(datos.nombre || 'Detalle de Recuerdo', false);
+      }
+
+      // ==================== FÍSICA 3D ====================
+      function pasoFisica(dt) {
+        const n = particulas.length;
+        if (n === 0) return;
+
+        // Resetear aceleraciones
+        for (let i = 0; i < n; i++) {
+          particulas[i].ax = 0;
+          particulas[i].ay = 0;
+          particulas[i].az = 0;
+        }
+
+        // Calcular fuerzas
+        for (let i = 0; i < n; i++) {
+          const p = particulas[i];
+          if (p.fija || !p.visible) continue;
+
+          let fx = 0, fy = 0, fz = 0;
+
+          for (let j = 0; j < n; j++) {
+            if (i === j) continue;
+            const q = particulas[j];
+            if (!q.visible) continue;
+
+            const d = distancia3D(p.x,p.y,p.z, q.x,q.y,q.z);
+            if (d === 0) continue;
+
+            const dx = q.x - p.x;
+            const dy = q.y - p.y;
+            const dz = q.z - p.z;
+
+            const ux = dx / d;
+            const uy = dy / d;
+            const uz = dz / d;
+
+            // Repulsión de corto alcance
+            if (d < DISTANCIA_MINIMA) {
+              const intensidad = (DISTANCIA_MINIMA - d) * K_REPULSION_CORTA;
+              fx -= ux * intensidad;
+              fy -= uy * intensidad;
+              fz -= uz * intensidad;
+              continue;
+            }
+
+            // Contar propiedades coincidentes
+            const propsCoinciden = [];
+            let hayPropsRelacionActivas = false;
+            for (const prop of clavesPropiedades) {
+              if (!usarEnRelacion[prop]) continue;
+              hayPropsRelacionActivas = true;
+              if (p.datos[prop] === q.datos[prop]) {
+                propsCoinciden.push(prop);
+              }
+            }
+
+            // Atracción/repulsión según similitud
+            if (propsCoinciden.length > 1) {
+              const delta = d - DISTANCIA_OBJETIVO;
+              fx += ux * delta * K_ATRACCION_FUERTE;
+              fy += uy * delta * K_ATRACCION_FUERTE;
+              fz += uz * delta * K_ATRACCION_FUERTE;
+            } else if (propsCoinciden.length === 1) {
+              const delta = d - DISTANCIA_OBJETIVO;
+              fx += ux * delta * K_ATRACCION_MEDIA;
+              fy += uy * delta * K_ATRACCION_MEDIA;
+              fz += uz * delta * K_ATRACCION_MEDIA;
+            } else {
+              if (d < DISTANCIA_REPULSION_DISTINTO) {
+                const intensidad = (DISTANCIA_REPULSION_DISTINTO - d) * K_REPULSION_DISTINTO;
+                fx -= ux * intensidad;
+                fy -= uy * intensidad;
+                fz -= uz * intensidad;
+              }
+            }
+          }
+
+          // Limitar fuerza máxima
+          const modF = Math.sqrt(fx*fx + fy*fy + fz*fz);
+          if (modF > MAX_FUERZA) {
+            fx = fx / modF * MAX_FUERZA;
+            fy = fy / modF * MAX_FUERZA;
+            fz = fz / modF * MAX_FUERZA;
+          }
+
+          p.ax = fx;
+          p.ay = fy;
+          p.az = fz;
+        }
+
+        // Integrar movimiento
+        for (let i = 0; i < n; i++) {
+          const p = particulas[i];
+          if (!p.fija && p.visible) {
+            p.vx += p.ax;
+            p.vy += p.ay;
+            p.vz += p.az;
+
+            p.vx *= FRICCION;
+            p.vy *= FRICCION;
+            p.vz *= FRICCION;
+
+            p.x += p.vx;
+            p.y += p.vy;
+            p.z += p.vz;
+
+            // Rebotes en límites
+            const REBOTE = -0.5;
+            if (p.x > LIM_X) { p.x = LIM_X; p.vx *= REBOTE; }
+            if (p.x < -LIM_X) { p.x = -LIM_X; p.vx *= REBOTE; }
+            if (p.z > LIM_Z) { p.z = LIM_Z; p.vz *= REBOTE; }
+            if (p.z < -LIM_Z) { p.z = -LIM_Z; p.vz *= REBOTE; }
+            if (p.y > LIM_Y) { p.y = LIM_Y; p.vy *= REBOTE; }
+            if (p.y < 0.5) { p.y = 0.5; p.vy *= REBOTE; }
+
+            // Detectar estabilidad
+            const vel = Math.sqrt(p.vx*p.vx + p.vy*p.vy + p.vz*p.vz);
+            const fuer = Math.sqrt(p.ax*p.ax + p.ay*p.ay + p.az*p.az);
+            if (vel < 0.02 && fuer < 0.002) {
+              p.estableFrames++;
+              if (p.estableFrames > 60) {
+                p.fija = true;
+                p.vx = p.vy = p.vz = 0;
+              }
+            } else {
+              p.estableFrames = 0;
+            }
+          }
+
+          // Actualizar posición visual
+          if (p.nodeEl) {
+            p.nodeEl.setAttribute("position", `${p.x} ${p.y} ${p.z}`);
+            p.nodeEl.object3D.visible = p.visible;
+          }
+
+          // Actualizar etiqueta si es necesario
+          if (etiquetasSucias && p.textEl) {
+            p.textEl.setAttribute("text", "value", construirEtiqueta(p.datos));
+          }
+        }
+
+        if (etiquetasSucias) {
+          etiquetasSucias = false;
+        }
+      }
+
+      // ==================== CONEXIONES ====================
+      function actualizarConexiones() {
+        conexionesEl.innerHTML = "";
+        if (!mostrarLineas) return;
+
+        let totalConexiones = 0;
+        const n = particulas.length;
+
+        for (let i = 0; i < n; i++) {
+          const a = particulas[i];
+          if (!a.visible) continue;
+
+          const candidatos = [];
+
+          for (let j = i+1; j < n; j++) {
+            const b = particulas[j];
+            if (!b.visible) continue;
+
+            const d = distancia3D(a.x,a.y,a.z, b.x,b.y,b.z);
+            if (d > RADIO_CONEXION) continue;
+
+            const propsCoinciden = [];
+            for (const prop of clavesPropiedades) {
+              if (!usarEnRelacion[prop]) continue;
+              if (a.datos[prop] === b.datos[prop]) {
+                propsCoinciden.push(prop);
+              }
+            }
+
+            if (propsCoinciden.length === 0) continue;
+
+            const clave = propsCoinciden.length === 1 
+              ? propsCoinciden[0] 
+              : propsCoinciden.slice().sort().join("+");
+
+            const h = hashCadena(clave) % 360;
+            const color = `hsl(${h}, 70%, 50%)`;
+
+            candidatos.push({j, d, color});
+          }
+
+          candidatos.sort((a,b) => a.d - b.d);
+          const limite = Math.min(maxConexionesPorNodo, candidatos.length);
+          
+          for (let k = 0; k < limite; k++) {
+            const c = candidatos[k];
+            const b = particulas[c.j];
+
+            const lineaEl = document.createElement("a-entity");
+            lineaEl.setAttribute("line", {
+              start: `${a.x} ${a.y} ${a.z}`,
+              end:   `${b.x} ${b.y} ${b.z}`,
+              color: c.color,
+              opacity: 0.6
+            });
+            conexionesEl.appendChild(lineaEl);
+            totalConexiones++;
+          }
+        }
+
+        document.getElementById('statConexiones').textContent = totalConexiones;
+      }
+
+      // ==================== CONTROLES DE VUELO ====================
+      const flyEstado = {
+        adelante:0, atras:0, izquierda:0, derecha:0, arriba:0, abajo:0
+      };
+      const VELOCIDAD_FLY = 7;
+
+      window.addEventListener("keydown", (e) => {
+        switch(e.key.toLowerCase()) {
+          case "w": flyEstado.adelante = 1; break;
+          case "s": flyEstado.atras = 1; break;
+          case "a": flyEstado.izquierda = 1; break;
+          case "d": flyEstado.derecha = 1; break;
+          case "q": flyEstado.arriba = 1; break;
+          case "e": flyEstado.abajo = 1; break;
+        }
+      });
+
+      window.addEventListener("keyup", (e) => {
+        switch(e.key.toLowerCase()) {
+          case "w": flyEstado.adelante = 0; break;
+          case "s": flyEstado.atras = 0; break;
+          case "a": flyEstado.izquierda = 0; break;
+          case "d": flyEstado.derecha = 0; break;
+          case "q": flyEstado.arriba = 0; break;
+          case "e": flyEstado.abajo = 0; break;
+        }
+      });
+
+      function actualizarFly(dt) {
+        const obj = rigEl.object3D;
+        const dir = new THREE.Vector3();
+        obj.getWorldDirection(dir);
+        dir.normalize();
+
+        const up = new THREE.Vector3(0,1,0);
+        const right = new THREE.Vector3().crossVectors(dir, up).normalize().negate();
+
+        let move = new THREE.Vector3(0,0,0);
+
+        if (flyEstado.adelante) move.add(dir.clone().multiplyScalar(-1));
+        if (flyEstado.atras) move.add(dir);
+        if (flyEstado.derecha) move.add(right);
+        if (flyEstado.izquierda) move.add(right.clone().multiplyScalar(-1));
+        if (flyEstado.arriba) move.add(up);
+        if (flyEstado.abajo) move.add(up.clone().multiplyScalar(-1));
+
+        if (move.lengthSq() > 0) {
+          move.normalize().multiplyScalar(VELOCIDAD_FLY * dt);
+          obj.position.add(move);
+        }
+      }
+
+      // ==================== ZOOM ====================
+      let zoomAnim = null;
+
+      function zoomACentroDeParticula(p) {
+        const rigPos = rigEl.object3D.position.clone();
+        const destino = new THREE.Vector3(p.x, p.y + 1, p.z + 6);
+        zoomAnim = { from: rigPos, to: destino, t: 0, dur: 1.0 };
+      }
+
+      function actualizarZoom(dt) {
+        if (!zoomAnim) return;
+        zoomAnim.t += dt / zoomAnim.dur;
+        let t = Math.min(zoomAnim.t, 1);
+        const ease = t < 0.5 ? 2*t*t : -1 + (4 - 2*t)*t;
+        const pos = new THREE.Vector3().lerpVectors(zoomAnim.from, zoomAnim.to, ease);
+        rigEl.object3D.position.copy(pos);
+        if (zoomAnim.t >= 1) zoomAnim = null;
+      }
+
+      // ==================== BÚSQUEDA Y FILTROS ====================
+      function aplicarBusqueda() {
+        const termino = terminoBusqueda.toLowerCase();
+        let visibles = 0;
+
+        particulas.forEach(p => {
+          if (termino === '') {
+            p.visible = true;
+            visibles++;
+          } else {
+            p.visible = Object.values(p.datos).some(val => 
+              String(val).toLowerCase().includes(termino)
+            );
+            if (p.visible) visibles++;
+          }
+        });
+
+        document.getElementById('statVisible').textContent = visibles;
+        actualizarEstadisticas();
+      }
+
+      document.getElementById('campoBusqueda').addEventListener('input', (e) => {
+        terminoBusqueda = e.target.value;
+        aplicarBusqueda();
+      });
+
+      // ==================== CONTROLES UI ====================
+      function crearControlesPropiedades(claves) {
+        const divPropiedades = document.getElementById("propiedades");
+        divPropiedades.innerHTML = "";
+        clavesPropiedades = claves.slice();
+
+        clavesPropiedades.forEach(prop => {
+          if (!(prop in usarEnRelacion)) usarEnRelacion[prop] = true;
+          if (!(prop in mostrarEnEtiqueta)) mostrarEnEtiqueta[prop] = true;
+
+          const propDiv = document.createElement("div");
+          propDiv.className = "prop-toggle";
+
+          const nombre = document.createElement("div");
+          nombre.className = "prop-name";
+          nombre.textContent = prop;
+          propDiv.appendChild(nombre);
+
+          const chkDiv1 = document.createElement("div");
+          chkDiv1.className = "checkbox-group";
+          const chkUsar = document.createElement("input");
+          chkUsar.type = "checkbox";
+          chkUsar.checked = usarEnRelacion[prop];
+          chkUsar.addEventListener("change", () => {
+            usarEnRelacion[prop] = chkUsar.checked;
+            particulas.forEach(p => {
+              p.fija = false;
+              p.estableFrames = 0;
+            });
+          });
+          const lblUsar = document.createElement("label");
+          lblUsar.textContent = "Usar en relación";
+          chkDiv1.appendChild(chkUsar);
+          chkDiv1.appendChild(lblUsar);
+          propDiv.appendChild(chkDiv1);
+
+          const chkDiv2 = document.createElement("div");
+          chkDiv2.className = "checkbox-group";
+          const chkMostrar = document.createElement("input");
+          chkMostrar.type = "checkbox";
+          chkMostrar.checked = mostrarEnEtiqueta[prop];
+          chkMostrar.addEventListener("change", () => {
+            mostrarEnEtiqueta[prop] = chkMostrar.checked;
+            etiquetasSucias = true;
+          });
+          const lblMostrar = document.createElement("label");
+          lblMostrar.textContent = "Mostrar en etiqueta";
+          chkDiv2.appendChild(chkMostrar);
+          chkDiv2.appendChild(lblMostrar);
+          propDiv.appendChild(chkDiv2);
+
+          divPropiedades.appendChild(propDiv);
+        });
+
+        etiquetasSucias = true;
+      }
+
+      // Sliders y checkboxes
+      document.getElementById('maxConexiones').addEventListener('input', (e) => {
+        maxConexionesPorNodo = parseInt(e.target.value, 10);
+        document.getElementById('maxConexionesValor').textContent = e.target.value;
+      });
+
+      document.getElementById('chkMostrarLineas').addEventListener('change', (e) => {
+        mostrarLineas = e.target.checked;
+      });
+
+      document.getElementById('chkMostrarCapsulas').addEventListener('change', (e) => {
+        mostrarCapsulas = e.target.checked;
+        particulas.forEach(p => {
+          if (p.capsulaEl) p.capsulaEl.object3D.visible = mostrarCapsulas;
+        });
+      });
+
+      document.getElementById('opacidadCapsulas').addEventListener('input', (e) => {
+        const v = parseInt(e.target.value, 10);
+        opacidadCapsulas = v / 100;
+        document.getElementById('opacidadCapsulasValor').textContent = v + "%";
+        particulas.forEach(p => {
+          if (p.capsulaEl) {
+            p.capsulaEl.setAttribute("transparente-capsula", "opacity:" + opacidadCapsulas);
+          }
+        });
+      });
+
+      document.getElementById('btnReactivarFisica').addEventListener('click', () => {
+        particulas.forEach(p => {
+          p.fija = false;
+          p.estableFrames = 0;
+        });
+        notificaciones.show('Física reactivada', 'info', 2000);
+      });
+
+      // ==================== ESTADÍSTICAS ====================
+      function actualizarEstadisticas() {
+        const total = particulas.length;
+        const visibles = particulas.filter(p => p.visible).length;
+        const personas = new Set(particulas.map(p => p.datos.nombre)).size;
+
+        document.getElementById('statTotal').textContent = total;
+        document.getElementById('statVisible').textContent = visibles;
+        document.getElementById('statPersonas').textContent = personas;
+      }
+
+      // ==================== CRUD DE RECUERDOS ====================
+      document.getElementById('btnNuevoRecuerdo').addEventListener('click', () => {
+        document.getElementById('formRecuerdo').reset();
+        mostrarModal('➕ Nuevo Recuerdo', true);
+      });
+
+      document.getElementById('btnCancelarForm').addEventListener('click', () => {
+        ocultarModal();
+      });
+
+      document.getElementById('formRecuerdo').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const nombre = document.getElementById('inputNombre').value;
+        const hobbie = document.getElementById('inputHobbie').value;
+        const edad = parseInt(document.getElementById('inputEdad').value);
+        const ciudad = document.getElementById('inputCiudad').value;
+        const profesion = document.getElementById('inputProfesion').value;
+        const fecha = document.getElementById('inputFecha').value;
+        const descripcion = document.getElementById('inputDescripcion').value;
+
+        const nuevoRecuerdo = {
+          categories: {
+            nombre, hobbie, edad, ciudad, profesion
+          },
+          content: `<h2>${nombre} (${edad})</h2><p><strong>Ciudad:</strong> ${ciudad}<br><strong>Profesión:</strong> ${profesion}<br><strong>Hobbie:</strong> ${hobbie}</p>`
+        };
+
+        if (fecha) nuevoRecuerdo.categories.fecha = fecha;
+        if (descripcion) nuevoRecuerdo.categories.descripcion = descripcion;
+
+        try {
+          await db.agregarRecuerdo(nuevoRecuerdo);
+          notificaciones.show('✓ Recuerdo guardado exitosamente', 'success');
+          ocultarModal();
+          await cargarRecuerdos();
+        } catch (error) {
+          console.error('Error al guardar:', error);
+          notificaciones.show('Error al guardar recuerdo', 'error');
+        }
+      });
+
+      // ==================== IMPORTAR/EXPORTAR ====================
+      document.getElementById('btnExportar').addEventListener('click', async () => {
+        try {
+          const recuerdos = await db.obtenerTodos();
+          const json = JSON.stringify(recuerdos, null, 2);
+          const blob = new Blob([json], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `memento-backup-${Date.now()}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+          notificaciones.show('✓ Datos exportados', 'success');
+        } catch (error) {
+          console.error('Error al exportar:', error);
+          notificaciones.show('Error al exportar', 'error');
+        }
+      });
+
+      document.getElementById('btnImportar').addEventListener('click', () => {
+        document.getElementById('inputArchivo').click();
+      });
+
+      document.getElementById('inputArchivo').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+          const text = await file.text();
+          const data = JSON.parse(text);
+          
+          await db.limpiarTodo();
+          await db.importarMasivo(data);
+          
+          notificaciones.show('✓ Datos importados exitosamente', 'success');
+          await cargarRecuerdos();
+        } catch (error) {
+          console.error('Error al importar:', error);
+          notificaciones.show('Error al importar archivo', 'error');
+        }
+      });
+
+      // ==================== CARGAR RECUERDOS ====================
+      async function cargarRecuerdos() {
+        try {
+          let items = await db.obtenerTodos();
+          
+          // Si no hay datos en DB, cargar desde JSON
+          if (items.length === 0) {
+            const response = await fetch("personas2.json");
+            items = await response.json();
+            await db.importarMasivo(items);
+          }
+
+          const setClaves = new Set();
+          items.forEach(item => {
+            const cats = item.categories || {};
+            Object.keys(cats).forEach(k => setClaves.add(k));
+          });
+
+          const claves = Array.from(setClaves);
+          crearControlesPropiedades(claves);
+          crearNodos3D(items);
+          
+          notificaciones.show(`✓ ${items.length} recuerdos cargados`, 'success', 2000);
+        } catch (error) {
+          console.error('Error al cargar recuerdos:', error);
+          notificaciones.show('Error al cargar datos', 'error');
+        }
+      }
+
+      // ==================== BUCLE PRINCIPAL ====================
+      let ultimoTiempo = null;
+      let contadorFrames = 0;
+
+      function bucle(tiempoMs) {
+        if (!ultimoTiempo) ultimoTiempo = tiempoMs;
+        const dt = (tiempoMs - ultimoTiempo) / 1000;
+        ultimoTiempo = tiempoMs;
+
+        pasoFisica(dt);
+        actualizarFly(dt);
+        actualizarZoom(dt);
+
+        contadorFrames++;
+        if (contadorFrames % ACTUALIZAR_LINEAS_CADA === 0) {
+          actualizarConexiones();
+        }
+
+        requestAnimationFrame(bucle);
+      }
+
+      // ==================== INICIALIZACIÓN ====================
+      async function inicializar() {
+        try {
+          await db.init();
+          await cargarRecuerdos();
+          requestAnimationFrame(bucle);
+        } catch (error) {
+          console.error('Error en inicialización:', error);
+          notificaciones.show('Error al inicializar aplicación', 'error');
+        }
+      }
+
+      // Iniciar cuando A-Frame esté listo
+      document.querySelector('a-scene').addEventListener('loaded', () => {
+        inicializar();
+      });
+    </script>
+  </body>
+</html>

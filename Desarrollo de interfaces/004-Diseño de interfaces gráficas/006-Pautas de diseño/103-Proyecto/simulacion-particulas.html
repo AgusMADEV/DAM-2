@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <title>Simulación Avanzada de Partículas 3D - Física Interactiva</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <style>
+      body,html{
+        margin:0;
+        padding:0;
+        font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        overflow:hidden;
+        background:#000;
+      }
+      #controles{
+        position:fixed;
+        top:10px;
+        left:10px;
+        padding:12px 15px;
+        background:rgba(20,20,40,0.92);
+        border:2px solid #4a9eff;
+        border-radius:8px;
+        font-size:12px;
+        z-index:10;
+        max-height:90vh;
+        overflow-y:auto;
+        color:#e0e0e0;
+        box-shadow:0 4px 20px rgba(74,158,255,0.3);
+        min-width:280px;
+      }
+      #controles h3{
+        margin:0 0 10px 0;
+        color:#4a9eff;
+        font-size:16px;
+        border-bottom:1px solid #4a9eff;
+        padding-bottom:5px;
+      }
+      #controles label{
+        display:block;
+        margin-bottom:8px;
+        color:#ccc;
+      }
+      #controles input[type=range]{
+        width:180px;
+        margin-left:5px;
+      }
+      #controles span.valor{
+        display:inline-block;
+        width:40px;
+        text-align:right;
+        margin-left:6px;
+        color:#4a9eff;
+        font-weight:bold;
+      }
+      #controles .seccion{
+        margin-top:12px;
+        padding-top:10px;
+        border-top:1px solid #333;
+      }
+      #controles button{
+        background:#4a9eff;
+        color:#fff;
+        border:none;
+        padding:8px 12px;
+        margin:5px 5px 5px 0;
+        border-radius:4px;
+        cursor:pointer;
+        font-size:11px;
+        transition:background 0.2s;
+      }
+      #controles button:hover{
+        background:#3a8eef;
+      }
+      #controles button.activo{
+        background:#2ecc71;
+      }
+      #ayuda{
+        font-size:11px;
+        margin-top:10px;
+        padding-top:8px;
+        border-top:1px solid #333;
+        color:#999;
+      }
+      .fila-botones{
+        display:flex;
+        flex-wrap:wrap;
+        gap:5px;
+      }
+      #stats{
+        position:fixed;
+        bottom:10px;
+        left:10px;
+        padding:8px 12px;
+        background:rgba(20,20,40,0.85);
+        border:1px solid #4a9eff;
+        border-radius:6px;
+        color:#4a9eff;
+        font-size:11px;
+        font-family:monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Panel de control -->
+    <div id="controles">
+      <h3>⚛️ Simulación de Partículas 3D</h3>
+      
+      <!-- Escenarios predefinidos -->
+      <div class="seccion">
+        <strong>🎬 Escenarios:</strong>
+        <div class="fila-botones">
+          <button id="btnLluvia">Lluvia</button>
+          <button id="btnExplosion">Explosión</button>
+          <button id="btnFuente">Fuente</button>
+          <button id="btnOrbital">Sistema Orbital</button>
+          <button id="btnVortice">Vórtice</button>
+          <button id="btnCaotico">Caos</button>
+        </div>
+      </div>
+
+      <!-- Número de partículas -->
+      <div class="seccion">
+        <label>
+          🔢 Partículas:
+          <input id="numParticulas" type="range" min="50" max="500" step="50" value="200">
+          <span id="numParticulasValor" class="valor">200</span>
+        </label>
+        <button id="btnRegenerarParticulas">Regenerar Partículas</button>
+      </div>
+
+      <!-- Fuerzas físicas -->
+      <div class="seccion">
+        <strong>⚡ Fuerzas Físicas:</strong>
+        
+        <label>
+          🌍 Gravedad (Y):
+          <input id="gravedad" type="range" min="-0.05" max="0.05" step="0.001" value="-0.01">
+          <span id="gravedadValor" class="valor">-0.01</span>
+        </label>
+        
+        <label>
+          💨 Viento (X):
+          <input id="viento" type="range" min="-0.02" max="0.02" step="0.001" value="0">
+          <span id="vientoValor" class="valor">0</span>
+        </label>
+        
+        <label>
+          🌀 Viento (Z):
+          <input id="vientoZ" type="range" min="-0.02" max="0.02" step="0.001" value="0">
+          <span id="vientoZValor" class="valor">0</span>
+        </label>
+        
+        <label>
+          🧲 Fuerza Central:
+          <input id="fuerzaCentral" type="range" min="0" max="0.005" step="0.0001" value="0">
+          <span id="fuerzaCentralValor" class="valor">0</span>
+        </label>
+      </div>
+
+      <!-- Propiedades físicas -->
+      <div class="seccion">
+        <strong>🔧 Propiedades:</strong>
+        
+        <label>
+          🛑 Fricción:
+          <input id="friccion" type="range" min="0.8" max="0.999" step="0.001" value="0.98">
+          <span id="friccionValor" class="valor">0.98</span>
+        </label>
+        
+        <label>
+          ⚖️ Coef. Rebote:
+          <input id="rebote" type="range" min="0" max="1" step="0.05" value="0.5">
+          <span id="reboteValor" class="valor">0.5</span>
+        </label>
+        
+        <label>
+          📏 Radio Partícula:
+          <input id="radioParticula" type="range" min="0.1" max="0.5" step="0.05" value="0.2">
+          <span id="radioParticulaValor" class="valor">0.2</span>
+        </label>
+      </div>
+
+      <!-- Efectos visuales -->
+      <div class="seccion">
+        <strong>✨ Efectos Visuales:</strong>
+        
+        <label>
+          <input id="chkEstelas" type="checkbox">
+          Activar estelas
+        </label>
+        
+        <label>
+          <input id="chkColores" type="checkbox" checked>
+          Colores dinámicos
+        </label>
+        
+        <label>
+          <input id="chkColisiones" type="checkbox" checked>
+          Detectar colisiones
+        </label>
+      </div>
+
+      <!-- Controles de simulación -->
+      <div class="seccion">
+        <button id="btnPausar">⏸️ Pausar</button>
+        <button id="btnReiniciar">🔄 Reiniciar</button>
+        <button id="btnLimpiar">🗑️ Limpiar</button>
+      </div>
+
+      <div id="ayuda">
+        <strong>🎮 Controles:</strong><br>
+        W/A/S/D: Navegar<br>
+        Q/E: Subir/Bajar<br>
+        Ratón: Mirar alrededor<br>
+        Click: Crear explosión
+      </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div id="stats">
+      Partículas activas: <span id="statsParticulas">0</span><br>
+      FPS: <span id="statsFPS">60</span>
+    </div>
+
+    <!-- Escena A-Frame -->
+    <a-scene background="color: #000814" fog="type: exponential; color: #000814; density: 0.02">
+      
+      <!-- Cielo con estrellas -->
+      <a-sky color="#000814" material="shader: flat"></a-sky>
+      
+      <!-- Cámara con controles -->
+      <a-entity id="rig" position="0 5 20">
+        <a-entity 
+          id="camara"
+          camera 
+          look-controls 
+          wasd-controls="acceleration: 30"
+          position="0 0 0"
+          cursor="rayOrigin: mouse"
+          raycaster="objects: .clickable; far: 100">
+        </a-entity>
+      </a-entity>
+
+      <!-- Luces -->
+      <a-entity light="type: ambient; color: #446688; intensity: 0.5"></a-entity>
+      <a-entity light="type: directional; color: #ffffff; intensity: 0.7" position="5 10 5"></a-entity>
+      <a-entity light="type: point; color: #4a9eff; intensity: 0.8" position="0 5 0"></a-entity>
+
+      <!-- Plano de referencia (suelo) -->
+      <a-plane 
+        position="0 0 0" 
+        rotation="-90 0 0" 
+        width="100" 
+        height="100" 
+        color="#001122"
+        metalness="0.3"
+        roughness="0.7"
+        opacity="0.6">
+      </a-plane>
+
+      <!-- Caja límite (referencia visual) -->
+      <a-box 
+        id="cajaLimite"
+        position="0 10 0" 
+        width="40" 
+        height="20" 
+        depth="40" 
+        material="color: #4a9eff; opacity: 0.05; transparent: true; side: double"
+        wireframe="true"
+        wireframe-linewidth="2">
+      </a-box>
+
+      <!-- Contenedor de partículas -->
+      <a-entity id="particulas"></a-entity>
+      
+      <!-- Contenedor de estelas -->
+      <a-entity id="estelas"></a-entity>
+
+      <!-- Punto central de referencia -->
+      <a-sphere 
+        position="0 10 0" 
+        radius="0.3" 
+        color="#ff4444" 
+        emissive="#ff4444" 
+        emissive-intensity="0.5">
+      </a-sphere>
+    </a-scene>
+
+    <script>
+      // ============================================
+      // SISTEMA DE FÍSICA 3D - SIMULACIÓN DE PARTÍCULAS
+      // ============================================
+
+      const THREE = AFRAME.THREE;
+
+      // ---------- Referencias DOM ----------
+      const escena = document.querySelector("a-scene");
+      const particulasContainer = document.getElementById("particulas");
+      const estelasContainer = document.getElementById("estelas");
+      const rigEl = document.getElementById("rig");
+      const camaraEl = document.getElementById("camara");
+
+      // ---------- Parámetros de simulación ----------
+      let parametros = {
+        // Límites del espacio 3D
+        limX: 20,
+        limY: 20,
+        limZ: 20,
+        
+        // Fuerzas
+        gravedad: -0.01,
+        viento: 0,
+        vientoZ: 0,
+        fuerzaCentral: 0,
+        
+        // Propiedades físicas
+        friccion: 0.98,
+        rebote: 0.5,
+        radioParticula: 0.2,
+        
+        // Colisiones
+        detectarColisiones: true,
+        
+        // Visual
+        coloresDinamicos: true,
+        mostrarEstelas: false,
+        
+        // Control
+        pausado: false
+      };
+
+      // ---------- Sistema de partículas ----------
+      let particulas = [];
+      let numParticulas = 200;
+      let frameCount = 0;
+      let lastTime = performance.now();
+      let fps = 60;
+
+      // Estructura de cada partícula
+      class Particula {
+        constructor(x, y, z, vx=0, vy=0, vz=0) {
+          this.x = x;
+          this.y = y;
+          this.z = z;
+          this.vx = vx;
+          this.vy = vy;
+          this.vz = vz;
+          this.ax = 0;
+          this.ay = 0;
+          this.az = 0;
+          this.masa = 1;
+          this.radio = parametros.radioParticula;
+          this.activa = true;
+          this.edad = 0;
+          this.vidaMaxima = Infinity;
+          this.color = this.generarColor();
+          this.elementoDOM = this.crearElementoDOM();
+          this.estela = [];
+        }
+
+        generarColor() {
+          const colores = [
+            '#ff4444', '#44ff44', '#4444ff', '#ffff44', 
+            '#ff44ff', '#44ffff', '#ff8844', '#88ff44'
+          ];
+          return colores[Math.floor(Math.random() * colores.length)];
+        }
+
+        crearElementoDOM() {
+          const esfera = document.createElement('a-sphere');
+          esfera.setAttribute('radius', this.radio);
+          esfera.setAttribute('color', this.color);
+          esfera.setAttribute('metalness', '0.5');
+          esfera.setAttribute('roughness', '0.3');
+          esfera.setAttribute('emissive', this.color);
+          esfera.setAttribute('emissive-intensity', '0.3');
+          esfera.setAttribute('position', `${this.x} ${this.y} ${this.z}`);
+          esfera.classList.add('clickable');
+          particulasContainer.appendChild(esfera);
+          return esfera;
+        }
+
+        actualizar(dt) {
+          if (!this.activa || parametros.pausado) return;
+
+          // Aplicar fuerzas
+          this.ax = 0;
+          this.ay = parametros.gravedad;
+          this.az = 0;
+
+          // Viento
+          this.ax += parametros.viento;
+          this.az += parametros.vientoZ;
+
+          // Fuerza central (hacia el centro)
+          if (parametros.fuerzaCentral > 0) {
+            const centroX = 0;
+            const centroY = 10;
+            const centroZ = 0;
+            const dx = centroX - this.x;
+            const dy = centroY - this.y;
+            const dz = centroZ - this.z;
+            const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+            if (dist > 0.1) {
+              this.ax += (dx / dist) * parametros.fuerzaCentral;
+              this.ay += (dy / dist) * parametros.fuerzaCentral;
+              this.az += (dz / dist) * parametros.fuerzaCentral;
+            }
+          }
+
+          // Integración de velocidad
+          this.vx += this.ax;
+          this.vy += this.ay;
+          this.vz += this.az;
+
+          // Aplicar fricción
+          this.vx *= parametros.friccion;
+          this.vy *= parametros.friccion;
+          this.vz *= parametros.friccion;
+
+          // Integración de posición
+          this.x += this.vx;
+          this.y += this.vy;
+          this.z += this.vz;
+
+          // Colisiones con límites
+          this.verificarLimites();
+
+          // Actualizar posición en DOM
+          this.elementoDOM.setAttribute('position', `${this.x} ${this.y} ${this.z}`);
+
+          // Color dinámico basado en velocidad
+          if (parametros.coloresDinamicos) {
+            const velocidad = Math.sqrt(this.vx*this.vx + this.vy*this.vy + this.vz*this.vz);
+            const intensidad = Math.min(1, velocidad * 10);
+            this.elementoDOM.setAttribute('emissive-intensity', intensidad);
+          }
+
+          // Actualizar edad
+          this.edad += dt;
+          if (this.edad > this.vidaMaxima) {
+            this.desactivar();
+          }
+
+          // Estela
+          if (parametros.mostrarEstelas && frameCount % 3 === 0) {
+            this.estela.push({x: this.x, y: this.y, z: this.z});
+            if (this.estela.length > 20) {
+              this.estela.shift();
+            }
+          }
+        }
+
+        verificarLimites() {
+          const r = this.radio;
+          
+          // Límites en X
+          if (this.x > parametros.limX - r) {
+            this.x = parametros.limX - r;
+            this.vx *= -parametros.rebote;
+          } else if (this.x < -parametros.limX + r) {
+            this.x = -parametros.limX + r;
+            this.vx *= -parametros.rebote;
+          }
+
+          // Límites en Y (suelo y techo)
+          if (this.y < r) {
+            this.y = r;
+            this.vy *= -parametros.rebote;
+            // Pérdida de energía adicional al tocar el suelo
+            this.vx *= 0.95;
+            this.vz *= 0.95;
+          } else if (this.y > parametros.limY * 2 - r) {
+            this.y = parametros.limY * 2 - r;
+            this.vy *= -parametros.rebote;
+          }
+
+          // Límites en Z
+          if (this.z > parametros.limZ - r) {
+            this.z = parametros.limZ - r;
+            this.vz *= -parametros.rebote;
+          } else if (this.z < -parametros.limZ + r) {
+            this.z = -parametros.limZ + r;
+            this.vz *= -parametros.rebote;
+          }
+        }
+
+        desactivar() {
+          this.activa = false;
+          if (this.elementoDOM && this.elementoDOM.parentNode) {
+            this.elementoDOM.parentNode.removeChild(this.elementoDOM);
+          }
+        }
+      }
+
+      // ---------- Detección de colisiones ----------
+      function detectarColisiones() {
+        if (!parametros.detectarColisiones) return;
+
+        for (let i = 0; i < particulas.length; i++) {
+          if (!particulas[i].activa) continue;
+          
+          for (let j = i + 1; j < particulas.length; j++) {
+            if (!particulas[j].activa) continue;
+
+            const p1 = particulas[i];
+            const p2 = particulas[j];
+
+            const dx = p2.x - p1.x;
+            const dy = p2.y - p1.y;
+            const dz = p2.z - p1.z;
+            const distSq = dx*dx + dy*dy + dz*dz;
+            const radioSum = p1.radio + p2.radio;
+            const radioSumSq = radioSum * radioSum;
+
+            if (distSq < radioSumSq && distSq > 0.0001) {
+              // Colisión detectada - colisión elástica simplificada
+              const dist = Math.sqrt(distSq);
+              const nx = dx / dist;
+              const ny = dy / dist;
+              const nz = dz / dist;
+
+              // Velocidad relativa
+              const dvx = p1.vx - p2.vx;
+              const dvy = p1.vy - p2.vy;
+              const dvz = p1.vz - p2.vz;
+
+              const velocidadRelativaNormal = dvx*nx + dvy*ny + dvz*nz;
+
+              // Solo resolver si se están acercando
+              if (velocidadRelativaNormal < 0) {
+                // Separar las partículas
+                const separacion = (radioSum - dist) * 0.5;
+                p1.x -= nx * separacion;
+                p1.y -= ny * separacion;
+                p1.z -= nz * separacion;
+                p2.x += nx * separacion;
+                p2.y += ny * separacion;
+                p2.z += nz * separacion;
+
+                // Cambiar velocidades (colisión elástica)
+                const factor = 1.5 * velocidadRelativaNormal / (p1.masa + p2.masa);
+                
+                p1.vx -= factor * p2.masa * nx;
+                p1.vy -= factor * p2.masa * ny;
+                p1.vz -= factor * p2.masa * nz;
+                
+                p2.vx += factor * p1.masa * nx;
+                p2.vy += factor * p1.masa * ny;
+                p2.vz += factor * p1.masa * nz;
+
+                // Efecto visual de colisión
+                p1.elementoDOM.setAttribute('emissive-intensity', '1');
+                p2.elementoDOM.setAttribute('emissive-intensity', '1');
+              }
+            }
+          }
+        }
+      }
+
+      // ---------- Escenarios predefinidos ----------
+      
+      function escenarioLluvia() {
+        limpiarParticulas();
+        parametros.gravedad = -0.02;
+        parametros.viento = 0.002;
+        parametros.vientoZ = 0;
+        parametros.friccion = 0.995;
+        parametros.rebote = 0.1;
+        parametros.fuerzaCentral = 0;
+        
+        for (let i = 0; i < numParticulas; i++) {
+          const x = (Math.random() - 0.5) * parametros.limX * 2;
+          const y = Math.random() * 15 + 15;
+          const z = (Math.random() - 0.5) * parametros.limZ * 2;
+          const p = new Particula(x, y, z, 0, -0.1, 0);
+          p.radio = 0.1 + Math.random() * 0.1;
+          p.elementoDOM.setAttribute('radius', p.radio);
+          particulas.push(p);
+        }
+        actualizarControles();
+      }
+
+      function escenarioExplosion() {
+        limpiarParticulas();
+        parametros.gravedad = -0.008;
+        parametros.viento = 0;
+        parametros.vientoZ = 0;
+        parametros.friccion = 0.985;
+        parametros.rebote = 0.6;
+        parametros.fuerzaCentral = 0;
+        
+        const centro = {x: 0, y: 10, z: 0};
+        for (let i = 0; i < numParticulas; i++) {
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.random() * Math.PI;
+          const velocidad = 0.3 + Math.random() * 0.4;
+          
+          const vx = velocidad * Math.sin(phi) * Math.cos(theta);
+          const vy = velocidad * Math.sin(phi) * Math.sin(theta);
+          const vz = velocidad * Math.cos(phi);
+          
+          const p = new Particula(centro.x, centro.y, centro.z, vx, vy, vz);
+          p.vidaMaxima = 10000;
+          particulas.push(p);
+        }
+        actualizarControles();
+      }
+
+      function escenarioFuente() {
+        limpiarParticulas();
+        parametros.gravedad = -0.015;
+        parametros.viento = 0;
+        parametros.vientoZ = 0;
+        parametros.friccion = 0.99;
+        parametros.rebote = 0.4;
+        parametros.fuerzaCentral = 0;
+        
+        // Generar partículas continuamente desde el centro
+        const intervalo = setInterval(() => {
+          if (particulas.filter(p => p.activa).length < numParticulas) {
+            for (let i = 0; i < 5; i++) {
+              const angulo = Math.random() * Math.PI * 2;
+              const velocidadH = 0.15 + Math.random() * 0.1;
+              const vx = Math.cos(angulo) * velocidadH;
+              const vz = Math.sin(angulo) * velocidadH;
+              const vy = 0.3 + Math.random() * 0.2;
+              
+              const p = new Particula(0, 1, 0, vx, vy, vz);
+              p.vidaMaxima = 8000;
+              particulas.push(p);
+            }
+          }
+        }, 200);
+        
+        // Guardar referencia para poder limpiar después
+        window.intervaloFuente = intervalo;
+        actualizarControles();
+      }
+
+      function escenarioOrbital() {
+        limpiarParticulas();
+        parametros.gravedad = 0;
+        parametros.viento = 0;
+        parametros.vientoZ = 0;
+        parametros.friccion = 0.999;
+        parametros.rebote = 0.8;
+        parametros.fuerzaCentral = 0.002;
+        
+        for (let i = 0; i < numParticulas; i++) {
+          const radio = 5 + Math.random() * 10;
+          const theta = Math.random() * Math.PI * 2;
+          const phi = (Math.random() - 0.5) * Math.PI * 0.5;
+          
+          const x = radio * Math.cos(theta) * Math.cos(phi);
+          const y = 10 + radio * Math.sin(phi);
+          const z = radio * Math.sin(theta) * Math.cos(phi);
+          
+          // Velocidad tangencial para órbita
+          const velocidadOrbital = 0.04 + Math.random() * 0.02;
+          const vx = -Math.sin(theta) * velocidadOrbital;
+          const vz = Math.cos(theta) * velocidadOrbital;
+          const vy = (Math.random() - 0.5) * 0.02;
+          
+          const p = new Particula(x, y, z, vx, vy, vz);
+          particulas.push(p);
+        }
+        actualizarControles();
+      }
+
+      function escenarioVortice() {
+        limpiarParticulas();
+        parametros.gravedad = -0.005;
+        parametros.viento = 0;
+        parametros.vientoZ = 0;
+        parametros.friccion = 0.995;
+        parametros.rebote = 0.3;
+        parametros.fuerzaCentral = 0.001;
+        
+        for (let i = 0; i < numParticulas; i++) {
+          const radio = Math.random() * 15;
+          const theta = Math.random() * Math.PI * 2;
+          const x = radio * Math.cos(theta);
+          const y = Math.random() * 20;
+          const z = radio * Math.sin(theta);
+          
+          // Velocidad tangencial + componente vertical
+          const velocidad = 0.1;
+          const vx = -Math.sin(theta) * velocidad;
+          const vz = Math.cos(theta) * velocidad;
+          const vy = (Math.random() - 0.5) * 0.1;
+          
+          const p = new Particula(x, y, z, vx, vy, vz);
+          particulas.push(p);
+        }
+        actualizarControles();
+      }
+
+      function escenarioCaotico() {
+        limpiarParticulas();
+        parametros.gravedad = (Math.random() - 0.5) * 0.02;
+        parametros.viento = (Math.random() - 0.5) * 0.02;
+        parametros.vientoZ = (Math.random() - 0.5) * 0.02;
+        parametros.friccion = 0.97 + Math.random() * 0.02;
+        parametros.rebote = 0.3 + Math.random() * 0.5;
+        parametros.fuerzaCentral = Math.random() * 0.003;
+        
+        for (let i = 0; i < numParticulas; i++) {
+          const x = (Math.random() - 0.5) * parametros.limX * 2;
+          const y = Math.random() * parametros.limY * 2;
+          const z = (Math.random() - 0.5) * parametros.limZ * 2;
+          const vx = (Math.random() - 0.5) * 0.5;
+          const vy = (Math.random() - 0.5) * 0.5;
+          const vz = (Math.random() - 0.5) * 0.5;
+          
+          const p = new Particula(x, y, z, vx, vy, vz);
+          particulas.push(p);
+        }
+        actualizarControles();
+      }
+
+      // ---------- Gestión de partículas ----------
+      
+      function limpiarParticulas() {
+        if (window.intervaloFuente) {
+          clearInterval(window.intervaloFuente);
+          window.intervaloFuente = null;
+        }
+        
+        particulas.forEach(p => p.desactivar());
+        particulas = [];
+        
+        // Limpiar DOM
+        while (particulasContainer.firstChild) {
+          particulasContainer.removeChild(particulasContainer.firstChild);
+        }
+      }
+
+      function regenerarParticulas() {
+        limpiarParticulas();
+        for (let i = 0; i < numParticulas; i++) {
+          const x = (Math.random() - 0.5) * parametros.limX * 1.5;
+          const y = Math.random() * parametros.limY + 5;
+          const z = (Math.random() - 0.5) * parametros.limZ * 1.5;
+          const vx = (Math.random() - 0.5) * 0.2;
+          const vy = (Math.random() - 0.5) * 0.2;
+          const vz = (Math.random() - 0.5) * 0.2;
+          
+          particulas.push(new Particula(x, y, z, vx, vy, vz));
+        }
+      }
+
+      // ---------- Bucle principal de animación ----------
+      
+      function bucleAnimacion() {
+        frameCount++;
+        
+        // Calcular FPS
+        const now = performance.now();
+        const delta = now - lastTime;
+        if (frameCount % 30 === 0) {
+          fps = Math.round(1000 / delta);
+          document.getElementById('statsFPS').textContent = fps;
+        }
+        lastTime = now;
+
+        // Actualizar partículas
+        particulas.forEach(p => {
+          if (p.activa) {
+            p.actualizar(delta / 1000);
+          }
+        });
+
+        // Detectar colisiones
+        if (parametros.detectarColisiones) {
+          detectarColisiones();
+        }
+
+        // Estadísticas
+        document.getElementById('statsParticulas').textContent = 
+          particulas.filter(p => p.activa).length;
+
+        requestAnimationFrame(bucleAnimacion);
+      }
+
+      // ---------- Control de vuelo mejorado (Q/E para subir/bajar) ----------
+      
+      const teclasPulsadas = {};
+      const velocidadVuelo = 0.3;
+
+      document.addEventListener('keydown', (e) => {
+        teclasPulsadas[e.key.toLowerCase()] = true;
+      });
+
+      document.addEventListener('keyup', (e) => {
+        teclasPulsadas[e.key.toLowerCase()] = false;
+      });
+
+      function actualizarVuelo() {
+        const pos = rigEl.getAttribute('position');
+        let cambio = false;
+
+        if (teclasPulsadas['q']) {
+          pos.y += velocidadVuelo;
+          cambio = true;
+        }
+        if (teclasPulsadas['e']) {
+          pos.y -= velocidadVuelo;
+          cambio = true;
+        }
+
+        if (cambio) {
+          rigEl.setAttribute('position', pos);
+        }
+
+        requestAnimationFrame(actualizarVuelo);
+      }
+
+      actualizarVuelo();
+
+      // ---------- Click para crear explosión ----------
+      
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('#controles')) return;
+        
+        // Crear mini explosión en posición del click
+        const camaraPos = camaraEl.object3D.position;
+        const camaraDir = new THREE.Vector3();
+        camaraEl.object3D.getWorldDirection(camaraDir);
+        
+        const distancia = 10;
+        const puntox = camaraPos.x + camaraDir.x * distancia;
+        const puntoy = camaraPos.y + camaraDir.y * distancia;
+        const puntoz = camaraPos.z + camaraDir.z * distancia;
+        
+        for (let i = 0; i < 20; i++) {
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.random() * Math.PI;
+          const velocidad = 0.2 + Math.random() * 0.3;
+          
+          const vx = velocidad * Math.sin(phi) * Math.cos(theta);
+          const vy = velocidad * Math.sin(phi) * Math.sin(theta);
+          const vz = velocidad * Math.cos(phi);
+          
+          const p = new Particula(puntox, puntoy, puntoz, vx, vy, vz);
+          p.vidaMaxima = 3000;
+          p.radio = 0.15;
+          p.elementoDOM.setAttribute('radius', p.radio);
+          particulas.push(p);
+        }
+      });
+
+      // ---------- Conectar controles UI ----------
+      
+      function conectarControl(id, nombreParam, multiplicador = 1) {
+        const slider = document.getElementById(id);
+        const span = document.getElementById(id + 'Valor');
+        
+        slider.addEventListener('input', () => {
+          const valor = parseFloat(slider.value) * multiplicador;
+          parametros[nombreParam] = valor;
+          span.textContent = slider.value;
+        });
+      }
+
+      conectarControl('gravedad', 'gravedad');
+      conectarControl('viento', 'viento');
+      conectarControl('vientoZ', 'vientoZ');
+      conectarControl('fuerzaCentral', 'fuerzaCentral');
+      conectarControl('friccion', 'friccion');
+      conectarControl('rebote', 'rebote');
+      conectarControl('radioParticula', 'radioParticula');
+
+      document.getElementById('numParticulas').addEventListener('input', () => {
+        numParticulas = parseInt(document.getElementById('numParticulas').value);
+        document.getElementById('numParticulasValor').textContent = numParticulas;
+      });
+
+      document.getElementById('chkEstelas').addEventListener('change', (e) => {
+        parametros.mostrarEstelas = e.target.checked;
+      });
+
+      document.getElementById('chkColores').addEventListener('change', (e) => {
+        parametros.coloresDinamicos = e.target.checked;
+      });
+
+      document.getElementById('chkColisiones').addEventListener('change', (e) => {
+        parametros.detectarColisiones = e.target.checked;
+      });
+
+      document.getElementById('btnPausar').addEventListener('click', () => {
+        parametros.pausado = !parametros.pausado;
+        document.getElementById('btnPausar').textContent = 
+          parametros.pausado ? '▶️ Reanudar' : '⏸️ Pausar';
+      });
+
+      document.getElementById('btnReiniciar').addEventListener('click', () => {
+        regenerarParticulas();
+      });
+
+      document.getElementById('btnLimpiar').addEventListener('click', () => {
+        limpiarParticulas();
+      });
+
+      document.getElementById('btnRegenerarParticulas').addEventListener('click', () => {
+        regenerarParticulas();
+      });
+
+      // Botones de escenarios
+      document.getElementById('btnLluvia').addEventListener('click', escenarioLluvia);
+      document.getElementById('btnExplosion').addEventListener('click', escenarioExplosion);
+      document.getElementById('btnFuente').addEventListener('click', escenarioFuente);
+      document.getElementById('btnOrbital').addEventListener('click', escenarioOrbital);
+      document.getElementById('btnVortice').addEventListener('click', escenarioVortice);
+      document.getElementById('btnCaotico').addEventListener('click', escenarioCaotico);
+
+      function actualizarControles() {
+        document.getElementById('gravedad').value = parametros.gravedad;
+        document.getElementById('gravedadValor').textContent = parametros.gravedad.toFixed(3);
+        document.getElementById('viento').value = parametros.viento;
+        document.getElementById('vientoValor').textContent = parametros.viento.toFixed(3);
+        document.getElementById('vientoZ').value = parametros.vientoZ;
+        document.getElementById('vientoZValor').textContent = parametros.vientoZ.toFixed(3);
+        document.getElementById('friccion').value = parametros.friccion;
+        document.getElementById('friccionValor').textContent = parametros.friccion.toFixed(3);
+        document.getElementById('rebote').value = parametros.rebote;
+        document.getElementById('reboteValor').textContent = parametros.rebote.toFixed(2);
+        document.getElementById('fuerzaCentral').value = parametros.fuerzaCentral;
+        document.getElementById('fuerzaCentralValor').textContent = parametros.fuerzaCentral.toFixed(4);
+      }
+
+      // ---------- Inicialización ----------
+      
+      escena.addEventListener('loaded', () => {
+        console.log('✅ Escena cargada - Iniciando simulación de partículas');
+        regenerarParticulas();
+        bucleAnimacion();
+      });
+
+    </script>
+  </body>
+</html>

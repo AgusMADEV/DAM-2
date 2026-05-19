@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>EmpresaIA - Chat SQL sobre clientes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --card-bg: #ffffff;
+            --accent: #2563eb;
+            --accent-soft: rgba(37, 99, 235, 0.08);
+            --border-soft: #e5e7eb;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.12);
+            --radius-lg: 18px;
+            --radius-md: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #e0edff 0, #f5f7fb 45%, #f5f7fb 100%);
+            color: var(--text-main);
+        }
+
+        .page-shell {
+            min-height: 100vh;
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            padding: 32px 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1080px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px 24px 28px;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .title-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: 0.02em;
+        }
+
+        .subtitle {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 11px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .pill-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: var(--accent);
+            box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.2);
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* FORM CARD */
+
+        .query-card {
+            border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, #f9fafb, #eef2ff);
+            padding: 18px 18px 14px;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .query-label-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .hint {
+            font-size: 0.78rem;
+            color: #4b5563;
+        }
+
+        .kbd {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px 6px;
+            border-radius: 5px;
+            border: 1px solid #d1d5db;
+            background: #f9fafb;
+            font-size: 0.7rem;
+            font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            color: #374151;
+        }
+
+        form {
+            margin: 0;
+        }
+
+        #user_query {
+            width: 100%;
+            min-height: 80px;
+            max-height: 160px;
+            padding: 10px 11px;
+            border-radius: 12px;
+            border: 1px solid #d1d5db;
+            font-size: 0.9rem;
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        #user_query:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.22);
+            background: #ffffff;
+        }
+
+        .form-footer {
+            margin-top: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-left,
+        .footer-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button {
+            font-family: inherit;
+        }
+
+        button[type="submit"] {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: var(--accent);
+            color: #ffffff;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.35);
+            transition: transform 0.08s ease-out, box-shadow 0.08s ease-out, background 0.15s ease-out;
+            white-space: nowrap;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-1px);
+            background: #1d4ed8;
+            box-shadow: 0 18px 30px rgba(37, 99, 235, 0.45);
+        }
+
+        button[type="submit"]:active {
+            transform: translateY(0);
+            box-shadow: 0 10px 18px rgba(37, 99, 235, 0.35);
+        }
+
+        .secondary-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.7);
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.7);
+            color: #111827;
+            transition: background 0.12s ease-out, border-color 0.12s ease-out, transform 0.08s ease-out;
+            white-space: nowrap;
+        }
+
+        .secondary-btn:hover {
+            background: #e5edff;
+            border-color: #4f46e5;
+        }
+
+        .secondary-btn.recording {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+            transform: translateY(-1px);
+        }
+
+        .btn-icon {
+            font-size: 1rem;
+        }
+
+        .btn-label {
+            font-size: 0.8rem;
+        }
+
+        /* ERROR BOX */
+
+        .box {
+            margin-top: 4px;
+            border-radius: var(--radius-md);
+            padding: 10px 11px;
+            font-size: 0.85rem;
+        }
+
+        .error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+        }
+
+        .info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1d4ed8;
+        }
+
+        /* RESULTS GRID */
+
+        .results-block {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .results-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .results-count {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-top: 4px;
+        }
+
+        .card {
+            position: relative;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 12px 12px 11px;
+            border: 1px solid rgba(209, 213, 219, 0.8);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+            overflow: hidden;
+
+            opacity: 0;
+            transform: translateY(10px) scale(0.96);
+            animation: pop-in 0.38s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            background: radial-gradient(circle at 0 0, rgba(59, 130, 246, 0.07), transparent 55%);
+            opacity: 0.9;
+            pointer-events: none;
+        }
+
+        .card-inner {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 0.92rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-tag {
+            font-size: 0.7rem;
+            padding: 2px 7px;
+            border-radius: 999px;
+            background: rgba(59, 130, 246, 0.08);
+            color: #1d4ed8;
+            border: 1px solid rgba(129, 140, 248, 0.3);
+        }
+
+        .card-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 0.8rem;
+        }
+
+        .field-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+        }
+
+        .field-label {
+            color: var(--text-muted);
+        }
+
+        .field-value {
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .card-footer {
+            margin-top: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .pill-sm {
+            padding: 2px 7px;
+            border-radius: 999px;
+            background: #f3f4ff;
+            border: 1px solid #e5e7ff;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        .dot-especial {
+            background: #22c55e;
+        }
+
+        /* SQL QUERY BOX ABAJO */
+
+        .sql-block {
+            margin-top: 4px;
+        }
+
+        .sql-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .sql-box {
+            border-radius: var(--radius-md);
+            padding: 9px 11px;
+            background: #020617;
+            color: #e5e7eb;
+            font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.78rem;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        .sql-keyword {
+            color: #93c5fd;
+            font-weight: 500;
+        }
+
+        .sql-table {
+            color: #fbbf24;
+        }
+
+        .sql-where {
+            color: #6ee7b7;
+        }
+
+        @keyframes pop-in {
+            0% {
+                opacity: 0;
+                transform: translateY(12px) scale(0.94);
+            }
+            60% {
+                opacity: 1;
+                transform: translateY(-2px) scale(1.02);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1.0);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 18px 14px 22px;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .query-card {
+                padding: 14px 12px 11px;
+            }
+
+            .form-footer {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+            .footer-right {
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page-shell">
+    <div class="container">
+        <header>
+            <div class="title-block">
+                <h1>EmpresaIA · Clientes</h1>
+                <p class="subtitle">
+                    Escribe o dicta una pregunta en lenguaje natural. El sistema la convierte en SQL sobre la tabla
+                    <strong>clientes</strong>.
+                </p>
+            </div>
+            <div class="pill">
+                <span class="pill-dot"></span>
+                Modo consulta segura
+            </div>
+        </header>
+
+        <main>
+            <!-- TARJETA DE CONSULTA -->
+            <section class="query-card">
+                <div class="query-label-row">
+                    <span>Pregunta en lenguaje natural</span>
+                    <span class="hint">
+                        Pulsa <span class="kbd">Enter</span> para enviar o usa el micrófono
+                    </span>
+                </div>
+
+                <form id="query_form" method="post">
+                    <textarea id="user_query" name="user_query"
+                              placeholder="Ejemplo: Muéstrame los clientes de Valencia mayores de 30 años."></textarea>
+                    <div class="form-footer">
+                        <div class="footer-left">
+                            <button type="button" id="mic_button" class="secondary-btn" title="Dicción por voz">
+                                <span class="btn-icon">🎙️</span>
+                                <span class="btn-label">Hablar</span>
+                            </button>
+                        </div>
+                        <div class="footer-right">
+                            <button type="submit">
+                                <span class="btn-icon">➤</span>
+                                <span>Consultar</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                {% if error %}
+                <div class="box error">
+                    {{ error }}
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- RESULTADOS EN TARJETAS -->
+            {% if results %}
+            <section class="results-block">
+                <div class="results-header">
+                    <div class="results-title">Resultados</div>
+                    <div class="results-count">
+                        {{ results|length }} registro{{ results|length != 1 and 's' or '' }}
+                    </div>
+                </div>
+
+                <div class="cards-grid">
+                    {% for row in results %}
+                    <article class="card" style="animation-delay: {{ loop.index0 * 0.08 }}s;">
+                        <div class="card-inner">
+                            <header class="card-header">
+                                <div class="card-title">
+                                    {% if row.get('nombre') or row.get('apellidos') %}
+                                        {{ row.get('nombre', '') }} {{ row.get('apellidos', '') }}
+                                    {% else %}
+                                        Cliente #{{ row.get('id', '—') }}
+                                    {% endif %}
+                                </div>
+                                {% if row.get('estado_civil') %}
+                                <div class="card-tag">
+                                    {{ row.get('estado_civil') }}
+                                </div>
+                                {% endif %}
+                            </header>
+
+                            <div class="card-fields">
+                                {% if row.get('ciudad') or row.get('pais') %}
+                                <div class="field-row">
+                                    <span class="field-label">Ubicación</span>
+                                    <span class="field-value">
+                                        {{ row.get('ciudad', '—') }}
+                                        {% if row.get('pais') %} · {{ row.get('pais') }}{% endif %}
+                                    </span>
+                                </div>
+                                {% endif %}
+
+                                {% if row.get('edad') is not none %}
+                                <div class="field-row">
+                                    <span class="field-label">Edad</span>
+                                    <span class="field-value">{{ row.get('edad') }}</span>
+                                </div>
+                                {% endif %}
+
+                                {% if row.get('email') %}
+                                <div class="field-row">
+                                    <span class="field-label">Email</span>
+                                    <span class="field-value">{{ row.get('email') }}</span>
+                                </div>
+                                {% endif %}
+
+                                {% if row.get('telefono') %}
+                                <div class="field-row">
+                                    <span class="field-label">Teléfono</span>
+                                    <span class="field-value">{{ row.get('telefono') }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <footer class="card-footer">
+                                <span>
+                                    <span class="dot dot-especial"></span>
+                                    ID {{ row.get('id', '—') }}
+                                </span>
+                                {% if row.get('fecha_registro') %}
+                                <span class="pill-sm">
+                                    Alta: {{ row.get('fecha_registro') }}
+                                </span>
+                                {% endif %}
+                            </footer>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+            {% elif sql_query and not error %}
+            <section class="results-block">
+                <div class="box info">
+                    La consulta no devolvió filas.
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- CONSULTA SQL ABAJO -->
+            {% if sql_query %}
+            <section class="sql-block">
+                <div class="sql-label">
+                    Consulta SQL generada
+                </div>
+                <pre class="sql-box">{{ sql_query }}</pre>
+            </section>
+            {% endif %}
+        </main>
+    </div>
+</div>
+
+<!-- Pasamos el resumen al JS para síntesis de voz -->
+<script>
+    window.resultsSummary = {% if results_summary %}{{ results_summary|tojson|safe }}{% else %}null{% endif %};
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const textarea = document.getElementById('user_query');
+        const form = document.getElementById('query_form');
+        const micButton = document.getElementById('mic_button');
+
+        // 1) Enviar con Enter (sin Shift)
+        textarea.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                if (textarea.value.trim() !== '') {
+                    form.submit();
+                }
+            }
+        });
+
+        // 2) Reconocimiento de voz (SpeechRecognition)
+        let recognition = null;
+        let recognizing = false;
+
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SR();
+            recognition.lang = 'es-ES';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            const micLabel = micButton.querySelector('.btn-label');
+
+            recognition.onstart = () => {
+                recognizing = true;
+                micButton.classList.add('recording');
+                if (micLabel) micLabel.textContent = 'Escuchando...';
+            };
+
+            recognition.onend = () => {
+                recognizing = false;
+                micButton.classList.remove('recording');
+                if (micLabel) micLabel.textContent = 'Hablar';
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                textarea.value = transcript;
+                if (textarea.value.trim() !== '') {
+                    form.submit();
+                }
+            };
+
+            micButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (!recognition) return;
+
+                if (recognizing) {
+                    recognition.stop();
+                } else {
+                    // detener cualquier síntesis actual para evitar solapamientos
+                    if ('speechSynthesis' in window) {
+                        window.speechSynthesis.cancel();
+                    }
+                    recognition.start();
+                }
+            });
+        } else {
+            // Navegador sin soporte de reconocimiento de voz
+            micButton.disabled = true;
+            micButton.title = 'El reconocimiento de voz no está soportado en este navegador.';
+        }
+
+        // 3) Síntesis de voz para el resumen de resultados
+        if (window.resultsSummary && 'speechSynthesis' in window) {
+            try {
+                const utterance = new SpeechSynthesisUtterance(window.resultsSummary);
+                utterance.lang = 'es-ES';
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(utterance);
+            } catch (e) {
+                // Si el navegador bloquea la síntesis, simplemente lo ignoramos
+                console.warn('Speech synthesis error:', e);
+            }
+        }
+    });
+</script>
+</body>
+</html>
+
