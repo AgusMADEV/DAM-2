@@ -1,0 +1,166 @@
+"""
+INSTRUCCIONES DE PRUEBA DEL CHAT
+=================================
+
+Este documento contiene instrucciones paso a paso para probar
+el sistema de chat cliente-servidor.
+
+## PASO 1: Iniciar el Servidor
+
+En una terminal (Terminal 1), ejecuta:
+
+    python "004-servidor de chat.py"
+
+Deberías ver:
+    ╔═══════════════════════════════════════════════╗
+    ║              💬  SERVIDOR DE CHAT PYTHON        ║
+    ║        Multiusuario · UTF-8 · Emojis 🙂        ║
+    ╚═══════════════════════════════════════════════╝
+    
+    Escuchando en 0.0.0.0:5000 ...
+
+
+## PASO 2: Conectar Primer Cliente
+
+En una nueva terminal (Terminal 2), ejecuta:
+
+    python "005-cliente de chat.py"
+
+Cuando te pregunte el apodo, escribe: Alice
+Deberías ver:
+    ╔═══════════════════════════════════════════════╗
+    ║                💬  CLIENTE DE CHAT PYTHON       ║
+    ║         Escribe /salir para abandonar el chat   ║
+    ╚═══════════════════════════════════════════════╝
+    
+    Elige un apodo: Alice
+    Conectado. Escribe tus mensajes. /salir para salir.
+
+
+## PASO 3: Conectar Segundo Cliente
+
+En una nueva terminal (Terminal 3), ejecuta:
+
+    python "005-cliente de chat.py"
+
+Cuando te pregunte el apodo, escribe: Bob
+
+En la Terminal 2 (Alice) deberías ver:
+    👤 Bob se ha unido al chat.
+
+
+## PASO 4: Conectar Tercer Cliente (Opcional)
+
+En una nueva terminal (Terminal 4), ejecuta:
+
+    python "005-cliente de chat.py"
+
+Apodo: Charlie
+
+Todos los clientes anteriores verán:
+    👤 Charlie se ha unido al chat.
+
+
+## PASO 5: Enviar Mensajes
+
+En Terminal 2 (Alice), escribe:
+    > Hola a todos! 👋
+
+En Terminal 3 (Bob) y Terminal 4 (Charlie) deberías ver:
+    💬 Alice: Hola a todos! 👋
+
+En Terminal 3 (Bob), escribe:
+    > Hola Alice! ¿Cómo estás? 😊
+
+Todos excepto Bob verán:
+    💬 Bob: Hola Alice! ¿Cómo estás? 😊
+
+
+## PASO 6: Probar Emojis y Caracteres Especiales
+
+Prueba enviar:
+    > España tiene ñ, á, é, í, ó, ú
+    > Emojis: 🎉 🚀 ❤️ 💻 🐍 🔥
+    > Símbolos: € £ ¥ © ® ™
+
+
+## PASO 7: Desconectar un Cliente
+
+En Terminal 3 (Bob), escribe:
+    > /salir
+
+Bob se desconectará y en las otras terminales verás:
+    🚪 Bob ha salido del chat.
+
+
+## PASO 8: Verificar en el Servidor
+
+En la Terminal 1 (Servidor), deberías ver un registro de todas las actividades:
+    [UNIÓN] Alice desde ('127.0.0.1', XXXXX)
+    [UNIÓN] Bob desde ('127.0.0.1', XXXXX)
+    [UNIÓN] Charlie desde ('127.0.0.1', XXXXX)
+    [MENSAJE] Alice: Hola a todos! 👋
+    [MENSAJE] Bob: Hola Alice! ¿Cómo estás? 😊
+    [SALIDA] Bob
+
+
+## PASO 9: Cerrar el Servidor
+
+En la Terminal 1, presiona Ctrl+C
+
+Todos los clientes conectados verán:
+    [El servidor se ha desconectado]
+
+
+## VERIFICACIÓN DE FUNCIONALIDAD
+
+✓ El servidor acepta múltiples clientes
+✓ Los mensajes se distribuyen a todos los clientes (excepto al remitente)
+✓ Los emojis y caracteres UTF-8 funcionan correctamente
+✓ El comando /salir desconecta limpiamente
+✓ El servidor registra todas las actividades
+✓ Las notificaciones de unión/salida funcionan
+
+
+## PROBLEMAS COMUNES
+
+### Error: "Address already in use"
+- Solución: El puerto 5000 está ocupado. Espera 30 segundos o cambia el PORT en ambos archivos.
+
+### Error: "Connection refused"
+- Solución: El servidor no está ejecutándose. Inicia primero el servidor.
+
+### No se ven los mensajes
+- Solución: Verifica que HOST y PORT son iguales en servidor y cliente.
+
+### Caracteres raros en lugar de emojis
+- Solución: Tu terminal no soporta emojis. Usa Windows Terminal, PowerShell 7, o WSL.
+
+
+## COMANDOS RÁPIDOS PARA WINDOWS POWERSHELL
+
+# Terminal 1 - Servidor
+cd "d:\\xampp\\htdocs\\DAM-2\\Programación de servicios y procesos\\003-Programación de comunicaciones en red\\004-Sockets. Tipos. Características\\102-Actividad EVAL"
+python "004-servidor de chat.py"
+
+# Terminal 2 - Cliente Alice
+cd "d:\\xampp\\htdocs\\DAM-2\\Programación de servicios y procesos\\003-Programación de comunicaciones en red\\004-Sockets. Tipos. Características\\102-Actividad EVAL"
+python "005-cliente de chat.py"
+
+# Terminal 3 - Cliente Bob
+cd "d:\\xampp\\htdocs\\DAM-2\\Programación de servicios y procesos\\003-Programación de comunicaciones en red\\004-Sockets. Tipos. Características\\102-Actividad EVAL"
+python "005-cliente de chat.py"
+
+
+## CAPTURAS RECOMENDADAS
+
+Para la documentación de la actividad, haz capturas de pantalla de:
+1. El servidor iniciado
+2. Tres clientes conectados
+3. Intercambio de mensajes
+4. Vista del servidor con los logs
+5. Cliente desconectándose con /salir
+
+
+¡Disfruta probando tu sistema de chat! 💬
+"""

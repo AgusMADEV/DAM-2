@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Encriptación - Clientes</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --bg: #ffffff;
+      --bg-secondary: #f9fafb;
+      --border: #e5e7eb;
+      --border-light: #f3f4f6;
+      --success: #059669;
+      --error: #dc2626;
+      --warning: #d97706;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: var(--bg);
+      padding: 48px;
+      margin-bottom: 32px;
+      border: 1px solid var(--border);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 32px;
+      margin-bottom: 40px;
+    }
+
+    .title-section h1 {
+      font-size: 1.875rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      letter-spacing: -0.025em;
+    }
+
+    .title-section p {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 8px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 10px 24px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-secondary);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .stat-item {
+      background: var(--bg);
+      padding: 24px 32px;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.025em;
+    }
+
+    .status-bar {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 16px 24px;
+      margin-bottom: 32px;
+      font-size: 0.875rem;
+      display: none;
+    }
+
+    .status-bar.loading {
+      display: block;
+      color: var(--primary);
+      border-left: 3px solid var(--primary);
+    }
+
+    .status-bar.success {
+      display: block;
+      color: var(--success);
+      border-left: 3px solid var(--success);
+    }
+
+    .status-bar.error {
+      display: block;
+      color: var(--error);
+      border-left: 3px solid var(--error);
+    }
+
+    .table-wrapper {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: var(--bg-secondary);
+    }
+
+    th {
+      text-align: left;
+      padding: 16px 24px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 0.875rem;
+      color: var(--text-primary);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: var(--bg-secondary);
+    }
+
+    .encrypted {
+      font-family: 'Monaco', 'Courier New', monospace;
+      color: var(--warning);
+      font-size: 0.8125rem;
+      word-break: break-all;
+    }
+
+    .decrypted {
+      color: var(--success);
+      font-weight: 500;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 80px 32px;
+      color: var(--text-muted);
+    }
+
+    .empty-state h3 {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .empty-state p {
+      font-size: 0.875rem;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 32px 24px;
+      }
+
+      .header-top {
+        flex-direction: column;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .title-section h1 {
+        font-size: 1.5rem;
+      }
+
+      table {
+        font-size: 0.8125rem;
+      }
+
+      th, td {
+        padding: 12px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-top">
+        <div class="title-section">
+          <h1>Sistema de Encriptación de Clientes</h1>
+          <p>Gestión segura de datos con cifrado César</p>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="cargarDatos()">Cargar Datos</button>
+          <button class="btn btn-secondary" onclick="toggleEncriptacion()">
+            <span id="toggleText">Desencriptar</span>
+          </button>
+        </div>
+      </div>
+      
+      <div id="infoPanel" class="stats" style="display: none;">
+        <div class="stat-item">
+          <div class="stat-label">Total Registros</div>
+          <div class="stat-value" id="totalClientes">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Estado Actual</div>
+          <div class="stat-value" id="estadoEncriptacion" style="font-size: 1.25rem;">Encriptado</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Algoritmo</div>
+          <div class="stat-value" style="font-size: 1.25rem;">César +5</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="status" class="status-bar"></div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr id="tableHeader"></tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr>
+            <td colspan="100" class="empty-state">
+              <h3>Sin datos</h3>
+              <p>Utiliza el botón "Cargar Datos" para consultar la base de datos</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Variables globales
+    let datosOriginales = [];
+    let datosDesencriptados = [];
+    let modoEncriptado = true;
+
+    /**
+     * Clase Encriptador (lado cliente)
+     * Debe coincidir con la implementación del servidor
+     */
+    class Encriptador {
+      encripta(objeto) {
+        let resultado = "";
+        for(let i = 0; i < objeto.length; i++) {
+          let ascii = objeto.charCodeAt(i);
+          ascii += 5;
+          resultado += String.fromCharCode(ascii);
+        }
+        return resultado;
+      }
+
+      desencripta(objeto) {
+        let desencriptado = "";
+        for(let i = 0; i < objeto.length; i++) {
+          let ascii = objeto.charCodeAt(i);
+          ascii -= 5;
+          desencriptado += String.fromCharCode(ascii);
+        }
+        return desencriptado;
+      }
+    }
+
+    const encriptador = new Encriptador();
+
+    /**
+     * Decodifica base64 y desencripta usando César
+     */
+    function desencriptarCampo(valorBase64) {
+      try {
+        // Decodificar base64
+        const cifrado = atob(valorBase64);
+        // Desencriptar con César
+        return encriptador.desencripta(cifrado);
+      } catch(e) {
+        console.error("Error al desencriptar:", e);
+        return "[Error]";
+      }
+    }
+
+    /**
+     * Muestra un mensaje de estado
+     */
+    function mostrarEstado(mensaje, tipo) {
+      const status = document.getElementById('status');
+      status.textContent = mensaje;
+      status.className = `status-bar ${tipo}`;
+    }
+
+    /**
+     * Carga los datos del servidor
+     */
+    async function cargarDatos() {
+      mostrarEstado('Cargando datos del servidor...', 'loading');
+      
+      try {
+        const response = await fetch('servidor.php');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.mensaje);
+        }
+        
+        datosOriginales = data;
+        
+        // Desencriptar todos los datos
+        datosDesencriptados = data.map(fila => {
+          const filaDesencriptada = {};
+          for (const campo in fila) {
+            filaDesencriptada[campo] = desencriptarCampo(fila[campo]);
+          }
+          return filaDesencriptada;
+        });
+        
+        mostrarEstado(`Datos cargados correctamente: ${data.length} registros`, 'success');
+        document.getElementById('infoPanel').style.display = 'grid';
+        document.getElementById('totalClientes').textContent = data.length;
+        
+        renderizarTabla();
+        
+      } catch (error) {
+        console.error('Error:', error);
+        mostrarEstado(`Error al cargar datos: ${error.message}`, 'error');
+      }
+    }
+
+    /**
+     * Renderiza la tabla con los datos
+     */
+    function renderizarTabla() {
+      if (datosOriginales.length === 0) return;
+      
+      const datos = modoEncriptado ? datosOriginales : datosDesencriptados;
+      const primeraFila = datos[0];
+      const campos = Object.keys(primeraFila);
+      
+      // Renderizar encabezados
+      const headerRow = document.getElementById('tableHeader');
+      headerRow.innerHTML = campos.map(campo => `<th>${campo}</th>`).join('');
+      
+      // Renderizar filas
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = datos.map(fila => {
+        const celdas = campos.map(campo => {
+          const valor = fila[campo];
+          const clase = modoEncriptado ? 'encrypted' : 'decrypted';
+          return `<td><span class="${clase}">${valor}</span></td>`;
+        }).join('');
+        return `<tr>${celdas}</tr>`;
+      }).join('');
+    }
+
+    /**
+     * Alterna entre modo encriptado y desencriptado
+     */
+    function toggleEncriptacion() {
+      if (datosOriginales.length === 0) {
+        mostrarEstado('Primero debes cargar los datos', 'error');
+        return;
+      }
+      
+      modoEncriptado = !modoEncriptado;
+      
+      const toggleText = document.getElementById('toggleText');
+      const estadoEncriptacion = document.getElementById('estadoEncriptacion');
+      
+      if (modoEncriptado) {
+        toggleText.textContent = 'Desencriptar';
+        estadoEncriptacion.textContent = 'Encriptado';
+        estadoEncriptacion.style.color = 'var(--warning)';
+      } else {
+        toggleText.textContent = 'Ver Encriptado';
+        estadoEncriptacion.textContent = 'Plano';
+        estadoEncriptacion.style.color = 'var(--success)';
+      }
+      
+      renderizarTabla();
+    }
+
+    // Cargar datos automáticamente al cargar la página (opcional)
+    // window.addEventListener('load', cargarDatos);
+  </script>
+</body>
+</html>

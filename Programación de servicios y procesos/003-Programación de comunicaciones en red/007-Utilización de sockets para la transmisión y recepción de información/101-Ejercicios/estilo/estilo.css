@@ -1,0 +1,518 @@
+/* =========================
+   Clean UI upgrade (drop-in)
+   Keeps your structure, improves polish
+   ========================= */
+
+/* ---------- Theme tokens ---------- */
+:root{
+  --bg: #ffffff;
+  --panel: #f3f4f6;
+  --panel-2: #eef0f3;
+  --border: rgba(0,0,0,0.10);
+  --border-2: rgba(0,0,0,0.06);
+  --text: #111827;
+  --muted: #6b7280;
+  --shadow: 0 10px 30px rgba(0,0,0,0.10);
+  --shadow-soft: 0 6px 18px rgba(0,0,0,0.08);
+
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+
+  --gap: 16px;
+  --pad: 20px;
+
+  --accent: #111;           /* keep black button */
+  --accent-2: #0b1220;      /* slightly richer black */
+  --focus: rgba(17, 24, 39, 0.18);
+}
+
+/* ---------- Base reset ---------- */
+*{ padding:0; margin:0; box-sizing:border-box; }
+html, body{
+  width:100%;
+  height:100%;
+  font-family: ubuntu, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  overflow: hidden; /* keep app-like */
+}
+
+p{
+  margin: 6px 0;
+  text-align: justify;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+a{ color: inherit; text-decoration: none; }
+::selection{ background: rgba(17,24,39,0.12); }
+
+body{
+  display:flex;
+  min-height: 100vh;
+}
+
+/* ---------- Desktop layout ---------- */
+nav{
+  flex:1;
+  min-width: 260px;
+  background: linear-gradient(180deg, var(--panel), var(--panel-2));
+  border-right: 1px solid var(--border);
+  display:flex;
+  flex-direction: column;
+}
+
+main{
+  flex:4;
+  min-width:0;
+  display:flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--bg);
+}
+
+/* ---------- Header ---------- */
+main header{
+  padding: var(--pad);
+  border-bottom: 1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+main header h1{
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+#logout{
+  cursor: pointer;
+  user-select: none;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-2);
+  background: rgba(0,0,0,0.03);
+  transition: transform .12s ease, background .2s ease, border-color .2s ease;
+}
+#logout:hover{
+  background: rgba(0,0,0,0.06);
+  border-color: var(--border);
+}
+#logout:active{ transform: scale(0.97); }
+
+/* ---------- Nav logo ---------- */
+nav img{
+  width: 52px;
+  margin: 18px;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.08));
+}
+
+/* ---------- Conversations list ---------- */
+nav #conversaciones{
+  height: calc(100vh - 90px);
+  padding: 18px;
+  display:flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Optional: if your conversation items are buttons/divs, this makes them look like list items */
+nav #conversaciones > *{
+  padding: 12px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.65);
+  border: 1px solid rgba(0,0,0,0.04);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.02);
+  transition: background .2s ease, transform .12s ease, border-color .2s ease;
+  cursor: pointer;
+}
+nav #conversaciones > *:hover{
+  background: rgba(255,255,255,0.85);
+  border-color: rgba(0,0,0,0.07);
+}
+nav #conversaciones > *:active{ transform: scale(0.99); }
+
+/* Nice scrollbars (Chromium/Edge) */
+nav #conversaciones::-webkit-scrollbar,
+main section::-webkit-scrollbar{
+  width: 10px;
+}
+nav #conversaciones::-webkit-scrollbar-thumb,
+main section::-webkit-scrollbar-thumb{
+  background: rgba(0,0,0,0.14);
+  border-radius: 999px;
+  border: 3px solid rgba(0,0,0,0);
+  background-clip: padding-box;
+}
+nav #conversaciones::-webkit-scrollbar-track,
+main section::-webkit-scrollbar-track{
+  background: rgba(0,0,0,0.03);
+}
+
+/* ---------- Chat area ---------- */
+main section{
+  padding: var(--pad);
+  display:flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  min-height:0;
+  background:
+    radial-gradient(900px 400px at 80% -10%, rgba(0,0,0,0.04), transparent 60%),
+    radial-gradient(900px 400px at -10% 10%, rgba(0,0,0,0.03), transparent 60%),
+    var(--bg);
+}
+
+/* Your welcome title */
+main section h1{
+  text-align: center;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 8px 0 4px 0;
+}
+
+/* Articles become “message blocks” */
+main section article{
+  padding: 0; /* bubble handles padding */
+}
+
+/* Bubble base */
+main section article{
+  display:flex;
+  flex-direction:column;
+}
+main section article > *{
+  max-width: 900px;
+}
+
+/* User bubble (existing class .usuario) */
+main section .usuario{
+  margin-left: auto;
+  width: min(80%, 860px);
+  background: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.045));
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 18px 18px 6px 18px;
+  padding: 14px 16px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+}
+
+/* If you have AI bubble class like .ia, this makes it look balanced */
+main section .ia{
+  margin-right: auto;
+  width: min(80%, 860px);
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--border);
+  border-radius: 18px 18px 18px 6px;
+  padding: 14px 16px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+}
+
+/* Code blocks */
+code{
+  background: rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 12px 12px;
+  border-radius: 12px;
+  display:block;
+  margin: 10px 0;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* Inline code if you ever use it */
+p code{
+  display:inline;
+  padding: 2px 6px;
+  margin: 0 2px;
+  border-radius: 8px;
+}
+
+/* ---------- Footer prompt ---------- */
+main footer{
+  padding: var(--pad);
+  border-top: 1px solid var(--border-2);
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+#prompt{
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 10px 12px;
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.06);
+  transition: border-color .2s ease, box-shadow .2s ease, transform .12s ease;
+}
+
+#prompt:focus-within{
+  border-color: rgba(17,24,39,0.25);
+  box-shadow: 0 12px 26px rgba(0,0,0,0.09);
+}
+
+#prompt input{
+  border:none;
+  width:100%;
+  outline:none;
+  font-size: 16px; /* prevents iOS zoom */
+  background: transparent;
+  color: var(--text);
+  padding: 6px 8px;
+}
+#prompt input::placeholder{
+  color: rgba(107,114,128,0.9);
+}
+
+#prompt button{
+  border:none;
+  width: 38px;
+  height: 38px;
+  color: white;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  border-radius: 999px;
+  line-height: 38px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 18px rgba(0,0,0,0.14);
+  transition: transform .12s ease, box-shadow .2s ease, filter .2s ease;
+}
+#prompt button:hover{
+  filter: brightness(1.05);
+  box-shadow: 0 12px 22px rgba(0,0,0,0.18);
+}
+#prompt button:active{ transform: scale(0.96); }
+
+/* ---------- Select (models) ---------- */
+select{
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.85);
+  color: var(--text);
+  outline:none;
+  min-width: 140px;
+  transition: box-shadow .2s ease, border-color .2s ease;
+}
+select:focus{
+  border-color: rgba(17,24,39,0.25);
+  box-shadow: 0 0 0 4px var(--focus);
+}
+
+/* ---------- Modal ---------- */
+#contienemodal{
+  position:absolute;
+  top:0; left:0;
+  width:100%;
+  height:100%;
+  background: rgba(0,0,0,0.70);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+#contienemodal #modal{
+  width: 860px;
+  max-width: 100%;
+  height: 420px;
+  max-height: 90vh;
+  padding: 22px;
+  background: rgba(255,255,255,0.92);
+  border-radius: 26px;
+  border: 1px solid rgba(0,0,0,0.10);
+  box-shadow: var(--shadow);
+  display:flex;
+  flex-direction: row;
+  gap: 18px;
+  justify-content:center;
+  align-items:center;
+}
+
+#contienemodal #modal img{
+  width: 52%;
+  height: auto;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.08));
+}
+
+/* Keep your existing flex rules, but improve spacing & typography */
+#contienemodal #modal *{
+  flex: 1;
+  display:flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items:center;
+  gap: 14px;
+}
+
+#contienemodal #modal h1{
+  font-size: 22px;
+  letter-spacing: 0.2px;
+}
+
+#contienemodal #modal input{
+  padding: 12px 14px;
+  text-align: center;
+  width: 240px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  outline: none;
+  background: rgba(255,255,255,0.85);
+  transition: box-shadow .2s ease, border-color .2s ease, transform .12s ease;
+}
+#contienemodal #modal input:focus{
+  border-color: rgba(17,24,39,0.25);
+  box-shadow: 0 0 0 4px var(--focus);
+}
+
+/* If your submit is also input[type=submit], make it button-like */
+#contienemodal #modal input[type="submit"]{
+  width: 240px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  color: white;
+  border: none;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 12px 22px rgba(0,0,0,0.16);
+}
+#contienemodal #modal input[type="submit"]:active{
+  transform: scale(0.98);
+}
+
+/* =========================
+   Responsive
+   ========================= */
+
+/* Tablet tweaks */
+@media (max-width: 900px){
+  nav{ min-width: 220px; }
+  main header, main section, main footer{ padding: 16px; }
+  #prompt{ padding: 10px 12px; }
+}
+
+/* Mobile: stack layout, horizontal nav */
+@media (max-width: 640px){
+  html, body{ height:100%; overflow:hidden; }
+  body{ flex-direction: column; }
+
+  nav{
+    flex:none;
+    width:100%;
+    min-width:0;
+    border-right:none;
+    border-bottom: 1px solid var(--border);
+    display:flex;
+    flex-direction: row;
+    align-items:center;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  nav img{
+    width: 34px;
+    margin: 0;
+    flex:none;
+  }
+
+  nav #conversaciones{
+    height:auto;
+    flex:1;
+    padding: 0;
+    overflow-x:auto;
+    overflow-y:hidden;
+    display:flex;
+    flex-direction: row;
+    gap: 10px;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+
+  nav #conversaciones > *{
+    flex:none;
+    display:inline-flex;
+    align-items:center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 999px;
+  }
+
+  main{ flex:1; min-height:0; }
+
+  main header{
+    padding: 12px;
+    gap: 10px;
+  }
+
+  main header h1{
+    font-size: 16px;
+  }
+
+  select{
+    min-width: 110px;
+    padding: 8px 10px;
+  }
+
+  main section{
+    padding: 12px;
+    gap: 12px;
+  }
+
+  main footer{ padding: 12px; }
+
+  #prompt{
+    padding: 10px 12px;
+    border-radius: 999px;
+  }
+
+  #prompt button{
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+  }
+
+  main section .usuario,
+  main section .ia{
+    width: 92%;
+  }
+
+  /* Modal becomes stacked */
+  #contienemodal #modal{
+    height:auto;
+    max-height: 90vh;
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  #contienemodal #modal img{
+    width: 120px;
+  }
+
+  #contienemodal #modal input{
+    width: 100%;
+    max-width: 320px;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 380px){
+  #prompt input{ font-size: 15px; }
+}
+
