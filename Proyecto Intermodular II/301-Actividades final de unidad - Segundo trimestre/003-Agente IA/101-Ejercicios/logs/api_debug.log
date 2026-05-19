@@ -1,0 +1,12 @@
+=== INICIO ===
+REQUEST: /dam-2/Proyecto%20Intermodular%20II/301-Actividades%20final%20de%20unidad%20-%20Segundo%20trimestre/003-Agente%20IA/101-Ejercicios/api/api_debug.php?action=obtener_mision&id=1
+Headers enviados
+config.php cargado
+database.php cargado
+Action: obtener_mision, ID: 1
+Conexión BD establecida
+Consultando misión ID: 1
+Misión encontrada: SÍ
+Consultando iteraciones
+Iteraciones encontradas: 13
+Preparando JSON de respuesta...

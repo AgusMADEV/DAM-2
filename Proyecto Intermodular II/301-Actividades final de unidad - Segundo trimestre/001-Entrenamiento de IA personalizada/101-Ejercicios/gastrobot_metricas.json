@@ -1,0 +1,37 @@
+[
+  {
+    "paso": 1,
+    "epoch": 0.174,
+    "loss": 4.280720233917236,
+    "learning_rate": 0.0,
+    "timestamp": "09:11:56"
+  },
+  {
+    "paso": 2,
+    "epoch": 0.348,
+    "loss": 6.886906623840332,
+    "learning_rate": 0.0002,
+    "timestamp": "09:30:50"
+  },
+  {
+    "paso": 3,
+    "epoch": 0.522,
+    "loss": 3.70932936668396,
+    "learning_rate": 0.00016,
+    "timestamp": "09:53:22"
+  },
+  {
+    "paso": 4,
+    "epoch": 0.696,
+    "loss": 3.311624050140381,
+    "learning_rate": 0.00012,
+    "timestamp": "10:52:03"
+  },
+  {
+    "paso": 5,
+    "epoch": 0.87,
+    "loss": 2.779689311981201,
+    "learning_rate": 8e-05,
+    "timestamp": "14:16:05"
+  }
+]

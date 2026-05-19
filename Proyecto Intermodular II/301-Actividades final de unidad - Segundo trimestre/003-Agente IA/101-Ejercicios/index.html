@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agente IA Autónomo - Panel de Control</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <h1>Agente IA Autónomo</h1>
+            </div>
+            <nav class="nav">
+                <button class="nav-btn active" data-view="dashboard">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </button>
+                <button class="nav-btn" data-view="misiones">
+                    <i class="fas fa-tasks"></i> Misiones
+                </button>
+                <button class="nav-btn" data-view="logs">
+                    <i class="fas fa-terminal"></i> Logs
+                </button>
+                <button class="nav-btn" data-view="config">
+                    <i class="fas fa-cog"></i> Configuración
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Dashboard View -->
+            <div id="view-dashboard" class="view active">
+                <div class="view-header">
+                    <h2>Panel de Control</h2>
+                    <button class="btn btn-primary" onclick="mostrarCrearMision()">
+                        <i class="fas fa-plus"></i> Nueva Misión
+                    </button>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #10b981;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="stat-completadas">0</div>
+                            <div class="stat-label">Completadas</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #3b82f6;">
+                            <i class="fas fa-spinner"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="stat-proceso">0</div>
+                            <div class="stat-label">En Proceso</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #f59e0b;">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="stat-pendientes">0</div>
+                            <div class="stat-label">Pendientes</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #8b5cf6;">
+                            <i class="fas fa-sync"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="stat-iteraciones">0</div>
+                            <div class="stat-label">Iteraciones</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Misiones Recientes -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Misiones Recientes</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="misiones-recientes" class="misiones-list">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Misiones View -->
+            <div id="view-misiones" class="view">
+                <div class="view-header">
+                    <h2>Misiones</h2>
+                    <button class="btn btn-primary" onclick="mostrarCrearMision()">
+                        <i class="fas fa-plus"></i> Nueva Misión
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div id="lista-misiones" class="misiones-list">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs View -->
+            <div id="view-logs" class="view">
+                <div class="view-header">
+                    <h2>Logs del Sistema</h2>
+                    <div class="filters">
+                        <select id="filter-nivel" class="filter-select">
+                            <option value="">Todos los niveles</option>
+                            <option value="debug">Debug</option>
+                            <option value="info">Info</option>
+                            <option value="warning">Warning</option>
+                            <option value="error">Error</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                        <button class="btn btn-secondary" onclick="cargarLogs()">
+                            <i class="fas fa-sync"></i> Actualizar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div id="logs-container" class="logs-container">
+                            <!-- Se llenará dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuración View -->
+            <div id="view-config" class="view">
+                <div class="view-header">
+                    <h2>Configuración</h2>
+                    <button class="btn btn-primary" onclick="guardarConfiguracion()">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <form id="form-config" class="config-form">
+                            <!-- Se llenará dinámicamente -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal: Crear Misión -->
+    <div id="modal-crear-mision" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nueva Misión</h3>
+                <button class="modal-close" onclick="cerrarModal('modal-crear-mision')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="form-crear-mision" onsubmit="crearMision(event)">
+                <div class="form-group">
+                    <label for="titulo">Título de la Misión</label>
+                    <input type="text" id="titulo" name="titulo" required 
+                           placeholder="Ej: Sistema de autenticación de usuarios">
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <textarea id="descripcion" name="descripcion" rows="3" 
+                              placeholder="Describe brevemente la misión..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="objetivo_final">Objetivo Final</label>
+                    <textarea id="objetivo_final" name="objetivo_final" rows="4" required
+                              placeholder="Describe el objetivo que el agente debe alcanzar..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="prioridad">Prioridad</label>
+                    <select id="prioridad" name="prioridad">
+                        <option value="baja">Baja</option>
+                        <option value="media" selected>Media</option>
+                        <option value="alta">Alta</option>
+                        <option value="critica">Crítica</option>
+                    </select>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" 
+                            onclick="cerrarModal('modal-crear-mision')">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-rocket"></i> Crear Misión
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Detalle de Misión -->
+    <div id="modal-detalle-mision" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3 id="detalle-titulo">Detalle de Misión</h3>
+                <button class="modal-close" onclick="cerrarModal('modal-detalle-mision')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="detalle-contenido">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

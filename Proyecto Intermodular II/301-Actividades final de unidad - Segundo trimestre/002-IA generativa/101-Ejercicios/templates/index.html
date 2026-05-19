@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InmoWeb AI - Generador de Sitios Inmobiliarios</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">🏠</div>
+                <h1>InmoWeb<span>AI</span></h1>
+                <p class="tagline">Genera sitios web inmobiliarios profesionales con IA</p>
+            </div>
+
+            <nav class="nav-menu">
+                <button class="nav-item active" data-view="generator">
+                    <span class="nav-icon">✨</span>
+                    <span class="nav-text">Generador</span>
+                </button>
+                <button class="nav-item" data-view="proyectos">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text">Mis Proyectos</span>
+                    <span class="badge" id="proyectos-count">0</span>
+                </button>
+                <button class="nav-item" data-view="plantillas">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">Plantillas</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Generaciones</span>
+                        <span class="stat-value" id="total-generaciones">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Guardados</span>
+                        <span class="stat-value" id="total-guardados">0</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <!-- VISTA: GENERADOR -->
+            <section id="view-generator" class="view active">
+                <header class="view-header">
+                    <h2>Generador de Sitios</h2>
+                    <p>Describe el sitio web que necesitas y la IA lo creará en segundos</p>
+                </header>
+
+                <div class="content-grid">
+                    <!-- COLUMNA IZQUIERDA: Formulario -->
+                    <div class="column-left">
+                        <form id="generator-form" class="generator-form">
+                            <div class="form-section">
+                                <label class="form-label">
+                                    <span class="label-icon">📝</span>
+                                    Descripción del sitio web
+                                </label>
+                                <textarea 
+                                    id="prompt" 
+                                    rows="4" 
+                                    placeholder="Ej: Landing page moderna para inmobiliaria de lujo, con galería de propiedades premium, formulario de contacto y mapa interactivo"
+                                    class="form-textarea"></textarea>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <span class="label-icon">🏢</span>
+                                        Tipo de propiedad
+                                    </label>
+                                    <select id="tipo-propiedad" class="form-select">
+                                        <option value="">Seleccionar...</option>
+                                        <option value="apartamentos">Apartamentos</option>
+                                        <option value="casas">Casas</option>
+                                        <option value="villas">Villas de lujo</option>
+                                        <option value="oficinas">Oficinas</option>
+                                        <option value="locales">Locales comerciales</option>
+                                        <option value="terrenos">Terrenos</option>
+                                        <option value="mixto">Mixto</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <span class="label-icon">💰</span>
+                                        Rango de precio
+                                    </label>
+                                    <select id="precio" class="form-select">
+                                        <option value="">Seleccionar...</option>
+                                        <option value="50k-150k">50K - 150K €</option>
+                                        <option value="150k-300k">150K - 300K €</option>
+                                        <option value="300k-500k">300K - 500K €</option>
+                                        <option value="500k-1M">500K - 1M €</option>
+                                        <option value="1M+">Más de 1M €</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <span class="label-icon">📍</span>
+                                    Ubicación
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="ubicacion" 
+                                    placeholder="Ej: Valencia, Costa Blanca, Madrid Centro..."
+                                    class="form-input">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <span class="label-icon">⭐</span>
+                                    Características destacadas
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="caracteristicas" 
+                                    placeholder="Ej: piscina, jardín, garaje, vistas al mar, cerca del metro..."
+                                    class="form-input">
+                            </div>
+
+                            <button type="submit" class="btn-generate" id="btn-generate">
+                                <span class="btn-icon">✨</span>
+                                <span class="btn-text">Generar Sitio Web</span>
+                            </button>
+
+                            <div id="status-message" class="status-message"></div>
+
+                            <div class="form-actions" id="form-actions" hidden>
+                                <button type="button" class="btn-secondary" id="btn-save">
+                                    <span>💾</span> Guardar Proyecto
+                                </button>
+                                <button type="button" class="btn-secondary" id="btn-copy">
+                                    <span>📋</span> Copiar HTML
+                                </button>
+                                <button type="button" class="btn-secondary" id="btn-download">
+                                    <span>⬇️</span> Descargar
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- PLANTILLAS RÁPIDAS -->
+                        <div class="quick-templates">
+                            <h3>⚡ Plantillas Rápidas</h3>
+                            <div class="template-grid">
+                                <button class="template-card" data-template="luxury">
+                                    <span class="template-icon">👑</span>
+                                    <span class="template-name">Inmobiliaria de Lujo</span>
+                                </button>
+                                <button class="template-card" data-template="modern">
+                                    <span class="template-icon">🏢</span>
+                                    <span class="template-name">Moderna y Minimalista</span>
+                                </button>
+                                <button class="template-card" data-template="vacation">
+                                    <span class="template-icon">🏖️</span>
+                                    <span class="template-name">Alquiler Vacacional</span>
+                                </button>
+                                <button class="template-card" data-template="commercial">
+                                    <span class="template-icon">🏪</span>
+                                    <span class="template-name">Comercial</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COLUMNA DERECHA: Preview -->
+                    <div class="column-right">
+                        <div class="preview-container">
+                            <div class="preview-header">
+                                <h3>👁️ Vista Previa</h3>
+                                <div class="preview-controls">
+                                    <button class="device-btn active" data-device="desktop" title="Escritorio">
+                                        🖥️
+                                    </button>
+                                    <button class="device-btn" data-device="tablet" title="Tablet">
+                                        📱
+                                    </button>
+                                    <button class="device-btn" data-device="mobile" title="Móvil">
+                                        📱
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="iframe-wrapper desktop">
+                                <iframe 
+                                    id="preview-frame" 
+                                    title="Vista previa del sitio generado"
+                                    sandbox="allow-same-origin allow-scripts allow-forms">
+                                </iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VISTA: MIS PROYECTOS -->
+            <section id="view-proyectos" class="view">
+                <header class="view-header">
+                    <h2>Mis Proyectos</h2>
+                    <p>Gestiona todos tus sitios web generados</p>
+                </header>
+
+                <div id="proyectos-list" class="proyectos-grid">
+                    <!-- Los proyectos se cargarán dinámicamente -->
+                </div>
+            </section>
+
+            <!-- VISTA: PLANTILLAS -->
+            <section id="view-plantillas" class="view">
+                <header class="view-header">
+                    <h2>Plantillas Predefinidas</h2>
+                    <p>Plantillas profesionales listas para usar</p>
+                </header>
+
+                <div class="plantillas-grid">
+                    <div class="plantilla-card">
+                        <div class="plantilla-preview">
+                            <div class="preview-placeholder">🏰</div>
+                        </div>
+                        <h3>Inmobiliaria de Lujo</h3>
+                        <p>Diseño elegante para propiedades premium con galerías sofisticadas</p>
+                        <button class="btn-use-template" data-template="luxury">Usar Plantilla</button>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <div class="plantilla-preview">
+                            <div class="preview-placeholder">🏢</div>
+                        </div>
+                        <h3>Moderna Minimalista</h3>
+                        <p>Diseño limpio y profesional para agencias modernas</p>
+                        <button class="btn-use-template" data-template="modern">Usar Plantilla</button>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <div class="plantilla-preview">
+                            <div class="preview-placeholder">🏖️</div>
+                        </div>
+                        <h3>Alquiler Vacacional</h3>
+                        <p>Diseño atractivo para propiedades vacacionales y turísticas</p>
+                        <button class="btn-use-template" data-template="vacation">Usar Plantilla</button>
+                    </div>
+
+                    <div class="plantilla-card">
+                        <div class="plantilla-preview">
+                            <div class="preview-placeholder">🏪</div>
+                        </div>
+                        <h3>Inmobiliaria Comercial</h3>
+                        <p>Enfocado en locales, oficinas y espacios comerciales</p>
+                        <button class="btn-use-template" data-template="commercial">Usar Plantilla</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL PARA GUARDAR PROYECTO -->
+    <div id="save-modal" class="modal" hidden>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💾 Guardar Proyecto</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Nombre del proyecto *</label>
+                    <input type="text" id="proyecto-nombre" class="form-input" placeholder="Ej: Villa Mediterránea Landing">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descripción breve</label>
+                    <textarea id="proyecto-descripcion" rows="3" class="form-textarea" placeholder="Breve descripción del proyecto..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="modal-cancel">Cancelar</button>
+                <button class="btn-primary" id="modal-save">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const GENERATE_URL = "{{ url_for('generate') }}";
+        const SAVE_URL = "{{ url_for('save_proyecto') }}";
+        const PROYECTOS_URL = "{{ url_for('listar_proyectos') }}";
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

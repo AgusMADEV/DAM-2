@@ -1,0 +1,30 @@
+[18-May-2026 18:12:02 Europe/Madrid] API Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'resultado_final' in 'field list' in D:\xampp\htdocs\DAM-2\Proyecto Intermodular II\301-Actividades final de unidad - Segundo trimestre\003-Agente IA\101-Ejercicios\api\api.php:436
+[18-May-2026 18:40:49 Europe/Madrid] PHP Warning:  require_once(classes/Database.php): Failed to open stream: No such file or directory in D:\xampp\htdocs\DAM-2\Proyecto Intermodular II\301-Actividades final de unidad - Segundo trimestre\003-Agente IA\101-Ejercicios\ver_resultados.php on line 3
+[18-May-2026 18:40:49 Europe/Madrid] PHP Fatal error:  Uncaught Error: Failed opening required 'classes/Database.php' (include_path='D:\xampp\php\PEAR') in D:\xampp\htdocs\DAM-2\Proyecto Intermodular II\301-Actividades final de unidad - Segundo trimestre\003-Agente IA\101-Ejercicios\ver_resultados.php:3
+Stack trace:
+#0 {main}
+  thrown in D:\xampp\htdocs\DAM-2\Proyecto Intermodular II\301-Actividades final de unidad - Segundo trimestre\003-Agente IA\101-Ejercicios\ver_resultados.php on line 3
+[18-May-2026 18:41:13 Europe/Madrid] PHP Warning:  require_once(classes/Database.php): Failed to open stream: No such file or directory in D:\xampp\htdocs\DAM-2\Proyecto Intermodular II\301-Actividades final de unidad - Segundo trimestre\003-Agente IA\101-Ejercicios\check_resultados.php on line 6
+[18-May-2026 18:41:13 Europe/Madrid] PHP Fatal error:  Uncaught Error: Failed opening required 'classes/Database.php' (include_path='D:\xampp\php\PEAR') in D:\xampp\htdocs\DAM-2\Proyecto Intermodular II\301-Actividades final de unidad - Segundo trimestre\003-Agente IA\101-Ejercicios\check_resultados.php:6
+Stack trace:
+#0 {main}
+  thrown in D:\xampp\htdocs\DAM-2\Proyecto Intermodular II\301-Actividades final de unidad - Segundo trimestre\003-Agente IA\101-Ejercicios\check_resultados.php on line 6
+[18-May-2026 18:45:06 Europe/Madrid] PHP Warning:  require(classes/Database.php): Failed to open stream: No such file or directory in D:\xampp\htdocs\DAM-2\Proyecto Intermodular II\301-Actividades final de unidad - Segundo trimestre\003-Agente IA\101-Ejercicios\ver_codigo_generado.php on line 3
+[18-May-2026 18:45:06 Europe/Madrid] PHP Fatal error:  Uncaught Error: Failed opening required 'classes/Database.php' (include_path='D:\xampp\php\PEAR') in D:\xampp\htdocs\DAM-2\Proyecto Intermodular II\301-Actividades final de unidad - Segundo trimestre\003-Agente IA\101-Ejercicios\ver_codigo_generado.php:3
+Stack trace:
+#0 {main}
+  thrown in D:\xampp\htdocs\DAM-2\Proyecto Intermodular II\301-Actividades final de unidad - Segundo trimestre\003-Agente IA\101-Ejercicios\ver_codigo_generado.php on line 3
+[18-May-2026 18:46:57 Europe/Madrid] PHP Warning:  require(classes/Database.php): Failed to open stream: No such file or directory in D:\xampp\htdocs\DAM-2\Proyecto Intermodular II\301-Actividades final de unidad - Segundo trimestre\003-Agente IA\101-Ejercicios\ver_codigo_generado.php on line 6
+[18-May-2026 18:46:57 Europe/Madrid] PHP Fatal error:  Uncaught Error: Failed opening required 'classes/Database.php' (include_path='D:\xampp\php\PEAR') in D:\xampp\htdocs\DAM-2\Proyecto Intermodular II\301-Actividades final de unidad - Segundo trimestre\003-Agente IA\101-Ejercicios\ver_codigo_generado.php:6
+Stack trace:
+#0 {main}
+  thrown in D:\xampp\htdocs\DAM-2\Proyecto Intermodular II\301-Actividades final de unidad - Segundo trimestre\003-Agente IA\101-Ejercicios\ver_codigo_generado.php on line 6
+[18-May-2026 18:52:57 Europe/Madrid] Error en obtenerIteracionCompleta: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'analisis' in 'field list'
+[18-May-2026 18:57:39 Europe/Madrid] Error en obtenerIteracionCompleta: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'analisis' in 'field list'
+[18-May-2026 18:59:40 Europe/Madrid] Error en obtenerIteracionCompleta: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'created_at' in 'field list'
+[18-May-2026 19:00:18 Europe/Madrid] Error en obtenerIteracionCompleta: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'created_at' in 'field list'
+[18-May-2026 20:02:00 Europe/Madrid] Error al guardar log en BD: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`agente_ia_autonomo`.`logs_agente`, CONSTRAINT `logs_agente_ibfk_1` FOREIGN KEY (`mision_id`) REFERENCES `misiones` (`id`) ON DELETE SET NULL)
+[18-May-2026 20:02:00 Europe/Madrid] Error al guardar log en BD: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`agente_ia_autonomo`.`logs_agente`, CONSTRAINT `logs_agente_ibfk_1` FOREIGN KEY (`mision_id`) REFERENCES `misiones` (`id`) ON DELETE SET NULL)
+[18-May-2026 20:02:00 Europe/Madrid] Error al guardar log en BD: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`agente_ia_autonomo`.`logs_agente`, CONSTRAINT `logs_agente_ibfk_1` FOREIGN KEY (`mision_id`) REFERENCES `misiones` (`id`) ON DELETE SET NULL)
+[18-May-2026 20:02:00 Europe/Madrid] Error al guardar log en BD: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`agente_ia_autonomo`.`logs_agente`, CONSTRAINT `logs_agente_ibfk_1` FOREIGN KEY (`mision_id`) REFERENCES `misiones` (`id`) ON DELETE SET NULL)
+[18-May-2026 20:02:00 Europe/Madrid] Error al guardar log en BD: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`agente_ia_autonomo`.`logs_agente`, CONSTRAINT `logs_agente_ibfk_1` FOREIGN KEY (`mision_id`) REFERENCES `misiones` (`id`) ON DELETE SET NULL)
